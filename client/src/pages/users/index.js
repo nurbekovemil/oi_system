@@ -23,8 +23,8 @@ const { Title } = Typography;
 
 const columns = [
   {
-    title: "Пользователь",
-    dataIndex: "firstName",
+    title: "Логин",
+    dataIndex: "login",
     key: "user",
     width: "30%",
   },
@@ -68,7 +68,7 @@ function Users() {
     isSuccess &&
     data.map((user) => ({
       key: user.id,
-      firstName: (
+      login: (
         <>
           <Avatar.Group>
             <Avatar
@@ -78,7 +78,7 @@ function Users() {
               icon={<UserOutlined />}
             ></Avatar>
             <div className="avatar-info">
-              <Title level={5}>{user.firstName}</Title>
+              <Title level={5}>{user.login}</Title>
             </div>
           </Avatar.Group>
         </>

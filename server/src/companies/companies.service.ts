@@ -8,7 +8,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Sequelize } from 'sequelize';
 import { Report } from 'src/reports/entities/report.entity';
 import * as bcrypt from 'bcryptjs';
-import { CompanyTemp } from './entities/company-temp.entity';
+import { CompanyTemplates } from './entities/company-templates.entity';
 import { BeforeSync } from 'sequelize-typescript';
 @Injectable()
 export class CompaniesService {
@@ -16,7 +16,8 @@ export class CompaniesService {
     @InjectModel(Company) private companyRepository: typeof Company,
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Report) private reportRepository: typeof Report,
-    @InjectModel(CompanyTemp) private companyTempRepository: typeof CompanyTemp,
+    @InjectModel(CompanyTemplates)
+    private companyTemplatesRepository: typeof CompanyTemplates,
 
     private UsersService: UsersService,
   ) {}
@@ -80,7 +81,7 @@ export class CompaniesService {
   }
 
   async getTemplate(form_type: string) {
-    const temp = await this.companyTempRepository.findOne({
+    const temp = await this.companyTemplatesRepository.findOne({
       where: {
         form_type,
       },
@@ -112,4 +113,14 @@ export class CompaniesService {
     }
     throw new HttpException('Некорректный пароль!', HttpStatus.BAD_REQUEST);
   }
+
+  //   async createMockData() {
+
+  //     try {
+  //       return this.companyRepository.bulkCreate(data);
+  //     } catch (error) {
+  //       console.log(error);
+  //       throw new HttpException(error, HttpStatus.BAD_REQUEST);
+  //     }
+  //   }
 }

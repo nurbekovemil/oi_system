@@ -21,7 +21,7 @@ const menuList = [
   },
   {
     path: "/dashboard/reports",
-    label: "Отчеты",
+    label: "Документы",
     icon: <ReconciliationOutlined />,
   },
   {

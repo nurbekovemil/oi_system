@@ -79,7 +79,7 @@ export class UsersService {
           attributes: ['name', 'id'],
         },
       ],
-      attributes: ['id', 'firstName'],
+      attributes: ['id', 'login'],
     });
   }
 

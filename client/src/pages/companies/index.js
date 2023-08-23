@@ -28,7 +28,7 @@ import {
   useRemoveCompanyMutation,
 } from "../../store/services/company-service";
 import { useState } from "react";
-const { Title, Text } = Typography;
+const { Paragraph, Title, Text } = Typography;
 const { confirm } = Modal;
 
 const columns = [
@@ -36,18 +36,20 @@ const columns = [
     title: "Название компании",
     dataIndex: "name",
     key: "name",
-    width: "50%",
+    width: "25%",
   },
   {
     title: "Пользователи",
     dataIndex: "users",
     key: "users",
+    width: "25%",
   },
 
   {
     title: "Отчеты",
     key: "reports",
     dataIndex: "reports",
+    width: "25%",
   },
   {
     title: "Действие",
@@ -108,7 +110,7 @@ const Companies = () => {
           ></Avatar>
           <div className="avatar-info">
             <Title level={5}>{company.name}</Title>
-            <p>{company.activity}</p>
+            <Paragraph>{company.activity}</Paragraph>
           </div>
         </Avatar.Group>
       ),
@@ -198,7 +200,7 @@ const Companies = () => {
                       borderColor: "#57b6c0",
                     }}
                   >
-                    Добавить
+                    Добавить компанию
                   </Button>
                 </Link>
               }

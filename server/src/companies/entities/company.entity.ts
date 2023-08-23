@@ -44,8 +44,17 @@ export class Company extends Model<Company, CompanyCreateAttrs> {
   @Column({ type: DataType.STRING })
   accounting: string;
 
-  @Column({ type: DataType.STRING, unique: true })
+  @Column({ type: DataType.STRING })
   inn: string;
+
+  @Column({ type: DataType.STRING })
+  kod: string;
+
+  @Column({ type: DataType.STRING })
+  opforma: string;
+
+  @Column({ type: DataType.STRING })
+  position: string;
 
   @HasMany(() => User)
   users: User[];

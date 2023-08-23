@@ -1,120 +1,46 @@
+import { useState } from "react";
+
+import { Row, Col, Card, Button } from "antd";
 import {
-  Row,
-  Col,
-  Card,
-  Radio,
-  Table,
-  Avatar,
-  Button,
-  Typography,
-  Tag,
-} from "antd";
-import {
-  CheckCircleOutlined,
-  SyncOutlined,
   PlusOutlined,
+  BarsOutlined,
+  ContainerOutlined,
 } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import NewReports from "../../components/report/NewReports";
+import OldReports from "../../components/report/OldReports";
 
-const { Title } = Typography;
-
-const columns = [
+const tabList = [
   {
-    title: "Тип отчета",
-    dataIndex: "report",
-    key: "report",
-    width: "32%",
+    key: "new",
+    tab: (
+      <span>
+        <BarsOutlined />
+        Новые
+      </span>
+    ),
   },
   {
-    title: "Дата",
-    dataIndex: "date",
-    key: "date",
-  },
-
-  {
-    title: "Статус",
-    key: "status",
-    dataIndex: "status",
-  },
-  {
-    title: "Действие",
-    key: "action",
-    dataIndex: "action",
+    key: "old",
+    tab: (
+      <span>
+        <ContainerOutlined />
+        Архив
+      </span>
+    ),
   },
 ];
 
-const data = [
-  {
-    key: "1",
-    report: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" shape="square" size={40}></Avatar>
-          <div className="avatar-info">
-            <Title level={5}>ОАО Банк "Бай-Тушум"</Title>
-            <p>Существенный факт</p>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    date: (
-      <>
-        <div className="author-info">
-          <p>23-04-2023/24-04-2023</p>
-        </div>
-      </>
-    ),
-    status: (
-      <>
-        <Tag icon={<CheckCircleOutlined />} color="success">
-          принят
-        </Tag>
-      </>
-    ),
-    action: (
-      <>
-        <h1>edit</h1>
-      </>
-    ),
-  },
-  {
-    key: "1",
-    report: (
-      <>
-        <Avatar.Group>
-          <Avatar className="shape-avatar" shape="square" size={40}></Avatar>
-          <div className="avatar-info">
-            <Title level={5}>ОАО Банк "Бай-Тушум"</Title>
-            <p>Существенный факт</p>
-          </div>
-        </Avatar.Group>
-      </>
-    ),
-    date: (
-      <>
-        <div className="author-info">
-          <p>23-04-2023/24-04-2023</p>
-        </div>
-      </>
-    ),
-    status: (
-      <>
-        <Tag icon={<SyncOutlined spin />} color="processing">
-          обработка
-        </Tag>
-      </>
-    ),
-    action: (
-      <>
-        <h1>edit</h1>
-      </>
-    ),
-  },
-];
+const contentList = {
+  new: <NewReports />,
+  old: <OldReports />,
+};
 
 function Reports() {
-  const onChange = (e) => console.log(`radio checked:${e.target.value}`);
-
+  const [activeTab, setActiveTab] = useState("new");
+  const onTabChange = (key) => {
+    setActiveTab(key);
+  };
   return (
     <>
       <div className="tabled">
@@ -123,9 +49,13 @@ function Reports() {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Отчеты"
+              title="Документы"
+              tabList={tabList}
+              onTabChange={(key) => {
+                onTabChange(key);
+              }}
               extra={
-                <Link to="/dashboard/reports/add">
+                <Link to="/dashboard/reports/types">
                   <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -134,19 +64,12 @@ function Reports() {
                       borderColor: "#57b6c0",
                     }}
                   >
-                    Добавить
+                    Создать документ
                   </Button>
                 </Link>
               }
             >
-              <div className="table-responsive">
-                <Table
-                  columns={columns}
-                  dataSource={data}
-                  pagination={false}
-                  className="ant-border-space"
-                />
-              </div>
+              <div className="table-responsive">{contentList[activeTab]}</div>
             </Card>
           </Col>
         </Row>

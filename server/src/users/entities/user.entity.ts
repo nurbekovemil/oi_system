@@ -31,9 +31,6 @@ export class User extends Model<User, UserCreateAttrs> {
   })
   id: number;
 
-  @Column({ type: DataType.STRING })
-  name: string;
-
   @Column({ type: DataType.STRING, unique: true })
   login: string;
 
@@ -50,7 +47,7 @@ export class User extends Model<User, UserCreateAttrs> {
   @Column({ type: DataType.STRING })
   lastName: string;
 
-  @Column({ type: DataType.STRING, unique: true })
+  @Column({ type: DataType.STRING })
   inn: string;
 
   @HasMany(() => Report)

@@ -7,11 +7,11 @@ import { User } from 'src/users/entities/user.entity';
 import { Report } from 'src/reports/entities/report.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
-import { CompanyTemp } from './entities/company-temp.entity';
+import { CompanyTemplates } from './entities/company-templates.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Company, CompanyTemp, User, Report]),
+    SequelizeModule.forFeature([Company, CompanyTemplates, User, Report]),
     JwtModule,
     UsersModule,
   ],

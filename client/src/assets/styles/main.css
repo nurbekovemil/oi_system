@@ -3064,3 +3064,16 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
   font-weight: 600 !important;
   color: #8c8c8c !important;
 }
+.ant-collapse {
+  border: none !important;
+  border-radius: 12px !important;
+}
+.ant-collapse > .ant-collapse-item {
+  border-bottom: none !important;
+}
+.ant-collapse-content {
+  border-top: none !important;
+}
+.ant-collapse-content > .ant-collapse-content-box {
+  padding: 16px;
+}

@@ -52,7 +52,7 @@ const CompanyView = () => {
     reports: <p>Отчеты</p>,
   };
   const [activeTab, setActiveTab] = useState("about");
-  const onTab1Change = (key) => {
+  const onTabChange = (key) => {
     setActiveTab(key);
   };
   console.log("data", data, id);
@@ -65,7 +65,7 @@ const CompanyView = () => {
           tabList={tabList}
           activeTabKey={activeTab}
           onTabChange={(key) => {
-            onTab1Change(key);
+            onTabChange(key);
           }}
           extra={
             <Link to={`/dashboard/companies/upd/${data.id}`}>

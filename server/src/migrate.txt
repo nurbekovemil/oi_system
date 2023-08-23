@@ -1,0 +1,27 @@
+SELECT jsonb_agg(
+	jsonb_build_object(
+		'id', id, 
+		'name', COALESCE(name, ''),
+		'activity', COALESCE(activity, ''),
+		'address', COALESCE(address, ''),
+		'phone_number', COALESCE(phone, ''),
+		'email', COALESCE(email, ''),
+		'director', COALESCE(sepervisor->>'dir', ''),
+		'accounting', COALESCE(sepervisor->>'buh', ''),
+		'position', COALESCE(sepervisor->>'position', ''),
+		'kod', kod,
+		'opforma', opforma,
+		'inn', LPAD(REPLACE(REPLACE(COALESCE(first_signers::text, '{}'), '{', ''), '}', ''), 14, '0')
+	)
+) AS json_data FROM tblcompany;
+
+
+SELECT jsonb_agg(
+	jsonb_build_object(
+		'id', id,
+		'login', COALESCE(login, ''),
+		'password', COALESCE(hash_pass, ''),
+		'companyId', idcompany,
+		'inn', LPAD(COALESCE(user_inn::text, ''), 14, '0')
+	)
+) AS json_data FROM users;

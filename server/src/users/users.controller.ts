@@ -13,7 +13,7 @@ import {
   Request,
 } from '@nestjs/common';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}

@@ -7,14 +7,17 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-interface CompanyTempCreateAttrs {
+interface CompanyTemplatesCreateAttrs {
   title: string;
   formType: string;
-  template: object;
+  template: object[];
 }
 
-@Table({ tableName: 'company_temp', timestamps: false })
-export class CompanyTemp extends Model<CompanyTemp, CompanyTempCreateAttrs> {
+@Table({ tableName: 'company_templates', timestamps: false })
+export class CompanyTemplates extends Model<
+  CompanyTemplates,
+  CompanyTemplatesCreateAttrs
+> {
   @Column({
     type: DataType.INTEGER,
     unique: true,

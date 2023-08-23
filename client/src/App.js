@@ -27,6 +27,7 @@ import "antd/dist/antd.css";
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
 import ReportForm from "./pages/reports/Form";
+import ReportTypes from "./pages/reports/Types";
 
 function App() {
   const [checkAuth, {}] = useLazyCheckAuthQuery();
@@ -46,7 +47,7 @@ function App() {
 
           <Route path="/dashboard/" element={<Private />}>
             <Route index element={<Home />} />
-            {/* Users routes */}
+            {/* User routes */}
             <Route path="/dashboard/users" element={<Users />} />
             <Route path="/dashboard/users/:formType" element={<UserForm />} />
             <Route
@@ -54,7 +55,7 @@ function App() {
               element={<UserForm />}
             />
             <Route path="/dashboard/users/view/:id" element={<UserView />} />
-            {/* Companies routes */}
+            {/* Company routes */}
             <Route path="/dashboard/companies" element={<Companies />} />
             <Route
               path="/dashboard/companies/:formType"
@@ -68,11 +69,14 @@ function App() {
               path="/dashboard/companies/view/:id"
               element={<CompanyView />}
             />
+            {/* Report routes */}
             <Route path="/dashboard/reports" element={<Reports />} />
+            <Route path="/dashboard/reports/types" element={<ReportTypes />} />
             <Route
-              path="/dashboard/reports/:formType"
+              path="/dashboard/reports/:formType/:reportType/:tempId/:reportId"
               element={<ReportForm />}
             />
+
             <Route path="/dashboard/billing" element={<Billing />} />
             <Route path="/dashboard/profile" element={<Profile />} />
             <Route path="*" element={<Navigate to="/dashboard/" />} />

@@ -17,7 +17,10 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.UsersService.getUserByLogin(loginDto.login);
     if (user && (await bcrypt.compare(loginDto.password, user.password))) {
-      const tokens = await this.TokenService.generateToken({ userId: user.id });
+      const tokens = await this.TokenService.generateToken({
+        userId: user.id,
+        companyId: user.companyId,
+      });
       await this.TokenService.saveToken(user.id, tokens.refreshToken);
       return {
         user: {
@@ -50,7 +53,10 @@ export class AuthService {
       );
     }
     const user = await this.UsersService.findUserByPk(userData.userId);
-    const tokens = await this.TokenService.generateToken({ userId: user.id });
+    const tokens = await this.TokenService.generateToken({
+      userId: user.id,
+      companyId: user.companyId,
+    });
     await this.TokenService.saveToken(user.id, tokens.refreshToken);
     return {
       user: {
