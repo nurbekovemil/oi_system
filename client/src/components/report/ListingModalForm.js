@@ -8,6 +8,7 @@ import {
   Space,
   Select,
   Modal,
+  Table,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useUpdateReportMutation } from "../../store/services/report-service";
@@ -31,6 +32,19 @@ const ListingModalForm = ({
     form.submit();
     onCancel();
   };
+
+  const onViewTableHandler = (inputArray) => {
+    if (inputArray) {
+      return inputArray.map((inputObject) => {
+        const outputObject = {};
+        for (const key in inputObject) {
+          const numericKey = parseInt(key.match(/\d+/)[0]);
+          outputObject[numericKey] = inputObject[key];
+        }
+        return outputObject;
+      });
+    }
+  };
   useEffect(() => {
     if (updData) {
       form.setFieldsValue(updData);
@@ -49,16 +63,13 @@ const ListingModalForm = ({
   };
   return (
     <Modal
-      width={"90%"}
+      width={"80%"}
       title={label}
       open={open}
       onCancel={onCancel}
-      onOk={onOk}
       okText="Сохранить"
-      onCancelText="Отмена"
-      style={{
-        top: "5%",
-      }}
+      onCancelText={"Отмена"}
+      onOk={onOk}
     >
       <Form
         form={form}
@@ -99,11 +110,13 @@ const ListingModalForm = ({
                 key={`${field}-${i}`}
               >
                 {element === "title" && (
-                  <Typography>
-                    <Title type={type} level={level}>
-                      {label}
-                    </Title>
-                  </Typography>
+                  <Title
+                    type={type}
+                    level={level}
+                    style={formType === "view" && { paddingTop: "20px" }}
+                  >
+                    {label}
+                  </Title>
                 )}
                 {element === "text" && (
                   <Space direction="vertical">
@@ -111,99 +124,141 @@ const ListingModalForm = ({
                   </Space>
                 )}
                 {element === "select" && (
-                  <Form.Item
-                    name={field}
-                    label={label}
-                    hasFeedback
-                    rules={[
-                      {
-                        required: required,
-                        message: `${label} обязательно`,
-                      },
-                    ]}
-                  >
-                    <Select
-                      showSearch
-                      placeholder={`${label} из списка`}
-                      className="header-search"
-                      options={options}
-                      optionFilterProp="children"
-                      filterOption={(input, opt) =>
-                        (opt?.label ?? "").includes(input)
-                      }
-                      filterSort={(optA, optB) =>
-                        (optA?.label ?? "")
-                          .toLowerCase()
-                          .localeCompare((optB?.label ?? "").toLowerCase())
-                      }
-                    />
-                  </Form.Item>
+                  <>
+                    {formType === "view" ? (
+                      <Title level={5}>
+                        {
+                          options.filter(
+                            (item) => item.value === form.getFieldValue(field)
+                          )[0]?.label
+                        }
+                      </Title>
+                    ) : (
+                      <Form.Item
+                        name={field}
+                        label={label}
+                        hasFeedback
+                        rules={[
+                          {
+                            required: required,
+                            message: `${label} обязательно`,
+                          },
+                        ]}
+                      >
+                        <Select
+                          showSearch
+                          placeholder={`${label} из списка`}
+                          className="header-search"
+                          options={options}
+                          optionFilterProp="children"
+                          filterOption={(input, opt) =>
+                            (opt?.label ?? "").includes(input)
+                          }
+                          filterSort={(optA, optB) =>
+                            (optA?.label ?? "")
+                              .toLowerCase()
+                              .localeCompare((optB?.label ?? "").toLowerCase())
+                          }
+                        />
+                      </Form.Item>
+                    )}
+                  </>
                 )}
                 {element === "input" && (
-                  <Form.Item
-                    label={label}
-                    name={field}
-                    rules={[
-                      {
-                        required: required,
-                        message: `${label} обязательно`,
-                        whitespace: true,
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Введите данные" />
-                  </Form.Item>
+                  <>
+                    {formType === "view" ? (
+                      <Text level={5}>{`${label}: ${form.getFieldValue(
+                        field
+                      )}`}</Text>
+                    ) : (
+                      <Form.Item
+                        label={label}
+                        name={field}
+                        rules={[
+                          {
+                            required: required,
+                            message: `${label} обязательно`,
+                            whitespace: true,
+                          },
+                        ]}
+                      >
+                        <Input placeholder="Введите данные" />
+                      </Form.Item>
+                    )}
+                  </>
                 )}
                 {element === "list" && (
-                  <Form.List name={field}>
-                    {(fields, { add, remove }) => (
-                      <>
-                        <Row gutter={16} align="middle">
-                          {headers.map((head, i) => (
-                            <Col span={head.span} key={`${field}-${i}`}>
-                              <div>{head.title}</div>
-                            </Col>
-                          ))}
-                        </Row>
+                  <>
+                    {formType === "view" ? (
+                      <Table
+                        columns={headers.map((h, i) => ({
+                          title: h.title,
+                          dataIndex: i + 1,
+                          ellipsis: {
+                            showTitle: false,
+                          },
+                        }))}
+                        locale={{
+                          emptyText: "Пусто",
+                        }}
+                        dataSource={onViewTableHandler(
+                          form.getFieldValue(field)
+                        )}
+                        bordered
+                        pagination={false}
+                      />
+                    ) : (
+                      <Form.List name={field}>
+                        {(fields, { add, remove }) => (
+                          <>
+                            <Row gutter={16} align="middle">
+                              {headers.map((head, i) => (
+                                <Col span={head.span} key={`${field}-${i}`}>
+                                  <div>{head.title}</div>
+                                </Col>
+                              ))}
+                            </Row>
 
-                        {fields.map(({ key, name, ...restField }) => (
-                          <Row gutter={16} key={key}>
-                            {lists.map((list) => (
-                              <Col span={list.span} key={list.field}>
-                                <Form.Item
-                                  {...restField}
-                                  name={[name, list.field]}
-                                >
-                                  <Input placeholder="Введите данные" />
-                                </Form.Item>
-                              </Col>
+                            {fields.map(({ key, name, ...restField }) => (
+                              <Row gutter={16} key={key}>
+                                {lists.map((list) => (
+                                  <Col span={list.span} key={list.field}>
+                                    <Form.Item
+                                      {...restField}
+                                      name={[name, list.field]}
+                                    >
+                                      <Input placeholder="Введите данные" />
+                                    </Form.Item>
+                                  </Col>
+                                ))}
+                                <Col span={1}>
+                                  <Form.Item>
+                                    <MinusCircleOutlined
+                                      color="primary"
+                                      onClick={() => remove(name)}
+                                    />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
                             ))}
-                            <Col span={1}>
-                              <Form.Item>
-                                <MinusCircleOutlined
-                                  color="primary"
-                                  onClick={() => remove(name)}
-                                />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        ))}
 
-                        {
-                          <Form.Item>
-                            <Button
-                              type="dashed"
-                              onClick={() => add()}
-                              block
-                              icon={<PlusOutlined />}
-                            >
-                              Добавить поле для ввода данных
-                            </Button>
-                          </Form.Item>
-                        }
-                      </>
+                            {
+                              <Form.Item>
+                                <Button
+                                  type="dashed"
+                                  onClick={() => add()}
+                                  block
+                                  icon={<PlusOutlined />}
+                                >
+                                  Добавить поле для ввода данных
+                                </Button>
+                              </Form.Item>
+                            }
+                          </>
+                        )}
+                      </Form.List>
                     )}
-                  </Form.List>
+                  </>
                 )}
                 {element === "rows" && (
                   <>
@@ -214,7 +269,14 @@ const ListingModalForm = ({
                         </Col>
                       ))}
                     </Row>
-                    <Row gutter={16}>
+                    <Row
+                      gutter={formType != "view" && 16}
+                      style={
+                        formType == "view" && {
+                          border: "1px solid #f0f0f0",
+                        }
+                      }
+                    >
                       {lists.map((list, i) => (
                         <Col
                           span={list.span}
@@ -222,11 +284,22 @@ const ListingModalForm = ({
                             (list.element === "title" && 2) ||
                             (list.offset && list.offset)
                           }
+                          style={
+                            formType == "view" && {
+                              border: "0.5px solid #f0f0f0",
+                            }
+                          }
                           key={`${list.field}-${i}`}
                         >
                           {list.element === "input" && list.disabled && (
                             <Form.Item>
-                              <Input disabled={true} value={list.value} />
+                              {formType === "view" ? (
+                                <Text style={{ padding: "0px 25px" }}>
+                                  {list.value}
+                                </Text>
+                              ) : (
+                                <Input disabled={true} value={list.value} />
+                              )}
                             </Form.Item>
                           )}
                           {list.element === "input" && !list.disabled && (
@@ -234,11 +307,26 @@ const ListingModalForm = ({
                               name={list.field}
                               initialValue={list.value}
                             >
-                              <Input placeholder="Введите данные" />
+                              {formType === "view" ? (
+                                <Text style={{ padding: "0px 25px" }}>
+                                  {form.getFieldValue(list.field)}
+                                </Text>
+                              ) : (
+                                <Input placeholder="Введите данные" />
+                              )}
                             </Form.Item>
                           )}
                           {list.element === "title" && (
-                            <Text strong>{list.value}</Text>
+                            <Text
+                              strong
+                              style={
+                                formType === "view" && {
+                                  padding: "0px 25px",
+                                }
+                              }
+                            >
+                              {list.value}
+                            </Text>
                           )}
                           {list.element === "text" && <Text>{list.value}</Text>}
                         </Col>
@@ -258,7 +346,11 @@ const ListingModalForm = ({
                       },
                     ]}
                   >
-                    <TextArea rows={4} placeholder="Введите данные" />
+                    {formType === "view" ? (
+                      <Text>{form.getFieldValue(field)}</Text>
+                    ) : (
+                      <TextArea rows={4} placeholder="Введите данные" />
+                    )}
                   </Form.Item>
                 )}
               </Col>

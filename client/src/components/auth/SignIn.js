@@ -66,7 +66,7 @@ const SignIn = () => {
               />
               <Card
                 title={<Title level={4}>Войти в личный кабинет</Title>}
-                bordered={true}
+                bordered={false}
                 className="criclebox"
               >
                 <Form layout="vertical" className="row-col" onFinish={onLogin}>

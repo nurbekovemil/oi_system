@@ -24,47 +24,6 @@ import {
 } from "../../store/services/user-service";
 import { useEffect } from "react";
 const { Title } = Typography;
-// const { Option } = Select;
-
-// const template = [
-//   {
-//     label: "Компания",
-//     element: "select",
-//     field: "companyId",
-//     value: "",
-//     option: optionCompanies,
-//   },
-//   {
-//     label: "Имя",
-//     element: "input",
-//     field: "firstName",
-//     value: "",
-//   },
-//   {
-//     label: "Фамилия",
-//     element: "input",
-//     field: "lastName",
-//     value: "",
-//   },
-//   {
-//     label: "ИНН",
-//     element: "input",
-//     field: "inn",
-//     value: "",
-//   },
-//   {
-//     label: "Логин",
-//     element: "input",
-//     field: "login",
-//     value: "",
-//   },
-//   {
-//     label: "Пароль",
-//     element: "input",
-//     field: "password",
-//     value: "",
-//   },
-// ];
 
 const UserForm = () => {
   // Параметры страницы тип формы formType и cid для получение компании по id
