@@ -12,14 +12,17 @@ const setCredentials = (state, action) => {
   state.user = action.payload.user;
 };
 
+const logoutHandler = (state, action) => {
+  localStorage.removeItem("accessToken");
+  state.isAuthenticated = false;
+  state.user = null;
+};
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout: (state, action) => {
-      state.isAuthenticated = false;
-      state.user = null;
-    },
+    logout: logoutHandler,
   },
   extraReducers: (builder) => {
     builder.addMatcher(authApi.endpoints.login.matchFulfilled, setCredentials);
@@ -27,9 +30,7 @@ const authSlice = createSlice({
       authApi.endpoints.checkAuth.matchFulfilled,
       setCredentials
     );
-    builder.addMatcher(authApi.endpoints.logout.matchFulfilled, () => {
-      console.log("logut extra reducer");
-    });
+    builder.addMatcher(authApi.endpoints.logout.matchFulfilled, logoutHandler);
   },
 });
 export const { logout } = authSlice.actions;

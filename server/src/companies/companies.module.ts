@@ -17,5 +17,6 @@ import { CompanyTemplates } from './entities/company-templates.entity';
   ],
   controllers: [CompaniesController],
   providers: [CompaniesService],
+  exports: [CompaniesService],
 })
 export class CompaniesModule {}

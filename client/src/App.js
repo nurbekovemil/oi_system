@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { useLazyCheckAuthQuery } from "./store/services/auth-service";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import Home from "./pages/Home";
 import Reports from "./pages/reports/index";
@@ -29,8 +30,14 @@ import "./assets/styles/responsive.css";
 import ReportForm from "./pages/reports/Form";
 import ReportTypes from "./pages/reports/Types";
 
+import moment from "moment";
+import "moment/locale/ru";
+import Eds from "./pages/Eds";
+
 function App() {
+  moment.locale("ru");
   const [checkAuth, {}] = useLazyCheckAuthQuery();
+
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
       checkAuth();
@@ -47,35 +54,47 @@ function App() {
 
           <Route path="/dashboard/" element={<Private />}>
             <Route index element={<Home />} />
-            {/* User routes */}
+
             <Route path="/dashboard/users" element={<Users />} />
+
             <Route path="/dashboard/users/:formType" element={<UserForm />} />
+
             <Route
               path="/dashboard/users/:formType/:id"
               element={<UserForm />}
             />
+
             <Route path="/dashboard/users/view/:id" element={<UserView />} />
-            {/* Company routes */}
+
             <Route path="/dashboard/companies" element={<Companies />} />
+
             <Route
               path="/dashboard/companies/:formType"
               element={<CompanyForm />}
             />
+
             <Route
               path="/dashboard/companies/:formType/:cid"
               element={<CompanyForm />}
             />
+
             <Route
               path="/dashboard/companies/view/:id"
               element={<CompanyView />}
             />
-            {/* Report routes */}
+
             <Route path="/dashboard/reports" element={<Reports />} />
             <Route path="/dashboard/reports/types" element={<ReportTypes />} />
             <Route
               path="/dashboard/reports/:formType/:reportType/:tempId/:reportId"
               element={<ReportForm />}
             />
+            <Route path="/dashboard/eds/:reportId" element={<Eds />} />
+
+            {/* <Route
+              path="/dashboard/reports/view/:reportType/:tempId/:reportId"
+              element={<ReportView />}
+            /> */}
 
             <Route path="/dashboard/billing" element={<Billing />} />
             <Route path="/dashboard/profile" element={<Profile />} />

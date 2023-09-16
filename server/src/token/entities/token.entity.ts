@@ -19,6 +19,6 @@ export class Token extends Model<Token, TokenCreateAttrs> {
   @Column({ type: DataType.INTEGER })
   userId: User;
 
-  @Column({ type: DataType.STRING, unique: true })
+  @Column({ type: DataType.TEXT, unique: true })
   refreshToken: string;
 }

@@ -11,6 +11,8 @@ import {
   Form,
   Space,
   Input,
+  Tooltip,
+  Spin,
 } from "antd";
 import {
   BarsOutlined,
@@ -27,7 +29,7 @@ import {
   useGetCompaniesQuery,
   useRemoveCompanyMutation,
 } from "../../store/services/company-service";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 const { Paragraph, Title, Text } = Typography;
 const { confirm } = Modal;
 
@@ -36,20 +38,7 @@ const columns = [
     title: "Название компании",
     dataIndex: "name",
     key: "name",
-    width: "25%",
-  },
-  {
-    title: "Пользователи",
-    dataIndex: "users",
-    key: "users",
-    width: "25%",
-  },
-
-  {
-    title: "Отчеты",
-    key: "reports",
-    dataIndex: "reports",
-    width: "25%",
+    width: "85%",
   },
   {
     title: "Действие",
@@ -62,28 +51,39 @@ const columns = [
 
 const items = [
   {
-    key: "view",
-    label: "Посмотреть",
-    icon: <EyeOutlined />,
-  },
-  {
     key: "upd",
     label: "Изменить",
     icon: <FormOutlined />,
+    description: "Изменить пользователя",
+    color: "#ffa940",
   },
   {
     key: "delete",
     label: "Удалить",
     danger: true,
     icon: <DeleteOutlined />,
+    description: "Удалить пользователя",
+    color: "#ff7a45",
   },
 ];
 
 const Companies = () => {
   const [form] = Form.useForm();
-  const { data, isSuccess } = useGetCompaniesQuery("");
+
+  const pageSizeOptions = [5, 10, 20];
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const getUsersHandler = (page, limit) => {
+    setCurrentPage(page);
+    setPageSize(limit);
+  };
+
+  const { data, isSuccess, isLoading, isFetching } = useGetCompaniesQuery({
+    page: currentPage,
+    limit: pageSize,
+  });
+
   const [removeCompany, {}] = useRemoveCompanyMutation();
-  const [confirmPassword, setConfirmPassword] = useState();
   const navigate = useNavigate();
   const onAction = (key, id) => {
     if (key === "view") {
@@ -98,7 +98,7 @@ const Companies = () => {
   };
   const companies =
     isSuccess &&
-    data.map((company) => ({
+    data?.rows.map((company) => ({
       key: company.id,
       name: (
         <Avatar.Group>
@@ -107,48 +107,58 @@ const Companies = () => {
             shape="square"
             size={40}
             icon={<BankOutlined />}
+            style={{
+              backgroundColor: "#57b6c0",
+            }}
           ></Avatar>
           <div className="avatar-info">
-            <Title level={5}>{company.name}</Title>
-            <Paragraph>{company.activity}</Paragraph>
+            <Tooltip title={company.name} placement="right">
+              <Title level={5}>
+                <Link to={`/dashboard/companies/view/${company.id}`}>
+                  {company.name.length > 50
+                    ? company.name.slice(0, 50) + "..."
+                    : company.name}
+                </Link>
+              </Title>
+            </Tooltip>
+            <Tooltip title={company.activity} placement="right">
+              <Text type="secondary">
+                {company.activity.length > 100
+                  ? company.activity.slice(0, 100) + "..."
+                  : company.activity}
+              </Text>
+            </Tooltip>
           </div>
         </Avatar.Group>
       ),
-      users: (
-        <div className="author-info">
-          <p>{company.countUsers}</p>
-        </div>
-      ),
-      reports: (
-        <div className="author-info">
-          <p>{company.countReports}</p>
-        </div>
-      ),
       action: (
-        <Dropdown
-          menu={{
-            items,
-            onClick: (event) => onAction(event.key, company.id),
-          }}
-          placement="bottomRight"
-        >
-          <Button
-            type="link"
-            icon={<BarsOutlined />}
-            style={{
-              width: "100%",
-            }}
-          >
-            Действие
-          </Button>
-        </Dropdown>
+        <Space>
+          {items.map((action) => (
+            <Fragment key={action.key}>
+              <Tooltip title={action.description}>
+                <Button
+                  type="primary"
+                  icon={action.icon}
+                  style={{
+                    background: action.color,
+                    borderColor: action.color,
+                    width: "120px",
+                  }}
+                  onClick={() => onAction(action.key, company.id)}
+                >
+                  {action.label}
+                </Button>
+              </Tooltip>
+            </Fragment>
+          ))}
+        </Space>
       ),
     }));
 
   const deleteCompany = (companyId) => {
     confirm({
       width: 500,
-      title: "Вы уверены, что хотите удалить эту компнию?",
+      title: "Вы уверены, что хотите удалить компнию?",
       icon: <ExclamationCircleOutlined />,
       content: (
         <>
@@ -189,7 +199,7 @@ const Companies = () => {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Компании"
+              title="Список компаний"
               extra={
                 <Link to="/dashboard/companies/add">
                   <Button
@@ -206,12 +216,32 @@ const Companies = () => {
               }
             >
               <div className="table-responsive">
-                <Table
-                  columns={columns}
-                  dataSource={companies}
-                  pagination={false}
-                  className="ant-border-space"
-                />
+                {isLoading || isFetching ? (
+                  <div
+                    style={{ padding: "16px 25px" }}
+                    className="d-flex justify-content-center"
+                  >
+                    <Spin />
+                  </div>
+                ) : (
+                  <Table
+                    columns={columns}
+                    dataSource={companies}
+                    className="ant-border-space"
+                    pagination={{
+                      pageSize,
+                      total: data?.count,
+                      pageSizeOptions,
+                      current: currentPage,
+                      locale: {
+                        items_per_page: " показано",
+                      },
+                      position: "bottomRight",
+                      onChange: (page, pageSize) =>
+                        getUsersHandler(page, pageSize),
+                    }}
+                  />
+                )}
               </div>
             </Card>
           </Col>

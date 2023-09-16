@@ -3,6 +3,7 @@ import { Row, Col, Button } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useLazyLogoutQuery } from "../../store/services/auth-service";
 
 const profile = [
   <svg
@@ -37,7 +38,13 @@ const toggler = [
 function Header({ onPress }) {
   useEffect(() => window.scrollTo(0, 0));
   const { user } = useSelector((state) => state.auth);
+  const [logout] = useLazyLogoutQuery();
   const navigate = useNavigate();
+
+  const logoutHandler = () => {
+    logout();
+    localStorage.removeItem("accessToken");
+  };
 
   const handleButtonClick = () => {
     navigate(-1); // Navigate back to the previous page
@@ -62,10 +69,9 @@ function Header({ onPress }) {
           >
             {toggler}
           </Button>
-          <Link to="/dashboard/profile" className="btn-sign-in">
-            {profile}
-            <span>{user.firstName}</span>
-          </Link>
+          <Button type="text" onClick={logoutHandler}>
+            Выйти
+          </Button>
         </Col>
       </Row>
     </>

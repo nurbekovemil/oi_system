@@ -1,3 +1,4 @@
+import { FilesService } from './../files/files.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ReportTypes } from './entities/report-types.entity';
@@ -11,6 +12,8 @@ import { Company } from 'src/companies/entities/company.entity';
 import { Sequelize } from 'sequelize';
 import { ReportGroups } from './entities/report-groups.entity';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { Eds } from 'src/eds/entities/ed.entity';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class ReportsService {
@@ -26,6 +29,10 @@ export class ReportsService {
     @InjectModel(Company) private companyRepository: typeof Company,
     @InjectModel(ReportTemplates)
     private reportTemplatesRepository: typeof ReportTemplates,
+    @InjectModel(Eds)
+    private edsRepository: typeof Eds,
+
+    private filesService: FilesService,
   ) {
     this.oi_old = new Sequelize({
       dialect: 'postgres',
@@ -71,105 +78,6 @@ export class ReportsService {
     return report.id;
   }
 
-  // mergeObjects(...objects) {
-  //   let mergedObj = {};
-
-  //   for (const obj of objects) {
-  //     for (const key in obj) {
-  //       if (Array.isArray(obj[key])) {
-  //         if (!mergedObj[key]) {
-  //           mergedObj[key] = [];
-  //         }
-  //         for (let i = 0; i < obj[key].length; i++) {
-  //           if (!mergedObj[key][i]) {
-  //             mergedObj[key][i] = {};
-  //           }
-  //           mergedObj[key][i] = this.mergeObjects(
-  //             mergedObj[key][i],
-  //             obj[key][i],
-  //           );
-  //         }
-  //       } else if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-  //         if (!mergedObj[key]) {
-  //           mergedObj[key] = {};
-  //         }
-  //         mergedObj[key] = this.mergeObjects(mergedObj[key], obj[key]);
-  //       } else {
-  //         mergedObj[key] = obj[key];
-  //       }
-  //     }
-  //   }
-
-  //   return mergedObj;
-  // }
-
-  // merge2Objects(...objects) {
-  //   let mergedObj = {};
-
-  //   for (const obj of objects) {
-  //     for (const key in obj) {
-  //       if (Array.isArray(obj[key])) {
-  //         if (!mergedObj[key]) {
-  //           mergedObj[key] = [];
-  //         }
-  //         if (obj[key].length === 0) {
-  //           // Set the value from obj2 even if it's an empty array
-  //           mergedObj[key] = obj[key];
-  //         } else if (mergedObj[key].length === 0) {
-  //           // Set a default value for an empty array
-  //           mergedObj[key] = [{}];
-  //         }
-  //         for (let i = 0; i < obj[key].length; i++) {
-  //           if (!mergedObj[key][i]) {
-  //             mergedObj[key][i] = {};
-  //           }
-  //           mergedObj[key][i] = this.mergeObjects(mergedObj[key][i], obj[key][i]);
-  //         }
-  //       } else if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-  //         if (!mergedObj[key]) {
-  //           mergedObj[key] = {};
-  //         }
-  //         mergedObj[key] = this.mergeObjects(mergedObj[key], obj[key]);
-  //       } else {
-  //         mergedObj[key] = obj[key];
-  //       }
-  //     }
-  //   }
-
-  //   return mergedObj;
-  // }
-
-  // mergeObjects(obj1, obj2) {
-  //   let mergedObj = { ...obj1 }; // Start with a copy of obj1
-
-  //   for (const key in obj2) {
-  //     if (Array.isArray(obj2[key])) {
-  //       // If obj2[key] is an array and obj1[key] is empty or undefined, use obj2[key]
-  //       if (!mergedObj[key] || mergedObj[key].length === 0) {
-  //         mergedObj[key] = obj2[key];
-  //       } else {
-  //         // Otherwise, merge the arrays element-wise
-  //         mergedObj[key] = mergedObj[key].map((item, index) =>
-  //           this.mergeObjects(item || {}, obj2[key][index] || {}),
-  //         );
-  //       }
-  //     } else if (typeof obj2[key] === 'object' && !Array.isArray(obj2[key])) {
-  //       // If obj2[key] is an object and obj1[key] is empty or undefined, use obj2[key]
-  //       if (!mergedObj[key]) {
-  //         mergedObj[key] = obj2[key];
-  //       } else {
-  //         // Otherwise, recursively merge the objects
-  //         mergedObj[key] = this.mergeObjects(mergedObj[key], obj2[key]);
-  //       }
-  //     } else {
-  //       // For all other cases, use obj2[key]
-  //       mergedObj[key] = obj2[key];
-  //     }
-  //   }
-
-  //   return mergedObj;
-  // }
-
   mergeObjects(obj1, obj2) {
     let mergedObj = { ...obj1 };
 
@@ -189,7 +97,7 @@ export class ReportsService {
     return mergedObj;
   }
 
-  async updateReport(updateReportDto: UpdateReportDto) {
+  async updateReport(updateReportDto: UpdateReportDto, file: any) {
     try {
       const { content, reportId } = updateReportDto;
       const report = await this.reportRepository.findByPk(reportId);
@@ -197,7 +105,24 @@ export class ReportsService {
         throw new HttpException('Документ не найден', HttpStatus.NOT_FOUND);
       }
       let parseContent = JSON.parse(report.content);
-      let newContent = this.mergeObjects(parseContent, content);
+      let newContent;
+      if (file) {
+        const { name, mimetype } = await this.filesService.createFile(file);
+        const { field, label } = JSON.parse(content);
+        newContent = this.mergeObjects(parseContent, {
+          [field]: [
+            {
+              name,
+              label,
+              url: `${process.env.SERVER_HOST}/reports/static/${name}`,
+              mimetype,
+            },
+          ],
+        });
+      } else {
+        newContent = this.mergeObjects(parseContent, content);
+      }
+
       report.content = JSON.stringify(newContent);
       report.save();
       return report;
@@ -205,13 +130,41 @@ export class ReportsService {
       console.log(error);
     }
   }
+
+  async uploadReportFile(file: any) {
+    const name = this.filesService.createFile(file);
+    return name;
+  }
+
+  async removeReportFile(path: { name: string }) {
+    return this.filesService.removeFile(path);
+  }
+
+  async sendReport({ id }) {
+    await this.updateReportStatus(id, 2);
+  }
+
   async getReportById(id: number) {
-    const report = await this.reportRepository.findByPk(id);
+    const report = await this.reportRepository.findOne({
+      where: { id },
+      include: [
+        {
+          model: this.edsRepository,
+          attributes: ['cert', 'typeId'],
+        },
+      ],
+    });
     return report;
   }
 
-  async getReports() {
-    const reports = await this.reportRepository.findAll({
+  async getReports({ roles, userId }, { limit, page }) {
+    // const { title } = roles[0];
+    const isAdmin = roles.some((role) =>
+      ['ADMIN', 'MODERATOR'].includes(role.title),
+    );
+    const allowedReportStatusIds = [2, 3, 4];
+    const offset = (page - 1) * limit;
+    const reports = await this.reportRepository.findAndCountAll({
       include: [
         {
           model: this.reportTypesRepository,
@@ -227,10 +180,22 @@ export class ReportsService {
           model: this.companyRepository,
           attributes: ['name', 'id'],
         },
+        {
+          model: this.edsRepository,
+          attributes: ['cert', 'typeId'],
+        },
       ],
       attributes: {
-        exclude: ['content', 'updatedAt', 'createdAt'],
+        exclude: ['content', 'createdAt'],
+        include: [
+          [sequelize.fn('DATE', sequelize.col('sendDate')), 'sendDate'],
+          [sequelize.fn('DATE', sequelize.col('confirmDate')), 'confirmDate'],
+        ],
       },
+      where: isAdmin ? { statusId: allowedReportStatusIds } : { userId },
+      limit,
+      offset,
+      order: [['updatedAt', 'DESC']],
     });
     return reports;
   }
@@ -247,8 +212,25 @@ export class ReportsService {
     return types;
   }
 
+  async getReportTypeById(id: number) {
+    const type = await this.reportTypesRepository.findByPk(id);
+    return type;
+  }
+
   async getReportTemplate(tid: number) {
     const template = await this.reportTemplatesRepository.findByPk(tid);
     return template;
+  }
+
+  async updateReportStatus(reportId, status) {
+    const report = await this.reportRepository.findByPk(reportId);
+    if (status == 2) {
+      report.sendDate = new Date();
+    }
+    if (status == 4) {
+      report.confirmDate = new Date();
+    }
+    report.statusId = status;
+    return await report.save();
   }
 }

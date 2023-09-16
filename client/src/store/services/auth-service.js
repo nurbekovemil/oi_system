@@ -8,6 +8,7 @@ const authApi = api.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Reports"],
     }),
     checkAuth: builder.query({
       query: () => ({

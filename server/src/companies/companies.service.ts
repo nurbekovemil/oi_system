@@ -34,26 +34,13 @@ export class CompaniesService {
     }
   }
 
-  async getCompaniesWithUserReportCount() {
-    const companies = await this.companyRepository.findAll({
-      include: [
-        {
-          model: this.userRepository,
-          attributes: [],
-        },
-        {
-          model: this.reportRepository,
-          attributes: [],
-        },
-      ],
-      attributes: [
-        'id',
-        'name',
-        'activity',
-        [Sequelize.fn('COUNT', Sequelize.col('users.id')), 'countUsers'],
-        [Sequelize.fn('COUNT', Sequelize.col('reports.id')), 'countReports'],
-      ],
-      group: ['Company.id'],
+  async getCompanies({ page, limit }) {
+    const offset = (page - 1) * limit;
+    console.log(page, limit);
+    const companies = await this.companyRepository.findAndCountAll({
+      attributes: ['id', 'name', 'activity'],
+      limit,
+      offset,
     });
     return companies;
   }
@@ -114,13 +101,15 @@ export class CompaniesService {
     throw new HttpException('Некорректный пароль!', HttpStatus.BAD_REQUEST);
   }
 
-  //   async createMockData() {
-
-  //     try {
-  //       return this.companyRepository.bulkCreate(data);
-  //     } catch (error) {
-  //       console.log(error);
-  //       throw new HttpException(error, HttpStatus.BAD_REQUEST);
-  //     }
-  //   }
+  async createMockData() {
+    const data = [];
+    try {
+      // return await this.companyRepository.bulkCreate(data);
+      // const users = await this.userRepository.bulkCreate(data);
+      return 'users';
+    } catch (error) {
+      console.log('mock data insert error ----- ', error);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

@@ -1,6 +1,9 @@
-import { Navigate, Outlet, useOutlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 import Main from "../layout/Main";
+import { useEffect } from "react";
+import { notification } from "antd";
 
 const Private = () => {
   const isAuth = useSelector((state) => state.auth.isAuthenticated);

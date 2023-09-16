@@ -6,7 +6,7 @@ async function start() {
     const PORT = process.env.PORT || 3000;
     const app = await NestFactory.create(AppModule);
     app.enableCors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CLIENT_HOST,
       credentials: true,
     });
     app.use(cookieParser());

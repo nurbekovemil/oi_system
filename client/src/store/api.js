@@ -5,7 +5,14 @@ const SERVER_HOST = process.env.REACT_APP_SERVER_HOST;
 const baseQuery = fetchBaseQuery({
   baseUrl: SERVER_HOST,
   credentials: "include",
-  tagTypes: ["Company", "UpdateCompany", "UserUpdate", "Reports"],
+  tagTypes: [
+    "Company",
+    "UpdateCompany",
+    "UserUpdate",
+    "Reports",
+    "UploadFile",
+    "ReportById",
+  ],
   prepareHeaders: (headers, { getState }) => {
     const token = localStorage.getItem("accessToken");
     if (token) {

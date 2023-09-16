@@ -7,10 +7,12 @@ import { Company } from 'src/companies/entities/company.entity';
 import { Sequelize } from 'sequelize';
 import { UserTemp } from './entities/user-temp.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Roles } from 'src/roles/entities/role.entity';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User) private userRepository: typeof User,
+    @InjectModel(Roles) private roleRepository: typeof Roles,
     @InjectModel(UserTemp) private userTempRepository: typeof UserTemp,
     @InjectModel(Company) private companyRepository: typeof Company,
   ) {}
@@ -22,7 +24,7 @@ export class UsersService {
     });
     if (condidate) {
       throw new HttpException(
-        { message: `User ${createUserDto.login} already exists` },
+        { message: `Пользователь ${createUserDto.login} уже существует` },
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -36,14 +38,32 @@ export class UsersService {
   async getUserByLogin(login: string) {
     return await this.userRepository.findOne({
       where: { login },
+      // include: { all: true },
+      include: [
+        {
+          model: this.roleRepository,
+          attributes: {
+            exclude: ['updatedAt', 'createdAt'],
+          },
+        },
+      ],
     });
   }
   async findUserByPk(id: number) {
     return await this.userRepository.findOne({
       where: { id },
       attributes: {
-        exclude: ['login', 'password', 'createdAt', 'updatedAt'],
+        exclude: ['password', 'createdAt', 'updatedAt'],
       },
+      // include: { all: true },
+      include: [
+        {
+          model: this.roleRepository,
+          attributes: {
+            exclude: ['updatedAt', 'createdAt'],
+          },
+        },
+      ],
     });
   }
   async getTemplate(form_type: string) {
@@ -71,8 +91,9 @@ export class UsersService {
     await user.save();
     return user;
   }
-  async findAll() {
-    return await this.userRepository.findAll({
+  async findAll({ page, limit }) {
+    const offset = (page - 1) * limit;
+    return await this.userRepository.findAndCountAll({
       include: [
         {
           model: this.companyRepository,
@@ -80,9 +101,10 @@ export class UsersService {
         },
       ],
       attributes: ['id', 'login'],
+      limit,
+      offset,
     });
   }
-
   async deleteUser({ id }: { id: number }) {
     const user = await this.userRepository.destroy({ where: { id } });
     return user;

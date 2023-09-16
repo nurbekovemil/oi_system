@@ -19,10 +19,7 @@ const userApi = api.injectEndpoints({
       invalidatesTags: ["UserUpdate"],
     }),
     getUsers: builder.query({
-      query: (data) => ({
-        url: "users",
-        method: "GET",
-      }),
+      query: ({ page, limit }) => `users?page=${page}&limit=${limit}`,
       providesTags: ["UserUpdate"],
     }),
     getUserById: builder.query({

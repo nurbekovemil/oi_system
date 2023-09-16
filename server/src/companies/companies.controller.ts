@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -32,8 +33,8 @@ export class CompaniesController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/')
-  getCompaniesWithUserReportCount() {
-    return this.companiesService.getCompaniesWithUserReportCount();
+  getCompanies(@Query() query) {
+    return this.companiesService.getCompanies(query);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -58,4 +59,9 @@ export class CompaniesController {
   getTemplate(@Param('form_type') form_type: string) {
     return this.companiesService.getTemplate(form_type);
   }
+
+  // @Get('/mock/test-data')
+  // createMockData() {
+  //   return this.companiesService.createMockData();
+  // }
 }

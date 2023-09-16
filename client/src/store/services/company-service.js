@@ -22,10 +22,7 @@ const companyApi = api.injectEndpoints({
       invalidatesTags: ["UpdateCompany"],
     }),
     getCompanies: builder.query({
-      query: () => ({
-        url: "companies",
-        method: "GET",
-      }),
+      query: ({ page, limit }) => `companies?page=${page}&limit=${limit}`,
       providesTags: ["Company"],
     }),
     getCompaniesForOption: builder.query({

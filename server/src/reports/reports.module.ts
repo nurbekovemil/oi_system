@@ -10,10 +10,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { ReportTypes } from './entities/report-types.entity';
 import { ReportTemplates } from './entities/report-templates.entity';
 import { ReportGroups } from './entities/report-groups.entity';
+import { FilesModule } from 'src/files/files.module';
+import { Eds } from 'src/eds/entities/ed.entity';
+import { Receipt } from 'src/receipts/entities/receipt.entity';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
+      Eds,
       Company,
       User,
       ReportTemplates,
@@ -21,10 +25,13 @@ import { ReportGroups } from './entities/report-groups.entity';
       ReportTypes,
       ReportStatus,
       Report,
+      Receipt,
     ]),
     JwtModule,
+    FilesModule,
   ],
   controllers: [ReportsController],
   providers: [ReportsService],
+  exports: [ReportsService],
 })
 export class ReportsModule {}

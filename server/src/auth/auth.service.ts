@@ -20,19 +20,22 @@ export class AuthService {
       const tokens = await this.TokenService.generateToken({
         userId: user.id,
         companyId: user.companyId,
+        roles: user.roles,
       });
       await this.TokenService.saveToken(user.id, tokens.refreshToken);
+
       return {
         user: {
           id: user.id,
           login: user.login,
           firstName: user.firstName,
           lastName: user.lastName,
+          roles: user.roles,
         },
         tokens,
       };
     }
-    throw new UnauthorizedException({ message: `Incorrect login or password` });
+    throw new UnauthorizedException({ message: 'Неверный логин или пароль' });
   }
   async logout(refreshToken) {
     return await this.TokenService.removeToken(refreshToken);
@@ -56,14 +59,17 @@ export class AuthService {
     const tokens = await this.TokenService.generateToken({
       userId: user.id,
       companyId: user.companyId,
+      roles: user.roles,
     });
     await this.TokenService.saveToken(user.id, tokens.refreshToken);
+
     return {
       user: {
         id: user.id,
         login: user.login,
         firstName: user.firstName,
         lastName: user.lastName,
+        roles: user.roles,
       },
       tokens,
     };

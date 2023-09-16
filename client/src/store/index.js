@@ -4,6 +4,7 @@ import authSlice from "./slices/auth-slice";
 import companySlice from "./slices/company-slice";
 import userSlice from "./slices/user-slice";
 import reportSlice from "./slices/report-slice";
+import messageSlice from "./slices/message-slice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     company: companySlice,
     user: userSlice,
     report: reportSlice,
+    message: messageSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),

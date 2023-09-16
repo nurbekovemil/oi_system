@@ -7,6 +7,9 @@ import {
   Button,
   Typography,
   Dropdown,
+  Space,
+  Tooltip,
+  Spin,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -18,12 +21,13 @@ import {
   BarsOutlined,
 } from "@ant-design/icons";
 import { useGetUsersQuery } from "../../store/services/user-service";
+import { Fragment, useState } from "react";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const columns = [
   {
-    title: "Логин",
+    title: "Логин пользователя",
     dataIndex: "login",
     key: "user",
     width: "30%",
@@ -44,29 +48,39 @@ const columns = [
 
 const items = [
   {
-    key: "view",
-    label: "Посмотреть",
-    icon: <EyeOutlined />,
-  },
-  {
     key: "upd",
     label: "Изменить",
     icon: <FormOutlined />,
+    description: "Изменить пользователя",
+    color: "#ffa940",
   },
   {
     key: "delete",
     label: "Удалить",
-    danger: true,
     icon: <DeleteOutlined />,
+    description: "Удалить пользователя",
+    color: "#ff7a45",
   },
 ];
 
 function Users() {
-  const { data, isSuccess } = useGetUsersQuery("");
+  const pageSizeOptions = [5, 10, 20];
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const getUsersHandler = (page, limit) => {
+    setCurrentPage(page);
+    setPageSize(limit);
+  };
+
+  const { data, isSuccess, isLoading, isFetching } = useGetUsersQuery({
+    page: currentPage,
+    limit: pageSize,
+  });
+
   const navigate = useNavigate();
   const users =
     isSuccess &&
-    data.map((user) => ({
+    data?.rows.map((user) => ({
       key: user.id,
       login: (
         <>
@@ -76,36 +90,44 @@ function Users() {
               shape="square"
               size={40}
               icon={<UserOutlined />}
+              style={{
+                backgroundColor: "#57b6c0",
+              }}
             ></Avatar>
             <div className="avatar-info">
-              <Title level={5}>{user.login}</Title>
+              <Link to={`/dashboard/users/view/${user.id}`}>{user.login}</Link>
             </div>
           </Avatar.Group>
         </>
       ),
       name: (
-        <div className="author-info">
-          <p>{user.company.name}</p>
-        </div>
+        <Link to={`/dashboard/companies/view/${user.company.id}`}>
+          {user?.company?.name.length > 50
+            ? user?.company?.name.slice(0, 50) + "..."
+            : user?.company?.name}
+        </Link>
       ),
       action: (
-        <Dropdown
-          menu={{
-            items,
-            onClick: (event) => onAction(event.key, user.id),
-          }}
-          placement="bottomRight"
-        >
-          <Button
-            type="link"
-            icon={<BarsOutlined />}
-            style={{
-              width: "100%",
-            }}
-          >
-            Действие
-          </Button>
-        </Dropdown>
+        <Space>
+          {items.map((action) => (
+            <Fragment key={action.key}>
+              <Tooltip title={action.description}>
+                <Button
+                  type="primary"
+                  icon={action.icon}
+                  style={{
+                    background: action.color,
+                    borderColor: action.color,
+                    width: "120px",
+                  }}
+                  onClick={() => onAction(action.key, user.id)}
+                >
+                  {action.label}
+                </Button>
+              </Tooltip>
+            </Fragment>
+          ))}
+        </Space>
       ),
     }));
   const onAction = (key, id) => {
@@ -127,7 +149,7 @@ function Users() {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Пользователи"
+              title="Список пользователей"
               extra={
                 <Link to="/dashboard/users/add">
                   <Button
@@ -138,18 +160,38 @@ function Users() {
                       borderColor: "#57b6c0",
                     }}
                   >
-                    Добавить
+                    Добавить пользователя
                   </Button>
                 </Link>
               }
             >
               <div className="table-responsive">
-                <Table
-                  columns={columns}
-                  dataSource={users}
-                  pagination={false}
-                  className="ant-border-space"
-                />
+                {isLoading || isFetching ? (
+                  <div
+                    style={{ padding: "16px 25px" }}
+                    className="d-flex justify-content-center"
+                  >
+                    <Spin />
+                  </div>
+                ) : (
+                  <Table
+                    columns={columns}
+                    dataSource={users}
+                    className="ant-border-space"
+                    pagination={{
+                      pageSize,
+                      total: data?.count,
+                      pageSizeOptions,
+                      current: currentPage,
+                      locale: {
+                        items_per_page: " показано",
+                      },
+                      position: "bottomRight",
+                      onChange: (page, pageSize) =>
+                        getUsersHandler(page, pageSize),
+                    }}
+                  />
+                )}
               </div>
             </Card>
           </Col>

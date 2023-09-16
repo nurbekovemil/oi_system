@@ -17,6 +17,16 @@ import { ReportStatus } from './reports/entities/report-status.entity';
 import { ReportGroups } from './reports/entities/report-groups.entity';
 import { FilesService } from './files/files.service';
 import { FilesModule } from './files/files.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { RolesModule } from './roles/roles.module';
+import { Roles } from './roles/entities/role.entity';
+import { RoleUsers } from './roles/entities/role-users.entity';
+import { EdsModule } from './eds/eds.module';
+import { Eds } from './eds/entities/ed.entity';
+import { EdsTypes } from './eds/entities/ed-types.entity';
+import { ReceiptsModule } from './receipts/receipts.module';
+import { Receipt } from './receipts/entities/receipt.entity';
 
 @Module({
   imports: [
@@ -40,6 +50,11 @@ import { FilesModule } from './files/files.module';
         Company,
         CompanyTemplates,
         Token,
+        Roles,
+        RoleUsers,
+        Eds,
+        EdsTypes,
+        Receipt,
       ],
       autoLoadModels: true,
       timezone: '+06:00',
@@ -51,6 +66,9 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     TokenModule,
     FilesModule,
+    RolesModule,
+    EdsModule,
+    ReceiptsModule,
   ],
   controllers: [],
   providers: [FilesService],

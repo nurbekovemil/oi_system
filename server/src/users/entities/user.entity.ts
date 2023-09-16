@@ -1,5 +1,6 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -10,6 +11,8 @@ import {
 
 import { Company } from 'src/companies/entities/company.entity';
 import { Report } from 'src/reports/entities/report.entity';
+import { RoleUsers } from 'src/roles/entities/role-users.entity';
+import { Roles } from 'src/roles/entities/role.entity';
 
 interface UserCreateAttrs {
   name: string;
@@ -55,4 +58,7 @@ export class User extends Model<User, UserCreateAttrs> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @BelongsToMany(() => Roles, () => RoleUsers)
+  roles: Roles[];
 }

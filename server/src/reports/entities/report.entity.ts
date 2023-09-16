@@ -5,11 +5,14 @@ import {
   ForeignKey,
   Model,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { Company } from 'src/companies/entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
 import { ReportTypes } from './report-types.entity';
 import { ReportStatus } from './report-status.entity';
+import { Eds } from 'src/eds/entities/ed.entity';
+import { Receipt } from 'src/receipts/entities/receipt.entity';
 
 interface ReportCreateAttrs {
   typeId: number;
@@ -64,4 +67,10 @@ export class Report extends Model<Report, ReportCreateAttrs> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @HasMany(() => Eds)
+  eds: Eds;
+
+  @HasMany(() => Receipt)
+  receipt: Receipt;
 }

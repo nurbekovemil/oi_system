@@ -9,6 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import NewReports from "../../components/report/NewReports";
 import OldReports from "../../components/report/OldReports";
+import { useSelector } from "react-redux";
 
 const tabList = [
   {
@@ -16,7 +17,7 @@ const tabList = [
     tab: (
       <span>
         <BarsOutlined />
-        Новые
+        Новые документы
       </span>
     ),
   },
@@ -25,7 +26,7 @@ const tabList = [
     tab: (
       <span>
         <ContainerOutlined />
-        Архив
+        Старые документы
       </span>
     ),
   },
@@ -38,6 +39,7 @@ const contentList = {
 
 function Reports() {
   const [activeTab, setActiveTab] = useState("new");
+  const { user } = useSelector((state) => state.auth);
   const onTabChange = (key) => {
     setActiveTab(key);
   };
@@ -49,24 +51,26 @@ function Reports() {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Документы"
+              title="Список документов"
               tabList={tabList}
               onTabChange={(key) => {
                 onTabChange(key);
               }}
               extra={
-                <Link to="/dashboard/reports/types">
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    style={{
-                      background: "#57b6c0",
-                      borderColor: "#57b6c0",
-                    }}
-                  >
-                    Создать документ
-                  </Button>
-                </Link>
+                user.roles[0].title == "USER" && (
+                  <Link to="/dashboard/reports/types">
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      style={{
+                        background: "#57b6c0",
+                        borderColor: "#57b6c0",
+                      }}
+                    >
+                      Создать документ
+                    </Button>
+                  </Link>
+                )
               }
             >
               <div className="table-responsive">{contentList[activeTab]}</div>
