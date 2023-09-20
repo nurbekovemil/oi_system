@@ -1,6 +1,7 @@
 client/node_modules
+client/build
 client/.env
 
 server/node_modules
-server/.env
-server/.gitignore
+server/.development.env
+server/.production.env
