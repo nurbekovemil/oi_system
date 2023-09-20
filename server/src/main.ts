@@ -12,7 +12,7 @@ async function start() {
     });
     app.use(cookieParser());
     await app.listen(PORT, HOST, () =>
-      console.log(`Server started on ${PORT}`),
+      console.log(`Server started on ${HOST} ${PORT}`),
     );
   } catch (error) {}
 }
