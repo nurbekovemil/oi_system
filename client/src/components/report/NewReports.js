@@ -8,6 +8,9 @@ import {
   Tooltip,
   Popover,
   Descriptions,
+  Popconfirm,
+  message,
+  Modal,
 } from "antd";
 import {
   FormOutlined,
@@ -19,10 +22,12 @@ import {
   AuditOutlined,
   SafetyCertificateOutlined,
   CheckOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import {
   useGetReportsQuery,
+  useRemoveReportMutation,
   useSendReportMutation,
 } from "../../store/services/report-service";
 import { StatusTag } from "./StatusTag";
@@ -31,6 +36,7 @@ import { Fragment, useState } from "react";
 import EdsCert from "../eds/EdsCert";
 import { useSelector } from "react-redux";
 const { Title, Text } = Typography;
+const { confirm } = Modal;
 
 const columns = [
   {
@@ -124,11 +130,11 @@ const items = [
     roles: ["USER", "ADMIN"],
   },
   {
-    key: "del",
+    key: "remove",
     label: "Удалить",
     icon: <DeleteOutlined />,
     description: "Удалить документ",
-    color: "#ff7a45",
+    color: "#ff4d4f",
     status: [1, 3, 5],
     roles: ["USER", "ADMIN"],
   },
@@ -147,6 +153,7 @@ function NewReports() {
   } = useGetReportsQuery({ page: currentPage, limit: pageSize });
 
   const [sendReport, {}] = useSendReportMutation();
+  const [removeReport, {}] = useRemoveReportMutation();
 
   const getReportsHandler = (page, limit) => {
     setCurrentPage(page);
@@ -160,7 +167,22 @@ function NewReports() {
   const updateReport = (id, reportType, tempId) =>
     navigate(`/dashboard/reports/upd/${reportType}/${tempId}/${id}`);
 
-  const deleteReport = () => {};
+  const deleteReport = (reportId) => {
+    confirm({
+      width: 500,
+      title: "Вы уверены, что хотите удалить документ?",
+      icon: <ExclamationCircleOutlined />,
+      okText: "Удалить",
+      okButtonProps: {
+        type: "primary",
+        danger: true,
+      },
+      cancelText: "Отмена",
+      onOk() {
+        removeReport({ reportId });
+      },
+    });
+  };
 
   const onAction = (key, id, reportType, tempId) => {
     if (key === "upd") {
@@ -174,6 +196,9 @@ function NewReports() {
     }
     if (key === "confirm") {
       signReport(id);
+    }
+    if (key === "remove") {
+      deleteReport(id);
     }
   };
   const reports =

@@ -39,6 +39,14 @@ const companyApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Reports"],
     }),
+    removeReport: builder.mutation({
+      query: (data) => ({
+        url: "reports/remove",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Reports"],
+    }),
     getReports: builder.query({
       query: ({ page, limit }) => `reports/sort/${page}/${limit}`,
       providesTags: ["Reports"],
@@ -81,4 +89,5 @@ export const {
   useCreateReportMutation,
   useUpdateReportMutation,
   useSendReportMutation,
+  useRemoveReportMutation,
 } = companyApi;

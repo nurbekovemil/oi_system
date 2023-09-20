@@ -32,11 +32,11 @@ import {
   useRemoveReportFileMutation,
   useGetReportTypeByIdQuery,
   useLazyGetReportsQuery,
-} from "../../store/services/report-service";
+} from "../../../store/services/report-service";
 
-import ListingModalForm from "../../components/report/ListingModalForm";
-import { debounce } from "../../hooks/useDebounce";
-import EdsCert from "../../components/eds/EdsCert";
+import ListingModalForm from "../../../components/report/ListingModalForm";
+import { debounce } from "../../../hooks/useDebounce";
+import EdsCert from "../../../components/eds/EdsCert";
 const { Meta } = Card;
 
 const { Title, Text } = Typography;
@@ -65,6 +65,7 @@ const ReportForm = () => {
 
   const { cert: edsData, typeId: edsType } =
     dataReportById?.eds.length > 0 && dataReportById?.eds[0];
+
   const {
     data: dataReportType,
     isSuccess,
@@ -135,11 +136,11 @@ const ReportForm = () => {
       const temp = JSON.parse(JSON.stringify(dataReportTemplate.template));
       setTemplate(temp);
 
-      const content = JSON.parse(dataReportById.content);
+      const content = dataReportById.content;
       form.setFieldsValue(content);
     }
     if (reportType == 2 && template.length && isSuccessGetReportById) {
-      const data = JSON.parse(dataReportById.content);
+      const data = dataReportById.content;
       const addFieldTemplate = [...template];
       for (const prop in data) {
         if (prop.slice(0, 10) == "other_file") {
@@ -170,7 +171,7 @@ const ReportForm = () => {
     formData.append("content", JSON.stringify({ field, label }));
     // after upload file rename from server generated name for example: c9020844-f6a2-4657-8dec-dca254fab141.pdf
     const response = await updateReport(formData);
-    const parseData = JSON.parse(response.data.content);
+    const parseData = response.data.content;
     // set object with new name
     form.setFieldsValue({ [field]: parseData[field] });
   };

@@ -16,7 +16,7 @@ import {
   useGetCompanyTemplateQuery,
   useLazyGetCompanyByIdQuery,
   useUpdateCompanyMutation,
-} from "../../store/services/company-service";
+} from "../../../store/services/company-service";
 import { useEffect, useState } from "react";
 const { Title } = Typography;
 

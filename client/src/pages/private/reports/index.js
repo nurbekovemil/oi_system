@@ -7,8 +7,8 @@ import {
   ContainerOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import NewReports from "../../components/report/NewReports";
-import OldReports from "../../components/report/OldReports";
+import NewReports from "../../../components/report/NewReports";
+import OldReports from "../../../components/report/OldReports";
 import { useSelector } from "react-redux";
 
 const tabList = [

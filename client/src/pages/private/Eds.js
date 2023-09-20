@@ -18,10 +18,10 @@ import {
   useConfirmPinCodeMutation,
   useSendPinCodeMutation,
   useSignRutokenMutation,
-} from "../store/services/eds-service";
+} from "../../store/services/eds-service";
 
 import rutokenplugin from "@aktivco/rutoken-plugin";
-import { useLazyGetReportByIdQuery } from "../store/services/report-service";
+import { useLazyGetReportByIdQuery } from "../../store/services/report-service";
 
 const { Title, Text } = Typography;
 const Eds = () => {
@@ -126,7 +126,7 @@ const Eds = () => {
       const hash = await plugin.sign(
         currentRutoken.value,
         currentCert.value,
-        data.content,
+        JSON.stringify(data.content),
         plugin.DATA_FORMAT_PLAIN,
         options
       );

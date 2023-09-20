@@ -14,14 +14,14 @@ import { SaveOutlined, BulbOutlined, CopyOutlined } from "@ant-design/icons";
 import {
   useGetCompaniesForOptionQuery,
   useLazyGetCompanyByIdQuery,
-} from "../../store/services/company-service";
-import useLoginPasswordGenerator from "../../hooks/useLoginPasswordGenerator";
+} from "../../../store/services/company-service";
+import useLoginPasswordGenerator from "../../../hooks/useLoginPasswordGenerator";
 import {
   useCreateUserMutation,
   useGetUserTemplateQuery,
   useLazyGetUserByIdQuery,
   useUpdateUserMutation,
-} from "../../store/services/user-service";
+} from "../../../store/services/user-service";
 import { useEffect } from "react";
 const { Title } = Typography;
 

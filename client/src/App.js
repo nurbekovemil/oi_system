@@ -8,31 +8,36 @@ import { useLazyCheckAuthQuery } from "./store/services/auth-service";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
-import Home from "./pages/Home";
-import Reports from "./pages/reports/index";
-import Billing from "./pages/Billing";
-import Profile from "./pages/Profile";
-import Auth from "./pages/Auth";
-import Users from "./pages/users/index";
-import UserForm from "./pages/users/Form";
-import UserView from "./pages/users/View";
+import Home from "./pages/private/Home";
 
-import Companies from "./pages/companies/index";
-import CompanyForm from "./pages/companies/Form";
-import CompanyView from "./pages/companies/View";
+import Billing from "./pages/Billing";
+import Profile from "./pages/private/Profile";
+import Auth from "./pages/public/Auth";
 
 import Public from "./components/route/Public";
 import Private from "./components/route/Private";
 
+import Companies from "./pages/private/companies/index";
+import CompanyForm from "./pages/private/companies/Form";
+import CompanyView from "./pages/private/companies/View";
+
 import "antd/dist/antd.css";
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
-import ReportForm from "./pages/reports/Form";
-import ReportTypes from "./pages/reports/Types";
+
+import Reports from "./pages/private/reports/index";
+import ReportForm from "./pages/private/reports/Form";
+import ReportTypes from "./pages/private/reports/Types";
+
+import Users from "./pages/private/users/index";
+import UserForm from "./pages/private/users/Form";
+import UserView from "./pages/private/users/View";
 
 import moment from "moment";
 import "moment/locale/ru";
-import Eds from "./pages/Eds";
+import Eds from "./pages/private/Eds";
+import ReportPublicView from "./pages/public/reports/View";
+import ListingView from "./pages/public/reports/ListingView";
 
 function App() {
   moment.locale("ru");
@@ -49,6 +54,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Public />}>
             <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/report/:reportType/:tempId/:reportId"
+              element={<ReportPublicView />}
+            />
+            <Route
+              path="/report/:name/:reportType/:tempId/:reportId"
+              element={<ListingView />}
+            />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>
 

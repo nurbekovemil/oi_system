@@ -39,8 +39,8 @@ export class Report extends Model<Report, ReportCreateAttrs> {
   @Column({ type: DataType.INTEGER })
   statusId: number;
 
-  @Column({ type: DataType.TEXT })
-  content: string;
+  @Column({ type: DataType.JSON })
+  content: object;
 
   @Column({ type: DataType.DATE })
   sendDate: Date;

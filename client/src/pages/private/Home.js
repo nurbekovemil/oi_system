@@ -6,7 +6,7 @@ import {
   FileTextOutlined,
 } from "@ant-design/icons";
 
-import Echart from "../components/chart/EChart";
+import Echart from "../../components/chart/EChart";
 
 const data = [
   {

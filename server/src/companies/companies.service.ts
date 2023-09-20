@@ -79,7 +79,7 @@ export class CompaniesService {
   async updateCompany(updateCompanyDto: UpdateCompanyDto) {
     const company = await this.companyRepository.findByPk(updateCompanyDto.id);
     if (!company) {
-      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+      throw new HttpException('Компания не найден', HttpStatus.NOT_FOUND);
     }
 
     // Update the company's attributes with the new data

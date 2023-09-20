@@ -27,6 +27,8 @@ import { Eds } from './eds/entities/ed.entity';
 import { EdsTypes } from './eds/entities/ed-types.entity';
 import { ReceiptsModule } from './receipts/receipts.module';
 import { Receipt } from './receipts/entities/receipt.entity';
+import { OiKseModule } from './oi_kse/oi_kse.module';
+import { OiKse } from './oi_kse/entities/oi_kse.entity';
 
 @Module({
   imports: [
@@ -55,6 +57,7 @@ import { Receipt } from './receipts/entities/receipt.entity';
         Eds,
         EdsTypes,
         Receipt,
+        OiKse,
       ],
       autoLoadModels: true,
       timezone: '+06:00',
@@ -69,6 +72,7 @@ import { Receipt } from './receipts/entities/receipt.entity';
     RolesModule,
     EdsModule,
     ReceiptsModule,
+    OiKseModule,
   ],
   controllers: [],
   providers: [FilesService],

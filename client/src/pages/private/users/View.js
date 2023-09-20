@@ -3,35 +3,30 @@ import { Card, Typography, Button } from "antd";
 import { useParams, Link } from "react-router-dom";
 import {
   SolutionOutlined,
-  TeamOutlined,
   ProjectOutlined,
   FormOutlined,
 } from "@ant-design/icons";
+import { useGetUserByIdQuery } from "../../../store/services/user-service";
+import { useGetCompanyByIdQuery } from "../../../store/services/company-service";
+import AboutUser from "../../../components/user/AboutUser";
 
-import { useGetCompanyByIdQuery } from "../../store/services/company-service";
-import AboutCompany from "../../components/company/AboutCompany";
 const { Title } = Typography;
 
-const CompanyView = () => {
+const UserView = () => {
   const { id } = useParams();
-  const { data, isSuccess } = useGetCompanyByIdQuery(id);
-
+  const { data: dataUser, isSuccess: isSuccessUser } = useGetUserByIdQuery(id);
+  const { companyId } = isSuccessUser && dataUser;
+  const { data: dataCompany, isSuccess: isSuccessCompany } =
+    useGetCompanyByIdQuery(companyId, {
+      skip: !isSuccessUser,
+    });
   const tabList = [
     {
       key: "about",
       tab: (
         <span>
           <SolutionOutlined />
-          Профиль компании
-        </span>
-      ),
-    },
-    {
-      key: "employees",
-      tab: (
-        <span>
-          <TeamOutlined />
-          Сотрудники
+          Профиль пользователя
         </span>
       ),
     },
@@ -45,36 +40,33 @@ const CompanyView = () => {
       ),
     },
   ];
-
   const contentList = {
-    about: <AboutCompany data={data} />,
-    employees: <p>Сотрудники</p>,
+    about: <AboutUser dataUser={dataUser} dataCompany={dataCompany} />,
     reports: <p>Отчеты</p>,
   };
   const [activeTab, setActiveTab] = useState("about");
-  const onTabChange = (key) => {
+  const onTab1Change = (key) => {
     setActiveTab(key);
   };
-  console.log("data", data, id);
   return (
     <>
-      {isSuccess && (
+      {isSuccessCompany && (
         <Card
           bordered={false}
           className="criclebox mb-24"
           tabList={tabList}
           activeTabKey={activeTab}
           onTabChange={(key) => {
-            onTabChange(key);
+            onTab1Change(key);
           }}
           extra={
-            <Link to={`/dashboard/companies/upd/${data.id}`}>
+            <Link to={`/dashboard/users/upd/${dataUser.id}`}>
               <Button type="link" icon={<FormOutlined />}>
                 Изменить
               </Button>
             </Link>
           }
-          title={<Title level={4}>Информация о компании</Title>}
+          title={<Title level={4}>Информация о пользователя</Title>}
         >
           {contentList[activeTab]}
         </Card>
@@ -83,4 +75,4 @@ const CompanyView = () => {
   );
 };
 
-export default CompanyView;
+export default UserView;

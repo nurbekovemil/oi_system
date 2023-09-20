@@ -7,7 +7,7 @@ const Public = () => {
   return (
     <>
       {location.pathname == "/auth" && isAuth ? (
-        <Navigate to="/dashboard/profile" />
+        <Navigate to="/dashboard/reports" />
       ) : (
         <Outlet />
       )}

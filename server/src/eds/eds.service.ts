@@ -30,8 +30,7 @@ export class EdsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      // test code
-      return true;
+
       const response = await axios.post(
         url,
         {
@@ -65,7 +64,9 @@ export class EdsService {
         pin,
       );
       const cert = await this.getEdsCertificate(token);
-      const hashDocument = Buffer.from(content).toString('base64');
+      const hashDocument = Buffer.from(JSON.stringify(content)).toString(
+        'base64',
+      );
       const signedDocument = await this.signEdsDocument(hashDocument, token);
 
       if (await this.isAdmin(roles)) {

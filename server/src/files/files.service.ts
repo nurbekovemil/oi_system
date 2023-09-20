@@ -7,7 +7,6 @@ import * as uuid from 'uuid';
 export class FilesService {
   async createFile(file) {
     try {
-      console.log(file);
       const fileExtension = file.originalname.split('.')[1];
       const name = uuid.v4() + `.${fileExtension}`;
       const filePath = path.resolve(__dirname, '..', 'static');
@@ -25,7 +24,6 @@ export class FilesService {
     }
   }
   async removeFile({ name }: { name: string }) {
-    console.log('fileName: ', name);
     const filePath = path.resolve(__dirname, '..', `static/${name}`);
     fs.unlink(filePath, (err) => {
       if (err) {

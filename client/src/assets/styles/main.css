@@ -3104,3 +3104,11 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
 .ant-notification-notice {
   border-radius: 12px !important;
 }
+.ant-popover-inner {
+  border-radius: 12px !important;
+
+}
+.ant-modal-content {
+  border-radius: 12px !important;
+
+}

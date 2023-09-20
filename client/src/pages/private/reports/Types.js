@@ -5,7 +5,7 @@ import { FileTextOutlined } from "@ant-design/icons";
 import {
   useGetReportTypesQuery,
   useCreateReportMutation,
-} from "../../store/services/report-service";
+} from "../../../store/services/report-service";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -44,7 +44,10 @@ const ReportTypes = () => {
           <Collapse accordion defaultActiveKey={["1"]}>
             {isSuccessReportTypes &&
               dataReportTypes.map((type, i) => (
-                <Panel header={type.title} key={i + 1}>
+                <Panel
+                  header={<Title level={5}>{type.title}</Title>}
+                  key={i + 1}
+                >
                   <List
                     itemLayout="horizontal"
                     dataSource={type.types}
@@ -60,8 +63,18 @@ const ReportTypes = () => {
                         }
                       >
                         <List.Item.Meta
-                          avatar={<FileTextOutlined />}
-                          title={item.title}
+                          avatar={
+                            <Avatar
+                              size={30}
+                              style={{
+                                backgroundColor: "#57b6c0",
+                              }}
+                              shape="square"
+                              icon={<FileTextOutlined />}
+                            />
+                          }
+                          // title={<Text type="secondary">{item.title}</Text>}
+                          description={<Text type="">{item.title}</Text>}
                         />
                       </List.Item>
                     )}

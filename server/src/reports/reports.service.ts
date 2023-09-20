@@ -9,7 +9,7 @@ import { ReportStatus } from './entities/report-status.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/companies/entities/company.entity';
 
-import { Sequelize } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { ReportGroups } from './entities/report-groups.entity';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { Eds } from 'src/eds/entities/ed.entity';
@@ -44,7 +44,7 @@ export class ReportsService {
     });
   }
 
-  // get old company reports
+  // get old company reports from old oi system
   async getOldReports(userId: number) {
     const queryString = `
     SELECT 
@@ -104,7 +104,7 @@ export class ReportsService {
       if (!report) {
         throw new HttpException('Документ не найден', HttpStatus.NOT_FOUND);
       }
-      let parseContent = JSON.parse(report.content);
+      let parseContent = report.content;
       let newContent;
       if (file) {
         const { name, mimetype } = await this.filesService.createFile(file);
@@ -123,7 +123,7 @@ export class ReportsService {
         newContent = this.mergeObjects(parseContent, content);
       }
 
-      report.content = JSON.stringify(newContent);
+      report.content = newContent;
       report.save();
       return report;
     } catch (error) {
@@ -232,5 +232,54 @@ export class ReportsService {
     }
     report.statusId = status;
     return await report.save();
+  }
+
+  async removeReport({ reportId }) {
+    const report = await this.reportRepository.findByPk(reportId);
+    // if report type listing need delete content files
+    if (report.typeId === 2) {
+      const content = report.content;
+      for (let field in content) {
+        if (Array.isArray(content[field]) && content[field].length > 0) {
+          console.log('content', content[field]);
+          await this.filesService.removeFile(content[field][0]);
+        }
+      }
+    }
+    await this.reportRepository.destroy({
+      where: {
+        id: reportId,
+      },
+    });
+  }
+
+  async getOiKseReports({ oi_company_id, type }) {
+    const conditions =
+      type == 'listing'
+        ? {
+            [Op.eq]: 2,
+          }
+        : {
+            [Op.ne]: 2,
+          };
+    const reports = await this.reportRepository.findAll({
+      where: {
+        companyId: oi_company_id,
+        statusId: 4,
+        typeId: conditions,
+      },
+      include: [
+        {
+          model: this.reportTypesRepository,
+        },
+      ],
+      attributes: [
+        'content',
+        'id',
+        'typeId',
+        [sequelize.fn('DATE', sequelize.col('confirmDate')), 'confirmDate'],
+      ],
+    });
+    return reports;
   }
 }

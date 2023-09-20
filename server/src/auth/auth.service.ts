@@ -31,6 +31,8 @@ export class AuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           roles: user.roles,
+          inn: user.inn,
+          companyId: user.companyId,
         },
         tokens,
       };
@@ -70,6 +72,8 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         roles: user.roles,
+        inn: user.inn,
+        companyId: user.companyId,
       },
       tokens,
     };

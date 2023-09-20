@@ -50,6 +50,7 @@ const ListingModalForm = ({
       form.setFieldsValue(updData);
     }
   }, [updData]);
+
   const [updateReport, {}] = useUpdateReportMutation();
 
   const updateField = (content, allvalues) => {
@@ -61,6 +62,7 @@ const ListingModalForm = ({
       field: Object.keys(content)[0],
     });
   };
+
   return (
     <Modal
       width={"80%"}

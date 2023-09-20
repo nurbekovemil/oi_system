@@ -28,7 +28,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   useGetCompaniesQuery,
   useRemoveCompanyMutation,
-} from "../../store/services/company-service";
+} from "../../../store/services/company-service";
 import { Fragment, useState } from "react";
 const { Paragraph, Title, Text } = Typography;
 const { confirm } = Modal;

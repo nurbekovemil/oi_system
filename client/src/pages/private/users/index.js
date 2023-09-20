@@ -20,7 +20,7 @@ import {
   EyeOutlined,
   BarsOutlined,
 } from "@ant-design/icons";
-import { useGetUsersQuery } from "../../store/services/user-service";
+import { useGetUsersQuery } from "../../../store/services/user-service";
 import { Fragment, useState } from "react";
 
 const { Title, Text } = Typography;

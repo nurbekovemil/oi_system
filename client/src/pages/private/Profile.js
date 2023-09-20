@@ -30,11 +30,11 @@ import {
   useGetCompanyByIdQuery,
   useGetCompanyTemplateQuery,
   useUpdateCompanyMutation,
-} from "../store/services/company-service";
+} from "../../store/services/company-service";
 import {
   useGetUserTemplateQuery,
   useUpdateUserMutation,
-} from "../store/services/user-service";
+} from "../../store/services/user-service";
 const { Title } = Typography;
 const Profile = () => {
   const [userForm] = Form.useForm();
@@ -102,23 +102,23 @@ const Profile = () => {
           }
         ></Card>
       </Col>
-      <Col span={8}>
+      <Col span={16}>
         <Card
           bordered={false}
           className="criclebox"
-          title={<Title level={5}>Информация пользователя</Title>}
+          title={<Title level={5}>Информация компании</Title>}
         >
           <Form
             layout="vertical"
             className="row-col"
-            onFinish={updateUserProfileHandler}
-            form={userForm}
+            form={companyForm}
+            onFinish={updateCompanyProfileHandler}
           >
             <Row gutter={16}>
-              {isSuccessUserProfileTemplate &&
-                dataUserProfileTemplate.template.map(({ field, label }) => (
-                  <Col span={24} key={field}>
-                    <Form.Item name={field} label={label}>
+              {isSuccessCompanyTemplate &&
+                dataCompanyTemplate.template.map(({ field, label }) => (
+                  <Col span={12} xs={24} sm={24} md={12} lg={12} key={field}>
+                    <Form.Item label={label} name={field}>
                       <Input placeholder={`Введите ${label.toLowerCase()}`} />
                     </Form.Item>
                   </Col>
@@ -145,23 +145,23 @@ const Profile = () => {
           </Form>
         </Card>
       </Col>
-      <Col span={16}>
+      <Col span={8}>
         <Card
           bordered={false}
           className="criclebox"
-          title={<Title level={5}>Информация компании</Title>}
+          title={<Title level={5}>Информация пользователя</Title>}
         >
           <Form
             layout="vertical"
             className="row-col"
-            form={companyForm}
-            onFinish={updateCompanyProfileHandler}
+            onFinish={updateUserProfileHandler}
+            form={userForm}
           >
             <Row gutter={16}>
-              {isSuccessCompanyTemplate &&
-                dataCompanyTemplate.template.map(({ field, label }) => (
-                  <Col span={12} xs={24} sm={24} md={12} lg={12} key={field}>
-                    <Form.Item label={label} name={field}>
+              {isSuccessUserProfileTemplate &&
+                dataUserProfileTemplate.template.map(({ field, label }) => (
+                  <Col span={24} key={field}>
+                    <Form.Item name={field} label={label}>
                       <Input placeholder={`Введите ${label.toLowerCase()}`} />
                     </Form.Item>
                   </Col>

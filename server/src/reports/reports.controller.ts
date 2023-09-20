@@ -57,7 +57,7 @@ export class ReportsController {
     return this.reportsService.sendReport(body);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/by/:id')
   getReportById(@Param('id') id: number) {
     return this.reportsService.getReportById(id);
@@ -77,7 +77,7 @@ export class ReportsController {
     return this.reportsService.getReportTypes();
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/types/:id')
   getReportTypeById(@Param('id') id: number) {
     return this.reportsService.getReportTypeById(id);
@@ -90,7 +90,7 @@ export class ReportsController {
     return this.reportsService.getOldReports(userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/template/:tid')
   getReportTemplates(@Param('tid') tid: number) {
     return this.reportsService.getReportTemplate(tid);
@@ -99,5 +99,11 @@ export class ReportsController {
   @Get('static/:filename')
   getStaticFile(@Param('filename') filename: string, @Res() res: Response) {
     res.sendFile(filename, { root: './dist/static' });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/remove')
+  removeReport(@Body() body) {
+    return this.reportsService.removeReport(body);
   }
 }
