@@ -23,7 +23,7 @@ const UserGuide = () => {
     {
       label: "Создание отчета и существенных фактов",
       content: {
-        url: "http://localhost:8088/reports/static/create_document.mov",
+        url: "http://localhost:8088/reports/static/create_document.mp4",
       },
       description: [
         {
