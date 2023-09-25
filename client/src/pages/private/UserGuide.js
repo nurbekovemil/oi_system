@@ -23,7 +23,7 @@ const UserGuide = () => {
     {
       label: "Создание отчета и существенных фактов",
       content: {
-        url: "http://localhost:8088/reports/static/create_document.mp4",
+        url: `${REACT_APP_SERVER_HOST}/reports/static/create_document.mp4`,
       },
       description: [
         {
