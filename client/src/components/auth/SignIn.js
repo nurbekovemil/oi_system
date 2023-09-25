@@ -61,7 +61,6 @@ const SignIn = () => {
                 }
                 style={{
                   padding: "16px",
-                  textAlign: "left",
                 }}
               />
               <Card

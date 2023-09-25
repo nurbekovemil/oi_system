@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 
 import Home from "./pages/private/Home";
 
-import Billing from "./pages/Billing";
 import Profile from "./pages/private/Profile";
 import Auth from "./pages/public/Auth";
 
@@ -38,6 +37,8 @@ import "moment/locale/ru";
 import Eds from "./pages/private/Eds";
 import ReportPublicView from "./pages/public/reports/View";
 import ListingView from "./pages/public/reports/ListingView";
+import Receipt from "./pages/private/Receipt";
+import UserGuide from "./pages/private/UserGuide";
 
 function App() {
   moment.locale("ru");
@@ -53,7 +54,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Public />}>
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/" index element={<Auth />} />
             <Route
               path="/report/:reportType/:tempId/:reportId"
               element={<ReportPublicView />}
@@ -103,14 +104,9 @@ function App() {
               element={<ReportForm />}
             />
             <Route path="/dashboard/eds/:reportId" element={<Eds />} />
-
-            {/* <Route
-              path="/dashboard/reports/view/:reportType/:tempId/:reportId"
-              element={<ReportView />}
-            /> */}
-
-            <Route path="/dashboard/billing" element={<Billing />} />
             <Route path="/dashboard/profile" element={<Profile />} />
+            <Route path="/dashboard/receipt/:receiptId" element={<Receipt />} />
+            <Route path="/dashboard/user-guide" element={<UserGuide />} />
             <Route path="*" element={<Navigate to="/dashboard/" />} />
           </Route>
         </Routes>

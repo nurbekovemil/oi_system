@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsService } from './reports.service';
@@ -49,6 +50,12 @@ export class ReportsController {
   removeReportFile(@Body() name: { name: string }) {
     console.log(name);
     return this.reportsService.removeReportFile(name);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/reject')
+  rejectReport(@Body() data) {
+    return this.reportsService.updateReportStatus(data.id, 3);
   }
 
   @UseGuards(JwtAuthGuard)

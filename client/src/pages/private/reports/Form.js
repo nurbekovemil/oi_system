@@ -37,6 +37,7 @@ import {
 import ListingModalForm from "../../../components/report/ListingModalForm";
 import { debounce } from "../../../hooks/useDebounce";
 import EdsCert from "../../../components/eds/EdsCert";
+import { useDispatch } from "react-redux";
 const { Meta } = Card;
 
 const { Title, Text } = Typography;
@@ -132,22 +133,22 @@ const ReportForm = () => {
   };
   // set data and other_file to main template
   const setTemplateAndOtherFileFields = () => {
+    const content = dataReportById.content;
+    form.setFieldsValue(content);
+
     if (!template.length) {
       const temp = JSON.parse(JSON.stringify(dataReportTemplate.template));
       setTemplate(temp);
-
-      const content = dataReportById.content;
-      form.setFieldsValue(content);
     }
     if (reportType == 2 && template.length && isSuccessGetReportById) {
-      const data = dataReportById.content;
+      // const data = dataReportById.content;
       const addFieldTemplate = [...template];
-      for (const prop in data) {
+      for (const prop in content) {
         if (prop.slice(0, 10) == "other_file") {
           const newField = {
             field: prop,
             element: "file",
-            label: data[prop].length > 0 ? data[prop][0].label : "",
+            label: content[prop].length > 0 ? content[prop][0].label : "",
             delete: true,
           };
           addFieldTemplate[2].lists.push(newField);
@@ -209,7 +210,6 @@ const ReportForm = () => {
   }, [isSuccessReportTemplate, isSuccessGetReportById, template.length]);
 
   const back = () => {
-    getReports();
     navigate(-1);
   };
 
@@ -270,7 +270,7 @@ const ReportForm = () => {
                       <Title
                         type={type}
                         level={level}
-                        style={formType === "view" && { paddingTop: "20px" }}
+                        style={formType === "view" && { paddingTop: "50px" }}
                       >
                         {label}
                       </Title>
@@ -283,14 +283,14 @@ const ReportForm = () => {
                     {element === "select" && (
                       <>
                         {formType === "view" ? (
-                          <Title level={5}>
-                            {
+                          <Text level={5}>
+                            {`${label}: ${
                               options.filter(
                                 (item) =>
-                                  item.value === form.getFieldValue(field)
-                              )[0]?.label
-                            }
-                          </Title>
+                                  item.value == form.getFieldValue(field)
+                              )[0]?.label || ""
+                            }`}
+                          </Text>
                         ) : (
                           <Form.Item
                             name={field}
@@ -327,9 +327,9 @@ const ReportForm = () => {
                     {element === "input" && (
                       <>
                         {formType === "view" ? (
-                          <Text level={5}>{`${label}: ${form.getFieldValue(
-                            field
-                          )}`}</Text>
+                          <Text level={5}>{`${label}: ${
+                            form.getFieldValue(field) || ""
+                          }`}</Text>
                         ) : (
                           <Form.Item
                             label={label}

@@ -15,7 +15,7 @@ const Private = () => {
           <Outlet />
         </Main>
       ) : (
-        <Navigate to="/auth" />
+        <Navigate to="/" />
       )}
     </>
   );

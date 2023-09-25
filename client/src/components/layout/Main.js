@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useLocation, Outlet } from "react-router-dom";
-import { Layout, Drawer, Affix } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Layout, Drawer, Affix, Modal } from "antd";
 import Sidenav from "./Sidenav";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -8,6 +8,7 @@ import Footer from "./Footer";
 const { Header: AntHeader, Content, Sider } = Layout;
 
 function Main({ children }) {
+  const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [placement, setPlacement] = useState("right");
   const [sidenavColor, setSidenavColor] = useState("#57b6c0");
@@ -21,6 +22,22 @@ function Main({ children }) {
 
   let { pathname } = useLocation();
   pathname = pathname.replace("/", "");
+  useEffect(() => {
+    if (!localStorage.getItem("info")) {
+      Modal.info({
+        width: "40%",
+        title: "Рекомендуем ознакомиться с правилами программы",
+        content:
+          "Руководство содержит практический алгоритм использования электронной системы ЗАО «Кыргызская фондовая биржа»",
+        onOk() {
+          localStorage.setItem("info", true);
+          navigate("/dashboard/user-guide");
+        },
+        okText: "Перейти",
+        maskClosable: true,
+      });
+    }
+  }, []);
   return (
     <Layout className={`layout-dashboard`}>
       <Drawer

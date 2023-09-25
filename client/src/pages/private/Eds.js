@@ -31,7 +31,7 @@ const Eds = () => {
   const [getReportById] = useLazyGetReportByIdQuery();
   // Eds
   const [eds, setEds] = useState();
-  const [pin, setPin] = useState();
+  const [pin, setPin] = useState("");
 
   // RuToken
   const [plugin, setPlugin] = useState();
@@ -54,6 +54,7 @@ const Eds = () => {
   ] = useConfirmPinCodeMutation();
 
   const confirmPinCodeHandler = () => {
+    if (pin.trim() == "") return false;
     if (eds === 1) {
       confirmEdsPinCode({ pin, reportId });
     } else {

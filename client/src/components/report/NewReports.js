@@ -27,6 +27,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import {
   useGetReportsQuery,
+  useRejectReportMutation,
   useRemoveReportMutation,
   useSendReportMutation,
 } from "../../store/services/report-service";
@@ -35,6 +36,7 @@ import moment from "moment";
 import { Fragment, useState } from "react";
 import EdsCert from "../eds/EdsCert";
 import { useSelector } from "react-redux";
+// import { isRejected } from "@reduxjs/toolkit";
 const { Title, Text } = Typography;
 const { confirm } = Modal;
 
@@ -69,7 +71,7 @@ const columns = [
     key: "action",
     dataIndex: "action",
     width: "35%",
-    align: "end",
+    align: "start",
   },
 ];
 
@@ -89,7 +91,7 @@ const items = [
     icon: <SafetyOutlined />,
     description: "Подписать документ",
     color: "#40a9ff",
-    status: [1],
+    status: [1, 3],
     roles: ["USER"],
   },
   {
@@ -154,6 +156,7 @@ function NewReports() {
 
   const [sendReport, {}] = useSendReportMutation();
   const [removeReport, {}] = useRemoveReportMutation();
+  const [rejectReport, {}] = useRejectReportMutation();
 
   const getReportsHandler = (page, limit) => {
     setCurrentPage(page);
@@ -184,7 +187,11 @@ function NewReports() {
     });
   };
 
-  const onAction = (key, id, reportType, tempId) => {
+  const backReport = (reportId) => {
+    rejectReport({ id: reportId });
+  };
+
+  const onAction = (key, id, reportType, tempId, receiptId) => {
     if (key === "upd") {
       updateReport(id, reportType, tempId);
     }
@@ -199,6 +206,12 @@ function NewReports() {
     }
     if (key === "remove") {
       deleteReport(id);
+    }
+    if (key === "receipt") {
+      navigate(`/dashboard/receipt/${receiptId}`);
+    }
+    if (key === "back") {
+      backReport(id);
     }
   };
   const reports =
@@ -308,7 +321,8 @@ function NewReports() {
                           action.key,
                           report.id,
                           report.type.id,
-                          report.type.tempId
+                          report.type.tempId,
+                          report?.receipt?.id
                         )
                       }
                     >

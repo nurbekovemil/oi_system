@@ -129,11 +129,9 @@ const ListingModalForm = ({
                   <>
                     {formType === "view" ? (
                       <Title level={5}>
-                        {
-                          options.filter(
-                            (item) => item.value === form.getFieldValue(field)
-                          )[0]?.label
-                        }
+                        {options.filter(
+                          (item) => item.value === form.getFieldValue(field)
+                        )[0]?.label || ""}
                       </Title>
                     ) : (
                       <Form.Item
@@ -169,9 +167,9 @@ const ListingModalForm = ({
                 {element === "input" && (
                   <>
                     {formType === "view" ? (
-                      <Text level={5}>{`${label}: ${form.getFieldValue(
-                        field
-                      )}`}</Text>
+                      <Text level={5}>{`${label}: ${
+                        form.getFieldValue(field) || ""
+                      }`}</Text>
                     ) : (
                       <Form.Item
                         label={label}

@@ -47,7 +47,7 @@ function Reports() {
     <>
       <div className="tabled">
         <Row gutter={[24, 0]}>
-          <Col xs="24" xl={24}>
+          <Col span={24}>
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"

@@ -1,4 +1,4 @@
-import { Card, Col, Row, Typography, List } from "antd";
+import { Card, Col, Row, Typography, List, Spin } from "antd";
 import {
   BankOutlined,
   TeamOutlined,
@@ -57,73 +57,70 @@ function Home() {
       bnb: "redtext",
     },
   ];
-
   return (
-    <>
-      <div className="layout-content">
-        <Row className="rowgap-vbox" gutter={[24, 0]}>
-          {count.map((c, index) => (
-            <Col
-              key={index}
-              xs={24}
-              sm={24}
-              md={12}
-              lg={8}
-              xl={8}
-              className="mb-24"
-            >
-              <Card bordered={false} className="criclebox ">
-                <div className="number">
-                  <Row align="middle" gutter={[24, 0]}>
-                    <Col xs={18}>
-                      <span>{c.today}</span>
-                      <Title level={3}>
-                        {c.title} <small className={c.bnb}></small>
-                      </Title>
-                    </Col>
-                    <Col xs={6}>
-                      <div className="icon-box">{c.icon}</div>
-                    </Col>
-                  </Row>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+    <div className="layout-content">
+      <Row className="rowgap-vbox" gutter={[24, 0]}>
+        {count.map((c, index) => (
+          <Col
+            key={index}
+            xs={24}
+            sm={24}
+            md={12}
+            lg={8}
+            xl={8}
+            className="mb-24"
+          >
+            <Card bordered={false} className="criclebox ">
+              <div className="number">
+                <Row align="middle" gutter={[24, 0]}>
+                  <Col xs={18}>
+                    <span>{c.today}</span>
+                    <Title level={3}>
+                      {c.title} <small className={c.bnb}></small>
+                    </Title>
+                  </Col>
+                  <Col xs={6}>
+                    <div className="icon-box">{c.icon}</div>
+                  </Col>
+                </Row>
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
 
-        <Row gutter={[24, 0]}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={16} className="mb-24">
-            <Card bordered={false} className="criclebox h-full">
-              <Echart />
-            </Card>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
-            <Card bordered={false} className="criclebox h-full">
-              <div className="timeline-box">
-                <Title level={5}>Последние отчеты</Title>
-              </div>
-              <div className="table-responsive">
-                <List
-                  itemLayout="horizontal"
-                  dataSource={data}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={<FileTextOutlined />}
-                        title={
-                          <a href="https://ant.design">{item.company_name}</a>
-                        }
-                        description={item.report}
-                      />
-                    </List.Item>
-                  )}
-                />
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
+      <Row gutter={[24, 0]}>
+        <Col xs={24} sm={24} md={12} lg={12} xl={16} className="mb-24">
+          <Card bordered={false} className="criclebox h-full">
+            <Echart />
+          </Card>
+        </Col>
+        <Col xs={24} sm={24} md={12} lg={12} xl={8} className="mb-24">
+          <Card bordered={false} className="criclebox h-full">
+            <div className="timeline-box">
+              <Title level={5}>Последние отчеты</Title>
+            </div>
+            <div className="table-responsive">
+              <List
+                itemLayout="horizontal"
+                dataSource={data}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<FileTextOutlined />}
+                      title={
+                        <a href="https://ant.design">{item.company_name}</a>
+                      }
+                      description={item.report}
+                    />
+                  </List.Item>
+                )}
+              />
+            </div>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 }
 

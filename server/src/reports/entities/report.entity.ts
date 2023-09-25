@@ -6,6 +6,7 @@ import {
   Model,
   BelongsTo,
   HasMany,
+  HasOne,
 } from 'sequelize-typescript';
 import { Company } from 'src/companies/entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -71,6 +72,6 @@ export class Report extends Model<Report, ReportCreateAttrs> {
   @HasMany(() => Eds)
   eds: Eds;
 
-  @HasMany(() => Receipt)
+  @HasOne(() => Receipt)
   receipt: Receipt;
 }

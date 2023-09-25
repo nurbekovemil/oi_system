@@ -26,24 +26,24 @@ const CompanyView = () => {
         </span>
       ),
     },
-    {
-      key: "employees",
-      tab: (
-        <span>
-          <TeamOutlined />
-          Сотрудники
-        </span>
-      ),
-    },
-    {
-      key: "reports",
-      tab: (
-        <span>
-          <ProjectOutlined />
-          Отчеты
-        </span>
-      ),
-    },
+    // {
+    //   key: "employees",
+    //   tab: (
+    //     <span>
+    //       <TeamOutlined />
+    //       Сотрудники
+    //     </span>
+    //   ),
+    // },
+    // {
+    //   key: "reports",
+    //   tab: (
+    //     <span>
+    //       <ProjectOutlined />
+    //       Отчеты
+    //     </span>
+    //   ),
+    // },
   ];
 
   const contentList = {
@@ -69,7 +69,14 @@ const CompanyView = () => {
           }}
           extra={
             <Link to={`/dashboard/companies/upd/${data.id}`}>
-              <Button type="link" icon={<FormOutlined />}>
+              <Button
+                type="primary"
+                icon={<FormOutlined />}
+                style={{
+                  background: "#57b6c0",
+                  borderColor: "#57b6c0",
+                }}
+              >
                 Изменить
               </Button>
             </Link>

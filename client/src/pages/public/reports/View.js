@@ -169,18 +169,18 @@ const ReportPublicView = () => {
                         )}
                         {element === "select" && (
                           <Title level={5}>
-                            {
+                            {`${label}: ${
                               options.filter(
                                 (item) =>
                                   item.value === form.getFieldValue(field)
-                              )[0]?.label
-                            }
+                              )[0]?.label || ""
+                            }`}
                           </Title>
                         )}
                         {element === "input" && (
-                          <Text level={5}>{`${label}: ${form.getFieldValue(
-                            field
-                          )}`}</Text>
+                          <Text level={5}>{`${label}: ${
+                            form.getFieldValue(field) || ""
+                          }`}</Text>
                         )}
                         {element === "list" && (
                           <Table
@@ -274,7 +274,10 @@ const ReportPublicView = () => {
                           </>
                         )}
                         {element === "textarea" && (
-                          <Form.Item label={label} name={field}>
+                          <Form.Item
+                            label={<Title level={5}>{label}</Title>}
+                            name={field}
+                          >
                             <Text>{form.getFieldValue(field)}</Text>
                           </Form.Item>
                         )}

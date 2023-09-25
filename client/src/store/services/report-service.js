@@ -16,6 +16,9 @@ const companyApi = api.injectEndpoints({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "ReportById", id: arg.reportId },
+      ],
     }),
     uploadReportFile: builder.mutation({
       query: (data) => ({
@@ -39,6 +42,14 @@ const companyApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Reports"],
     }),
+    rejectReport: builder.mutation({
+      query: (data) => ({
+        url: "reports/reject",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Reports"],
+    }),
     removeReport: builder.mutation({
       query: (data) => ({
         url: "reports/remove",
@@ -53,7 +64,7 @@ const companyApi = api.injectEndpoints({
     }),
     getReportById: builder.query({
       query: (id) => `reports/by/${id}`,
-      providesTags: ["ReportById"],
+      providesTags: (result, error, arg) => [{ type: "ReportById", id: arg }],
     }),
     getOldReports: builder.query({
       query: () => "reports/old",
@@ -90,4 +101,5 @@ export const {
   useUpdateReportMutation,
   useSendReportMutation,
   useRemoveReportMutation,
+  useRejectReportMutation,
 } = companyApi;

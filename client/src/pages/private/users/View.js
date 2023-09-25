@@ -30,15 +30,15 @@ const UserView = () => {
         </span>
       ),
     },
-    {
-      key: "reports",
-      tab: (
-        <span>
-          <ProjectOutlined />
-          Отчеты
-        </span>
-      ),
-    },
+    // {
+    //   key: "reports",
+    //   tab: (
+    //     <span>
+    //       <ProjectOutlined />
+    //       Отчеты
+    //     </span>
+    //   ),
+    // },
   ];
   const contentList = {
     about: <AboutUser dataUser={dataUser} dataCompany={dataCompany} />,

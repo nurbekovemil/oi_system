@@ -14,6 +14,7 @@ import { ReportGroups } from './entities/report-groups.entity';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { Eds } from 'src/eds/entities/ed.entity';
 import sequelize from 'sequelize';
+import { Receipt } from 'src/receipts/entities/receipt.entity';
 
 @Injectable()
 export class ReportsService {
@@ -31,6 +32,7 @@ export class ReportsService {
     private reportTemplatesRepository: typeof ReportTemplates,
     @InjectModel(Eds)
     private edsRepository: typeof Eds,
+    @InjectModel(Receipt) private receiptRepository: typeof Receipt,
 
     private filesService: FilesService,
   ) {
@@ -152,6 +154,14 @@ export class ReportsService {
           model: this.edsRepository,
           attributes: ['cert', 'typeId'],
         },
+        {
+          model: this.companyRepository,
+          attributes: ['name'],
+        },
+        {
+          model: this.reportTypesRepository,
+          attributes: ['title'],
+        },
       ],
     });
     return report;
@@ -183,6 +193,10 @@ export class ReportsService {
         {
           model: this.edsRepository,
           attributes: ['cert', 'typeId'],
+        },
+        {
+          model: this.receiptRepository,
+          attributes: ['id'],
         },
       ],
       attributes: {
@@ -229,6 +243,9 @@ export class ReportsService {
     }
     if (status == 4) {
       report.confirmDate = new Date();
+    }
+    if (status == 3) {
+      await this.edsRepository.destroy({ where: { reportId } });
     }
     report.statusId = status;
     return await report.save();

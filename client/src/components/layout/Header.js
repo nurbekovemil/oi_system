@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Row, Col, Button } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useLazyLogoutQuery } from "../../store/services/auth-service";
 
 const profile = [

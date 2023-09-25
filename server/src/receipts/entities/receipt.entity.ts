@@ -29,7 +29,7 @@ export class Receipt extends Model<Receipt, ReceiptCreateAttrs> {
 
   @ForeignKey(() => Report)
   @Column({ type: DataType.INTEGER })
-  reportId: Report;
+  reportId: number;
 
   @Column({ type: DataType.JSON })
   cert: object;

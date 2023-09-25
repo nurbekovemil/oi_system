@@ -413,7 +413,7 @@ body {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 .ant-dropdown-menu.ant-dropdown-menu-split.header-notifications-dropdown {
@@ -1256,7 +1256,7 @@ img {
 }
 
 .gradent {
-  background: url("../images/info-card-2.jpg") no-repeat center top;
+  /* background: url("../images/info-card-2.jpg") no-repeat center top; */
   background-size: cover;
   padding: 15px;
   border-radius: 15px;
@@ -2276,7 +2276,7 @@ section.ant-layout.layout-content .ant-layout-content.content-ant {
 }
 
 .card-credit {
-  background-image: url("../images/info-card-3.jpg");
+  /* background-image: url("../images/info-card-3.jpg"); */
   background-position: 50%;
   background-size: cover;
   border: none;

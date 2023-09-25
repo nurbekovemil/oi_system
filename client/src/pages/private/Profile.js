@@ -102,7 +102,7 @@ const Profile = () => {
           }
         ></Card>
       </Col>
-      <Col span={16}>
+      <Col span={16} xs={24} sm={24} md={16} lg={16}>
         <Card
           bordered={false}
           className="criclebox"
@@ -145,7 +145,7 @@ const Profile = () => {
           </Form>
         </Card>
       </Col>
-      <Col span={8}>
+      <Col span={8} xs={24} sm={24} md={8} lg={8}>
         <Card
           bordered={false}
           className="criclebox"

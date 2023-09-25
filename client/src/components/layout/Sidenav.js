@@ -6,6 +6,7 @@ import {
   ReconciliationOutlined,
   IdcardOutlined,
   BankOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/images/oi_logo.png";
 import { useSelector } from "react-redux";
@@ -39,6 +40,12 @@ const menuList = [
     label: "Компании",
     icon: <BankOutlined />,
     role: ["ADMIN"],
+  },
+  {
+    path: "/dashboard/user-guide",
+    label: "Руководство",
+    icon: <BookOutlined />,
+    role: ["ADMIN", "USER"],
   },
 ];
 function Sidenav({ color }) {
