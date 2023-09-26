@@ -18,9 +18,11 @@ export class OiKseService {
         type,
       },
     });
+    console.log('company', JSON.stringify(company));
     if (!company) {
       throw new HttpException('Компания не найдено!', HttpStatus.BAD_REQUEST);
     }
+
     const reports = await this.reportsService.getOiKseReports({
       oi_company_id: company.oi_company_id,
       type,

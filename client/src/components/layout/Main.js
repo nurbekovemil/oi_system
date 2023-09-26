@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Layout, Drawer, Affix, Modal } from "antd";
+import { Layout, Drawer, Affix, Modal, Col, Row } from "antd";
 import Sidenav from "./Sidenav";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -90,7 +90,12 @@ function Main({ children }) {
             />
           </AntHeader>
         </Affix>
+
+        {/* <Row> */}
+        {/* <Col xs={24} sm={24} md={24} lg={20} xl={18} xxl={16}> */}
         <Content className="content-ant">{children}</Content>
+        {/* </Col> */}
+        {/* </Row> */}
         <Footer />
       </Layout>
     </Layout>

@@ -172,7 +172,7 @@ export class ReportsService {
     const isAdmin = roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),
     );
-    const allowedReportStatusIds = [2, 3, 4];
+    const allowedReportStatusIds = [2, 4];
     const offset = (page - 1) * limit;
     const reports = await this.reportRepository.findAndCountAll({
       include: [
@@ -279,6 +279,7 @@ export class ReportsService {
         : {
             [Op.ne]: 2,
           };
+    console.log(oi_company_id, type);
     const reports = await this.reportRepository.findAll({
       where: {
         companyId: oi_company_id,
@@ -297,6 +298,7 @@ export class ReportsService {
         [sequelize.fn('DATE', sequelize.col('confirmDate')), 'confirmDate'],
       ],
     });
+    console.log('reports --- ', JSON.stringify(reports));
     return reports;
   }
 }

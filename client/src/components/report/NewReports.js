@@ -100,7 +100,7 @@ const items = [
     icon: <FormOutlined />,
     description: "Изменить документ",
     color: "#ffa940",
-    status: [1, 3, 5],
+    status: [1, 3],
     roles: ["USER"],
   },
   {
@@ -109,7 +109,7 @@ const items = [
     icon: <CloseOutlined />,
     description: "Отменить отправку документа",
     color: "#ffa940",
-    status: [2],
+    status: [2, 5],
     roles: ["USER", "ADMIN"],
   },
   {

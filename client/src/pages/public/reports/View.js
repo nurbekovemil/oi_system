@@ -101,7 +101,7 @@ const ReportPublicView = () => {
 
   return (
     <Row justify="center">
-      <Col span={20}>
+      <Col span={18}>
         <Card
           bordered={false}
           className="criclebox mb-24"
