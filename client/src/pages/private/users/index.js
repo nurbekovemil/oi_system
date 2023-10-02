@@ -24,7 +24,11 @@ import { useGetUsersQuery } from "../../../store/services/user-service";
 import { Fragment, useState } from "react";
 
 const { Title, Text } = Typography;
-
+// через класс или id не работает стили так как шаблон стили загружает динамически
+const btnStyle = {
+  background: "#57b6c0",
+  borderColor: "#57b6c0",
+};
 const columns = [
   {
     title: "Логин пользователя",
@@ -156,8 +160,7 @@ function Users() {
                     type="primary"
                     icon={<PlusOutlined />}
                     style={{
-                      background: "#57b6c0",
-                      borderColor: "#57b6c0",
+                      ...btnStyle,
                     }}
                   >
                     Добавить пользователя

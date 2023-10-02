@@ -11,6 +11,12 @@ import NewReports from "../../../components/report/NewReports";
 import OldReports from "../../../components/report/OldReports";
 import { useSelector } from "react-redux";
 
+// через класс или id не работает стили так как шаблон стили загружает динамически
+const btnStyle = {
+  background: "#57b6c0",
+  borderColor: "#57b6c0",
+};
+
 const tabList = [
   {
     key: "new",
@@ -63,8 +69,7 @@ function Reports() {
                       type="primary"
                       icon={<PlusOutlined />}
                       style={{
-                        background: "#57b6c0",
-                        borderColor: "#57b6c0",
+                        ...btnStyle,
                       }}
                     >
                       Создать документ

@@ -7,10 +7,8 @@ import {
 import { useLazyCheckAuthQuery } from "./store/services/auth-service";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-
 import Home from "./pages/private/Home";
-
-import Profile from "./pages/private/Profile";
+import Profile from "./pages/private/Profile/index";
 import Auth from "./pages/public/Auth";
 
 import Public from "./components/route/Public";
@@ -39,6 +37,7 @@ import ReportPublicView from "./pages/public/reports/View";
 import ListingView from "./pages/public/reports/ListingView";
 import Receipt from "./pages/private/Receipt";
 import UserGuide from "./pages/private/UserGuide";
+import ChangeAccess from "./components/profile/ChangeUserPass";
 
 function App() {
   moment.locale("ru");
@@ -105,6 +104,10 @@ function App() {
             />
             <Route path="/dashboard/eds/:reportId" element={<Eds />} />
             <Route path="/dashboard/profile" element={<Profile />} />
+            <Route
+              path="/dashboard/profile/changeAccess"
+              element={<ChangeAccess />}
+            />
             <Route path="/dashboard/receipt/:receiptId" element={<Receipt />} />
             <Route path="/dashboard/user-guide" element={<UserGuide />} />
             <Route path="*" element={<Navigate to="/dashboard/" />} />

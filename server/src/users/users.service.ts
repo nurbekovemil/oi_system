@@ -8,6 +8,8 @@ import { Sequelize } from 'sequelize';
 import { UserTemp } from './entities/user-temp.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/roles/entities/role.entity';
+import { RolesService } from 'src/roles/roles.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 @Injectable()
 export class UsersService {
   constructor(
@@ -15,25 +17,32 @@ export class UsersService {
     @InjectModel(Roles) private roleRepository: typeof Roles,
     @InjectModel(UserTemp) private userTempRepository: typeof UserTemp,
     @InjectModel(Company) private companyRepository: typeof Company,
+    private roleService: RolesService,
   ) {}
   async createUser(createUserDto: CreateUserDto) {
-    const condidate = await this.userRepository.findOne({
-      where: {
-        login: createUserDto.login,
-      },
-    });
-    if (condidate) {
-      throw new HttpException(
-        { message: `Пользователь ${createUserDto.login} уже существует` },
-        HttpStatus.BAD_REQUEST,
-      );
+    try {
+      const condidate = await this.userRepository.findOne({
+        where: {
+          login: createUserDto.login,
+        },
+      });
+      if (condidate) {
+        throw new HttpException(
+          { message: `Пользователь ${createUserDto.login} уже существует` },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const hashPassword = await bcrypt.hash(createUserDto.password, 3);
+      const { roleId, password, ...rest } = createUserDto;
+      const user = await this.userRepository.create({
+        ...rest,
+        password: hashPassword,
+      });
+      await this.roleService.createRole({ roleId, userId: user.id });
+      return { id: user.id };
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
-    const hashPassword = await bcrypt.hash(createUserDto.password, 3);
-    const user = await this.userRepository.create({
-      ...createUserDto,
-      password: hashPassword,
-    });
-    return { id: user.id };
   }
   async getUserByLogin(login: string) {
     return await this.userRepository.findOne({
@@ -85,11 +94,25 @@ export class UsersService {
       throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
     }
     // Update the user's attributes with the new data
-    Object.assign(user, updateUserDto);
-
+    const { roleId, ...rest } = updateUserDto;
+    Object.assign(user, rest);
+    await this.roleService.updateRole({ roleId, userId: user.id });
     // Save the updated user in the database
     await user.save();
     return user;
+  }
+  async updateUserPassword(changePasswordDto: ChangePasswordDto) {
+    const user = await this.userRepository.findByPk(changePasswordDto.userId);
+    if (
+      user &&
+      (await bcrypt.compare(changePasswordDto.confirmPassword, user.password))
+    ) {
+      const hashPassword = await bcrypt.hash(changePasswordDto.password, 3);
+      user.password = hashPassword;
+      await user.save();
+      return;
+    }
+    throw new HttpException('Неверный пароль', HttpStatus.BAD_REQUEST);
   }
   async findAll({ page, limit }) {
     const offset = (page - 1) * limit;

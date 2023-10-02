@@ -65,7 +65,11 @@ function OldReports() {
             <Avatar className="shape-avatar" shape="square" size={40}></Avatar>
             <div className="avatar-info">
               <Title level={5}>{report.company_name}</Title>
-              <p>{report.typedoc}</p>
+              <p>
+                {report.typedoc.length > 35
+                  ? report.typedoc.slice(0, 35) + "..."
+                  : report.typedoc}
+              </p>
             </div>
           </Avatar.Group>
         </>

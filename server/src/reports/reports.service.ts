@@ -202,8 +202,14 @@ export class ReportsService {
       attributes: {
         exclude: ['content', 'createdAt'],
         include: [
-          [sequelize.fn('DATE', sequelize.col('sendDate')), 'sendDate'],
-          [sequelize.fn('DATE', sequelize.col('confirmDate')), 'confirmDate'],
+          [
+            sequelize.fn('TO_CHAR', sequelize.col('sendDate'), 'DD-MM-YYYY'),
+            'sendDate',
+          ],
+          [
+            sequelize.fn('TO_CHAR', sequelize.col('confirmDate'), 'DD-MM-YYYY'),
+            'confirmDate',
+          ],
         ],
       },
       where: isAdmin ? { statusId: allowedReportStatusIds } : { userId },
@@ -245,6 +251,7 @@ export class ReportsService {
       report.confirmDate = new Date();
     }
     if (status == 3) {
+      report.sendDate = null;
       await this.edsRepository.destroy({ where: { reportId } });
     }
     report.statusId = status;

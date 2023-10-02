@@ -32,7 +32,11 @@ const ListingModalForm = ({
     form.submit();
     onCancel();
   };
-
+  // через класс или id не работает стили так как шаблон стили загружает динамически
+  const btnStyle = {
+    background: "#57b6c0",
+    borderColor: "#57b6c0",
+  };
   const onViewTableHandler = (inputArray) => {
     if (inputArray) {
       return inputArray.map((inputObject) => {
@@ -65,13 +69,18 @@ const ListingModalForm = ({
 
   return (
     <Modal
-      width={"80%"}
+      width={"70%"}
       title={label}
       open={open}
-      onCancel={onCancel}
-      okText="Сохранить"
-      onCancelText={"Отмена"}
       onOk={onOk}
+      okText="Сохранить"
+      okButtonProps={{
+        style: {
+          ...btnStyle,
+        },
+      }}
+      onCancel={onCancel}
+      cancelText="Назад"
     >
       <Form
         form={form}

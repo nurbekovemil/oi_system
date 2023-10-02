@@ -1,4 +1,5 @@
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
@@ -25,8 +26,13 @@ export class UsersController {
   }
 
   @Put()
-  updateCompany(@Body() updateUserDto: UpdateUserDto) {
+  updateUser(@Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(updateUserDto);
+  }
+
+  @Put('/change-pass')
+  updateUserPassword(@Body() changePasswordDto: ChangePasswordDto) {
+    return this.usersService.updateUserPassword(changePasswordDto);
   }
 
   @Get()

@@ -18,6 +18,13 @@ const userApi = api.injectEndpoints({
       }),
       invalidatesTags: ["UserUpdate"],
     }),
+    updateUserPassword: builder.mutation({
+      query: (data) => ({
+        url: "users/change-pass",
+        method: "PUT",
+        body: data,
+      }),
+    }),
     getUsers: builder.query({
       query: ({ page, limit }) => `users?page=${page}&limit=${limit}`,
       providesTags: ["UserUpdate"],
@@ -36,6 +43,7 @@ export const {
   useGetUserTemplateQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
+  useUpdateUserPasswordMutation,
   useGetUsersQuery,
   useLazyGetUserByIdQuery,
   useGetUserByIdQuery,

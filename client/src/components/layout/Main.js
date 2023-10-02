@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Layout, Drawer, Affix, Modal, Col, Row } from "antd";
+import { Layout, Drawer, Affix, Modal, Col, Row, Typography } from "antd";
 import Sidenav from "./Sidenav";
 import Header from "./Header";
 import Footer from "./Footer";
-
+// через класс или id не работает стили так как шаблон стили загружает динамически
+const btnStyle = {
+  background: "#57b6c0",
+  borderColor: "#57b6c0",
+};
+const { Title } = Typography;
 const { Header: AntHeader, Content, Sider } = Layout;
 
 function Main({ children }) {
@@ -26,7 +31,11 @@ function Main({ children }) {
     if (!localStorage.getItem("info")) {
       Modal.info({
         width: "40%",
-        title: "Рекомендуем ознакомиться с правилами программы",
+        title: (
+          <Title level={5}>
+            Рекомендуем ознакомиться с правилами программы
+          </Title>
+        ),
         content:
           "Руководство содержит практический алгоритм использования электронной системы ЗАО «Кыргызская фондовая биржа»",
         onOk() {
@@ -34,6 +43,11 @@ function Main({ children }) {
           navigate("/dashboard/user-guide");
         },
         okText: "Перейти",
+        okButtonProps: {
+          style: {
+            ...btnStyle,
+          },
+        },
         maskClosable: true,
       });
     }

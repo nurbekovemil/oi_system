@@ -23,6 +23,7 @@ import {
   useUpdateUserMutation,
 } from "../../../store/services/user-service";
 import { useEffect } from "react";
+import { useGetAllRolesQuery } from "../../../store/services/role-service";
 const { Title } = Typography;
 
 const UserForm = () => {
@@ -49,6 +50,7 @@ const UserForm = () => {
   const [updateUser, {}] = useUpdateUserMutation();
   // Сервис - Получиь список компаний
   const { data: optionCompanies } = useGetCompaniesForOptionQuery("");
+  const { data: optionRoles } = useGetAllRolesQuery();
 
   // Сервис - Получить компанию по id
   const [getCompanyById, { data: companyData, isSuccess: isSuccessCompany }] =
@@ -65,7 +67,8 @@ const UserForm = () => {
         getUserById(id);
       }
       if (isSuccessUser && userData) {
-        form.setFieldsValue(userData);
+        const user = userData;
+        form.setFieldsValue({ ...user, roleId: user.roles[0].id });
       }
     }
     if (formType === "add") {
@@ -123,7 +126,11 @@ const UserForm = () => {
   const template =
     isSuccessTemplate &&
     dataTemplate.template.map((f) =>
-      f.field === "companyId" ? { ...f, option: optionCompanies } : f
+      f.field === "companyId"
+        ? { ...f, option: optionCompanies }
+        : f.field === "roleId"
+        ? { ...f, option: optionRoles }
+        : f
     );
 
   return (
@@ -165,13 +172,13 @@ const UserForm = () => {
                       rules={[
                         {
                           required: true,
-                          message: "Выберите компанию",
+                          message: "Выберите из списка",
                         },
                       ]}
                     >
                       <Select
                         showSearch
-                        placeholder="Выберите компанию из списка"
+                        placeholder="Выберите из списка"
                         className="header-search"
                         options={option}
                         optionFilterProp="children"

@@ -9,11 +9,13 @@ import { Company } from 'src/companies/entities/company.entity';
 import { Report } from 'src/reports/entities/report.entity';
 import { UserTemp } from './entities/user-temp.entity';
 import { Roles } from 'src/roles/entities/role.entity';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([User, UserTemp, Company, Report, Roles]),
     JwtModule,
+    RolesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

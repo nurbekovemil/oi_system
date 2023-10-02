@@ -30,6 +30,13 @@ import {
   useRemoveCompanyMutation,
 } from "../../../store/services/company-service";
 import { Fragment, useState } from "react";
+
+// через класс или id не работает стили так как шаблон стили загружает динамически
+const btnStyle = {
+  background: "#57b6c0",
+  borderColor: "#57b6c0",
+};
+
 const { Paragraph, Title, Text } = Typography;
 const { confirm } = Modal;
 
@@ -206,8 +213,7 @@ const Companies = () => {
                     type="primary"
                     icon={<PlusOutlined />}
                     style={{
-                      background: "#57b6c0",
-                      borderColor: "#57b6c0",
+                      ...btnStyle,
                     }}
                   >
                     Добавить компанию

@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import companyApi from "../services/company-service";
 
 const initialState = {
   users: [],

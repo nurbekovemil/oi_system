@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import reportApi from "../services/report-service";
 import authApi from "../services/auth-service";
+import userApi from "../services/user-service";
 import { notification } from "antd";
 
 notification.config({
@@ -27,8 +28,19 @@ const messageSlice = createSlice({
     builder.addMatcher(
       authApi.endpoints.login.matchRejected,
       (state, { payload }) => {
-        // console.log(action);
         showMessage(payload.data.message, "error");
+      }
+    );
+    builder.addMatcher(
+      userApi.endpoints.updateUserPassword.matchFulfilled,
+      (state, { payload }) => {
+        showMessage("Пароль успешно изменен", "success");
+      }
+    );
+    builder.addMatcher(
+      userApi.endpoints.updateUserPassword.matchRejected,
+      (state, { payload }) => {
+        showMessage("Неверный пароль", "error");
       }
     );
   },

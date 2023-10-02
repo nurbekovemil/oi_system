@@ -39,7 +39,11 @@ import { debounce } from "../../../hooks/useDebounce";
 import EdsCert from "../../../components/eds/EdsCert";
 import { useDispatch } from "react-redux";
 const { Meta } = Card;
-
+// через класс или id не работает стили так как шаблон стили загружает динамически
+const btnStyle = {
+  background: "#57b6c0",
+  borderColor: "#57b6c0",
+};
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const ReportForm = () => {
@@ -738,8 +742,7 @@ const ReportForm = () => {
                     type="primary"
                     icon={<SaveOutlined />}
                     style={{
-                      background: "#57b6c0",
-                      borderColor: "#57b6c0",
+                      ...btnStyle,
                     }}
                     onClick={back}
                   >

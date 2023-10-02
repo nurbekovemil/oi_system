@@ -107,6 +107,13 @@ export class ReportsController {
   getStaticFile(@Param('filename') filename: string, @Res() res: Response) {
     res.sendFile(filename, { root: './dist/static' });
   }
+  @Get('static/user_guides/:filename')
+  getStaticUserGuideFile(
+    @Param('filename') filename: string,
+    @Res() res: Response,
+  ) {
+    res.sendFile(filename, { root: './dist/static/user_guides' });
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('/remove')

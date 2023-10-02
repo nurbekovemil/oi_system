@@ -15,7 +15,6 @@ import { RoleUsers } from 'src/roles/entities/role-users.entity';
 import { Roles } from 'src/roles/entities/role.entity';
 
 interface UserCreateAttrs {
-  name: string;
   login: string;
   password: string;
   companyId: number;
