@@ -116,7 +116,7 @@ export class ReportsService {
             {
               name,
               label,
-              url: `${process.env.SERVER_HOST}/reports/static/${name}`,
+              url: `${process.env.SERVER_FILE_URL}/reports/static/${name}`,
               mimetype,
             },
           ],

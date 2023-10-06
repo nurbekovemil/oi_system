@@ -52,7 +52,7 @@ export class OiKseService {
       data = reports.map(({ content, typeId, type, id, confirmDate }) => {
         const contentData = {};
         for (const key in content) {
-          if (Array.isArray(content[key])) {
+          if (Array.isArray(content[key]) && content[key].length > 0) {
             let { label, url } = content[key][0];
             contentData[key] = { label, url };
           } else if (typeof content[key] == 'object') {

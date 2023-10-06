@@ -612,13 +612,13 @@ const ReportForm = () => {
                                           }}
                                           href={
                                             form.getFieldValue(list.field)[0]
-                                              .url
+                                              ?.url
                                           }
                                           target="_blank"
                                         >
                                           {
                                             form.getFieldValue(list.field)[0]
-                                              .name
+                                              ?.name
                                           }
                                         </Button>
                                       )}
