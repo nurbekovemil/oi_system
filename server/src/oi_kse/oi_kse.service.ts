@@ -39,9 +39,9 @@ export class OiKseService {
     }
     if (typeString == 'oi') {
       data = reports.map(({ content, typeId, type, id, confirmDate }) => {
-        const { period, year } = content;
         // typeId == 2 - Листинговый отчет
         if (typeId == 2) {
+          const { listing_period, listing_year } = content;
           let contentData = {};
           for (const key in content) {
             // attachment_2_1 - Листинг отчет Приложение 2-1
@@ -55,12 +55,13 @@ export class OiKseService {
           return {
             content: contentData,
             confirmDate,
-            period,
-            year,
+            period: listing_period,
+            year: listing_year,
             group: type.groupId,
           };
         } else {
           const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
+          const { period, year } = content;
           return {
             content: { label: type.title, url },
             confirmDate,
