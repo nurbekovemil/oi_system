@@ -51,15 +51,28 @@ export class OiKseService {
     if (typeString == 'listing') {
       data = reports.map(({ content, typeId, type, id, confirmDate }) => {
         const contentData = {};
+        const accessibleFields = [
+          'balance',
+          'prospect',
+          'fin_rep',
+          'cash_flow',
+          'cap_rep',
+          'analytics',
+          'corporate',
+          'auditreport',
+          'emission',
+        ];
         for (const key in content) {
-          if (Array.isArray(content[key]) && content[key].length > 0) {
-            let { label, url } = content[key][0];
-            contentData[key] = { label, url };
-          } else if (typeof content[key] == 'object') {
-            let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
-            contentData[key] = { label: key, url };
-          } else {
-            contentData[key] = content[key];
+          if (accessibleFields.includes(key)) {
+            if (Array.isArray(content[key]) && content[key].length > 0) {
+              let { label, url } = content[key][0];
+              contentData[key] = { label, url };
+            } else if (typeof content[key] == 'object') {
+              let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
+              contentData[key] = { label: key, url };
+            } else {
+              contentData[key] = content[key];
+            }
           }
         }
         return {
