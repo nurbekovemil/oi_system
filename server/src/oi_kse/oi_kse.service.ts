@@ -40,28 +40,52 @@ export class OiKseService {
     if (typeString == 'oi') {
       data = reports.map(({ content, typeId, type, id, confirmDate }) => {
         const { period, year } = content;
-        const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
-        return {
-          content: { period, year, label: type.title, url },
-          confirmDate,
-          group: type.groupId,
-        };
+        // typeId == 2 - Листинговый отчет
+        if (typeId == 2) {
+          let contentData = {};
+          for (const key in content) {
+            // attachment_2_1 - Листинг отчет Приложение 2-1
+            if (key == 'attachment_2_1') {
+              if (typeof content[key] == 'object') {
+                let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
+                contentData = { label: 'Приложение 2-1', url };
+              }
+            }
+          }
+          return {
+            content: contentData,
+            confirmDate,
+            period,
+            year,
+            group: type.groupId,
+          };
+        } else {
+          const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
+          return {
+            content: { label: type.title, url },
+            confirmDate,
+            period,
+            year,
+            group: type.groupId,
+          };
+        }
       });
     }
     if (typeString == 'listing') {
+      // accessibleFields - Доступные поля листинг отчета
+      const accessibleFields = [
+        'balance',
+        'prospect',
+        'fin_rep',
+        'cash_flow',
+        'cap_rep',
+        'analytics',
+        'corporate',
+        'auditreport',
+        'emission',
+      ];
       data = reports.map(({ content, typeId, type, id, confirmDate }) => {
         const contentData = {};
-        const accessibleFields = [
-          'balance',
-          'prospect',
-          'fin_rep',
-          'cash_flow',
-          'cap_rep',
-          'analytics',
-          'corporate',
-          'auditreport',
-          'emission',
-        ];
         for (const key in content) {
           if (accessibleFields.includes(key)) {
             if (Array.isArray(content[key]) && content[key].length > 0) {
@@ -70,18 +94,19 @@ export class OiKseService {
             } else if (typeof content[key] == 'object') {
               let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
               contentData[key] = { label: key, url };
-            } else {
-              contentData[key] = content[key];
             }
           }
         }
+
         return {
           content: contentData,
           confirmDate,
+          period: content.listing_period,
+          year: content.listing_year,
           group: type.groupId,
         };
       });
     }
-    return data;
+    return data.filter(({ content }) => Object.keys(content).length);
   }
 }

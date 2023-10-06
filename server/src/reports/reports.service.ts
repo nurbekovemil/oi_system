@@ -281,18 +281,17 @@ export class ReportsService {
     const conditions =
       type == 'listing'
         ? {
-            [Op.eq]: 2,
+            companyId: oi_company_id,
+            statusId: 4,
+            typeId: 2,
           }
         : {
-            [Op.ne]: 2,
+            companyId: oi_company_id,
+            statusId: 4,
           };
-    console.log(oi_company_id, type);
+
     const reports = await this.reportRepository.findAll({
-      where: {
-        companyId: oi_company_id,
-        statusId: 4,
-        typeId: conditions,
-      },
+      where: conditions,
       include: [
         {
           model: this.reportTypesRepository,
@@ -305,7 +304,6 @@ export class ReportsService {
         [sequelize.fn('DATE', sequelize.col('confirmDate')), 'confirmDate'],
       ],
     });
-    console.log('reports --- ', JSON.stringify(reports));
     return reports;
   }
 }
