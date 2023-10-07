@@ -331,12 +331,16 @@ export class ReportsService {
         'id',
         'typeId',
         [
-          sequelize.fn('TO_CHAR', sequelize.col('confirmDate'), 'DD.MM.YYYY'),
+          sequelize.fn(
+            'TO_CHAR',
+            sequelize.col('confirmDate'),
+            'YYYY.MM.DD HH24:MI:SS',
+          ),
           'confirmDate',
         ],
       ],
       order: [
-        // Will escape title and validate DESC against a list of valid direction parameters
+        // Will escape title and validate DESC against a list of valid direction parameters 2022-08-26 16:51:44"
         ['confirmDate', 'desc'],
       ],
       limit: 3,
