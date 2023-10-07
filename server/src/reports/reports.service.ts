@@ -301,8 +301,45 @@ export class ReportsService {
         'content',
         'id',
         'typeId',
-        [sequelize.fn('DATE', sequelize.col('confirmDate')), 'confirmDate'],
+        [
+          sequelize.fn('TO_CHAR', sequelize.col('confirmDate'), 'DD.MM.YYYY'),
+          'confirmDate',
+        ],
       ],
+    });
+    return reports;
+  }
+  async getOiKseLastNews() {
+    const reports = await this.reportRepository.findAll({
+      where: {
+        statusId: 4,
+      },
+      include: [
+        {
+          model: this.reportTypesRepository,
+          where: {
+            groupId: 2,
+          },
+          attributes: ['tempId', 'title'],
+        },
+        {
+          model: this.companyRepository,
+          attributes: ['name'],
+        },
+      ],
+      attributes: [
+        'id',
+        'typeId',
+        [
+          sequelize.fn('TO_CHAR', sequelize.col('confirmDate'), 'DD.MM.YYYY'),
+          'confirmDate',
+        ],
+      ],
+      order: [
+        // Will escape title and validate DESC against a list of valid direction parameters
+        ['confirmDate', 'desc'],
+      ],
+      limit: 3,
     });
     return reports;
   }

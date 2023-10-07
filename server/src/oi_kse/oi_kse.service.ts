@@ -18,7 +18,6 @@ export class OiKseService {
         type,
       },
     });
-    console.log('company', JSON.stringify(company));
     if (!company) {
       throw new HttpException('Компания не найдено!', HttpStatus.BAD_REQUEST);
     }
@@ -29,6 +28,22 @@ export class OiKseService {
     });
     const data = await this.reportsByType(reports, type);
     return data;
+  }
+
+  async getLastNews() {
+    const client_host = process.env.CLIENT_HOST;
+    const reports = await this.reportsService.getOiKseLastNews();
+    const news = reports.map(
+      ({ typeId, type, id, confirmDate: date, company }) => {
+        const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
+        return {
+          url,
+          title: `${company.name} : ${type.title}`,
+          date,
+        };
+      },
+    );
+    return news;
   }
 
   private async reportsByType(reports, typeString) {

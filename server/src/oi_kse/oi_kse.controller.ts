@@ -19,4 +19,9 @@ export class OiKseController {
   getReportsByCompanyId(@Query() query) {
     return this.oiKseService.getReportsByCompanyId(query);
   }
+
+  @Get('/news')
+  getLastNews() {
+    return this.oiKseService.getLastNews();
+  }
 }
