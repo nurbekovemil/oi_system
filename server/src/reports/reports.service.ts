@@ -334,7 +334,7 @@ export class ReportsService {
           sequelize.fn(
             'TO_CHAR',
             sequelize.col('confirmDate'),
-            'YYYY.MM.DD HH24:MI:SS',
+            'YYYY-MM-DD HH24:MI:SS',
           ),
           'confirmDate',
         ],
