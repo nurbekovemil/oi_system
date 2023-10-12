@@ -310,6 +310,7 @@ const ReportForm = () => {
       bordered={false}
       className="criclebox mb-24"
       title={<Title level={4}>{dataReportType?.title}</Title>}
+      extra={dataReportById?.company?.name}
     >
       <Form.Provider>
         <Form
