@@ -12,6 +12,9 @@ import {
   Spin,
   Table,
   Popover,
+  Modal,
+  Radio,
+  List,
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -23,6 +26,7 @@ import {
   CopyOutlined,
   FileTextOutlined,
   SafetyCertificateOutlined,
+  OrderedListOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState, Fragment } from "react";
 import {
@@ -31,13 +35,14 @@ import {
   useGetReportByIdQuery,
   useRemoveReportFileMutation,
   useGetReportTypeByIdQuery,
-  useLazyGetReportsQuery,
+  useLazyGetReportByGroupTypeQuery,
 } from "../../../store/services/report-service";
 
 import ListingModalForm from "../../../components/report/ListingModalForm";
 import { debounce } from "../../../hooks/useDebounce";
 import EdsCert from "../../../components/eds/EdsCert";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useLazyGetCompanyByIdQuery } from "../../../store/services/company-service";
 const { Meta } = Card;
 // через класс или id не работает стили так как шаблон стили загружает динамически
 const btnStyle = {
@@ -46,12 +51,16 @@ const btnStyle = {
 };
 const { Title, Text } = Typography;
 const { TextArea } = Input;
+
 const ReportForm = () => {
+  const [loadedReport, setLoadedReport] = useState();
   const navigate = useNavigate();
   const { formType, reportType, tempId, reportId } = useParams();
   const [template, setTemplate] = useState([]);
+
   // Форма - Для добавление или обновление
   const [form] = Form.useForm();
+  const { confirm } = Modal;
 
   const [listingTemplate, setListingTemplate] = useState({
     listing_prospectus: false,
@@ -59,11 +68,20 @@ const ReportForm = () => {
   });
   const [listingField, setListingField] = useState("");
 
+  const { user } = useSelector((state) => state.auth);
+
   const {
     data: dataReportTemplate,
     isSuccess: isSuccessReportTemplate,
     isLoading: isLoadingReportTemplate,
   } = useGetReportTemplateQuery(tempId);
+
+  const [getCompanyById, {}] = useLazyGetCompanyByIdQuery();
+
+  const [
+    getReportByGroupType,
+    { data: reportGroupData, isSuccess: isSuccessReportGroupData },
+  ] = useLazyGetReportByGroupTypeQuery();
 
   const { data: dataReportById, isSuccess: isSuccessGetReportById } =
     useGetReportByIdQuery(reportId);
@@ -80,8 +98,6 @@ const ReportForm = () => {
   const [updateReport, {}] = useUpdateReportMutation();
 
   const [removeReportFile, {}] = useRemoveReportFileMutation();
-
-  const [getReports] = useLazyGetReportsQuery();
 
   const addListingField = () => {
     if (listingField.trim() !== "") {
@@ -136,7 +152,7 @@ const ReportForm = () => {
     }
   };
   // set data and other_file to main template
-  const setTemplateAndOtherFileFields = () => {
+  const setTemplateAndOtherFileFields = async () => {
     const content = dataReportById.content;
     form.setFieldsValue(content);
 
@@ -145,7 +161,6 @@ const ReportForm = () => {
       setTemplate(temp);
     }
     if (reportType == 2 && template.length && isSuccessGetReportById) {
-      // const data = dataReportById.content;
       const addFieldTemplate = [...template];
       for (const prop in content) {
         if (prop.slice(0, 10) == "other_file") {
@@ -200,13 +215,86 @@ const ReportForm = () => {
       updateReportFieldHandler(newContent);
     }
   };
+  const setDataFromLastReport = (value) => {
+    form.setFieldsValue({
+      attachment_2_1: value.attachment_2_1,
+    });
+    updateReportFieldHandler({ attachment_2_1: value.attachment_2_1 });
+  };
+  const loadReportFromTemplate = () => {
+    confirm({
+      title: "Выберите документ",
+      width: 700,
+      icon: "",
+      content: (
+        <>
+          {isSuccessReportGroupData && (
+            <Radio.Group
+              onChange={(e) => {
+                setDataFromLastReport(e.target.value);
+              }}
+            >
+              <Space direction="vertical">
+                {reportGroupData.map((report) => (
+                  <Radio value={report.content} key={report.id}>
+                    {report.content.listing_period < 5
+                      ? `${report.content.listing_period} квартал ${report.content.listing_year}`
+                      : `Годовой отчет ${report.content.listing_year}`}{" "}
+                    {report.type.title} {report.confirm_date}
+                  </Radio>
+                ))}
+              </Space>
+            </Radio.Group>
+          )}
+        </>
+      ),
+      okText: "Cохранить",
+      cancelText: "Отмента",
+      onOk() {},
+    });
+  };
   const normFile = (e) => {
     if (Array.isArray(e)) {
       return e;
     }
     return e?.fileList;
   };
+  const setCompanyFields = async () => {
+    const company = await getCompanyById(user.companyId);
+    const {
+      name: issuer_data_full_name,
+      opforma: issuer_data_org_legal,
+      activity: issuer_data_main_activity,
+      address: issuer_data_legal_info,
+    } = company.data;
 
+    const companyData = {
+      issuer_data_full_name,
+      issuer_data_org_legal,
+      issuer_data_legal_info,
+      issuer_data_main_activity,
+    };
+    // Листинговый отчет Приложения 2-1 данные компании
+    if (reportType == 2) {
+      form.setFieldsValue({ attachment_2_1: companyData });
+      updateReportFieldHandler({ attachment_2_1: companyData });
+    }
+    // Приложения 2-1 данные компании
+    if (reportType == 1) {
+      form.setFieldsValue(companyData);
+      updateReportFieldHandler(companyData);
+    }
+  };
+  useEffect(() => {
+    getReportByGroupType({ type: reportType, reportId });
+
+    if (
+      (formType == "add" && reportType == 2) ||
+      (formType == "add" && reportType == 1)
+    ) {
+      setCompanyFields();
+    }
+  }, []);
   useEffect(() => {
     if (isSuccessGetReportById && isSuccessReportTemplate) {
       setTemplateAndOtherFileFields();
@@ -214,7 +302,7 @@ const ReportForm = () => {
   }, [isSuccessReportTemplate, isSuccessGetReportById, template.length]);
 
   const back = () => {
-    navigate(-1);
+    navigate("/dashboard/reports");
   };
 
   return (
@@ -222,6 +310,7 @@ const ReportForm = () => {
       bordered={false}
       className="criclebox mb-24"
       title={<Title level={4}>{dataReportType?.title}</Title>}
+      extra={dataReportById.company.name}
     >
       <Form.Provider>
         <Form
@@ -592,6 +681,7 @@ const ReportForm = () => {
                                         width: "200px",
                                         textAlign: "start",
                                       }}
+                                      onClick={loadReportFromTemplate}
                                     >
                                       Загрузить из шаблона
                                     </Button>

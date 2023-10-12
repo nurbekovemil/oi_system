@@ -59,31 +59,58 @@ const Receipt = () => {
             </Col>
           )}
           {isSuccess && (
-            <Row gutter={[0, 16]} ref={printContentRef}>
+            <Row
+              gutter={[0, 16]}
+              ref={printContentRef}
+              align={"stretch"}
+              style={{ height: "1200px" }}
+            >
               <Col span={24}>
-                <Meta avatar={<img src={logo} />}></Meta>
+                <Meta
+                  avatar={<img src={logo} />}
+                  style={{ marginLeft: "50px", marginRight: "50px" }}
+                ></Meta>
               </Col>
               <Col span={24}>
-                <Descriptions>
-                  <Descriptions.Item label="Названия компании" span={3}>
-                    {data?.report?.company?.name}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Основание документа" span={3}>
-                    {data?.report?.type?.title}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Дата размещения" span={3}>
-                    {data?.receipt?.createdAt}
-                  </Descriptions.Item>
-                </Descriptions>
-              </Col>
-              <Col>
-                <Button
-                  type="dashed"
-                  style={{}}
-                  icon={<SafetyCertificateOutlined />}
+                <div
+                  style={{
+                    fontFamily: "Arial,Helvetica,sans-serif",
+                    marginLeft: "50px",
+                  }}
                 >
-                  Подписан ЭЦП: {data?.receipt?.cert.commonName}
-                </Button>
+                  <div style={{ fontSize: "14pt" }}>
+                    {data?.report?.company?.name}
+                  </div>
+                  <div style={{ fontSize: "14pt" }}>
+                    Основание документа : {data?.report?.type?.title}
+                  </div>
+                  <div style={{ fontSize: "14pt" }}>
+                    Дата размещения : {data?.receipt?.createdAt}
+                  </div>
+                </div>
+              </Col>
+              <Col span={24}>
+                <div
+                  data-v-5b637425=""
+                  style={{
+                    flexDirection: "column",
+                    border: "2px solid grey",
+                    marginLeft: "50px",
+                    padding: "10px",
+                    color: "grey",
+                    display: "flex",
+                    fontFamily: "Andale Mono monospace",
+                    overflowWrap: "break-word",
+                    width: "40%",
+                  }}
+                >
+                  <span data-v-5b637425="">
+                    Подписан ЭЦП: {data.receipt.cert.commonName}
+                  </span>
+                  <span data-v-5b637425="">
+                    Cрок действия ЭЦП: {data.receipt.createdAt}
+                  </span>
+                </div>
               </Col>
             </Row>
           )}

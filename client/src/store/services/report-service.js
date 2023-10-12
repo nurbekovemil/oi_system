@@ -62,6 +62,11 @@ const companyApi = api.injectEndpoints({
       query: ({ page, limit }) => `reports/sort/${page}/${limit}`,
       providesTags: ["Reports"],
     }),
+    getReportByGroupType: builder.query({
+      query: ({ reportId, type }) =>
+        `reports/group?type=${type}&reportId=${reportId}`,
+      providesTags: [],
+    }),
     getReportById: builder.query({
       query: (id) => `reports/by/${id}`,
       providesTags: (result, error, arg) => [{ type: "ReportById", id: arg }],
@@ -94,6 +99,7 @@ export const {
   useLazyGetReportTemplateQuery,
   useLazyGetReportByIdQuery,
   useLazyGetReportsQuery,
+  useLazyGetReportByGroupTypeQuery,
 
   useUploadReportFileMutation,
   useRemoveReportFileMutation,

@@ -69,7 +69,7 @@ const items = [
 
 function Users() {
   const pageSizeOptions = [5, 10, 20];
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const getUsersHandler = (page, limit) => {
     setCurrentPage(page);

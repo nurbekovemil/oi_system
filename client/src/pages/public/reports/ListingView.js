@@ -55,6 +55,7 @@ const ListingView = () => {
     const temp =
       isSuccessReportTemplate &&
       getTemplate.template[2].lists.filter((item) => item.field == name)[0];
+
     if (temp) {
       const report = listingData?.content[name];
       setTitle(temp.label);

@@ -34,7 +34,7 @@ export class OiKseService {
     const client_host = process.env.CLIENT_HOST;
     const reports = await this.reportsService.getOiKseLastNews();
     const news = reports.map(
-      ({ typeId, type, id, confirmDate: date, company }) => {
+      ({ typeId, type, id, confirm_date: date, company }) => {
         const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
         return {
           url,

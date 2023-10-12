@@ -15,6 +15,7 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { Eds } from 'src/eds/entities/ed.entity';
 import sequelize from 'sequelize';
 import { Receipt } from 'src/receipts/entities/receipt.entity';
+import { group } from 'console';
 
 @Injectable()
 export class ReportsService {
@@ -203,12 +204,16 @@ export class ReportsService {
         exclude: ['content', 'createdAt'],
         include: [
           [
-            sequelize.fn('TO_CHAR', sequelize.col('sendDate'), 'DD-MM-YYYY'),
-            'sendDate',
+            sequelize.fn('TO_CHAR', sequelize.col('send_date'), 'DD-MM-YYYY'),
+            'send_date',
           ],
           [
-            sequelize.fn('TO_CHAR', sequelize.col('confirmDate'), 'DD-MM-YYYY'),
-            'confirmDate',
+            sequelize.fn(
+              'TO_CHAR',
+              sequelize.col('confirm_date'),
+              'DD-MM-YYYY',
+            ),
+            'confirm_date',
           ],
         ],
       },
@@ -232,6 +237,33 @@ export class ReportsService {
     return types;
   }
 
+  async getReportsByGroupType({ type, reportId }, { userId }) {
+    const reports = await this.reportRepository.findAll({
+      where: {
+        typeId: type,
+        id: {
+          [Op.ne]: reportId,
+        },
+        userId,
+      },
+      attributes: [
+        [
+          sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD-MM-YYYY'),
+          'confirm_date',
+        ],
+        'content',
+        'id',
+      ],
+      include: [
+        {
+          model: this.reportTypesRepository,
+        },
+      ],
+      order: [['send_date', 'DESC']],
+    });
+    return reports;
+  }
+
   async getReportTypeById(id: number) {
     const type = await this.reportTypesRepository.findByPk(id);
     return type;
@@ -245,13 +277,13 @@ export class ReportsService {
   async updateReportStatus(reportId, status) {
     const report = await this.reportRepository.findByPk(reportId);
     if (status == 2) {
-      report.sendDate = new Date();
+      report.send_date = new Date();
     }
     if (status == 4) {
-      report.confirmDate = new Date();
+      report.confirm_date = new Date();
     }
     if (status == 3) {
-      report.sendDate = null;
+      report.send_date = null;
       await this.edsRepository.destroy({ where: { reportId } });
     }
     report.statusId = status;
@@ -302,8 +334,8 @@ export class ReportsService {
         'id',
         'typeId',
         [
-          sequelize.fn('TO_CHAR', sequelize.col('confirmDate'), 'DD.MM.YYYY'),
-          'confirmDate',
+          sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
+          'confirm_date',
         ],
       ],
     });
@@ -333,15 +365,15 @@ export class ReportsService {
         [
           sequelize.fn(
             'TO_CHAR',
-            sequelize.col('confirmDate'),
+            sequelize.col('confirm_date'),
             'YYYY-MM-DD HH24:MI:SS',
           ),
-          'confirmDate',
+          'confirm_date',
         ],
       ],
       order: [
         // Will escape title and validate DESC against a list of valid direction parameters 2022-08-26 16:51:44"
-        ['confirmDate', 'desc'],
+        ['confirm_date', 'desc'],
       ],
       limit: 3,
     });

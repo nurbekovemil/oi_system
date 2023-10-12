@@ -16,7 +16,7 @@ import {
 } from "antd";
 import { Link } from "react-router-dom";
 import { useLoginMutation } from "../../store/services/auth-service";
-import logo from "../../assets/images/oi_logo.png";
+import logo from "../../assets/images/auth_logo.png";
 
 import {
   DribbbleOutlined,
@@ -52,17 +52,7 @@ const SignIn = () => {
         <Row justify="center">
           <Col span={8} xs={24} sm={24} md={10} lg={8}>
             <Space direction="vertical" style={{ width: "100%" }}>
-              <Meta
-                avatar={<Avatar size={32} shape="square" src={logo} />}
-                title={
-                  <Title level={5} type="secondary">
-                    Центр раскрытия информации
-                  </Title>
-                }
-                style={{
-                  padding: "16px",
-                }}
-              />
+              <img src={logo} />
               <Card
                 title={<Title level={4}>Войти в личный кабинет</Title>}
                 bordered={false}

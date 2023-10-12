@@ -90,6 +90,7 @@ const ReportPublicView = () => {
   };
 
   useEffect(() => {
+    console.log(dataReportType);
     if (isSuccessGetReportById && isSuccessReportTemplate) {
       setTemplateAndOtherFileFields();
     }
@@ -106,6 +107,7 @@ const ReportPublicView = () => {
           bordered={false}
           className="criclebox mb-24"
           title={<Title level={4}>{dataReportType?.title}</Title>}
+          extra={dataReportById.company.name}
         >
           <Form.Provider>
             <Form
@@ -173,7 +175,7 @@ const ReportPublicView = () => {
                               options.filter(
                                 (item) =>
                                   item.value === form.getFieldValue(field)
-                              )[0]?.label || ""
+                              )[0]?.label
                             }`}
                           </Title>
                         )}

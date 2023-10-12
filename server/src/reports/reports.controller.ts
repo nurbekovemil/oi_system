@@ -114,6 +114,11 @@ export class ReportsController {
   ) {
     res.sendFile(filename, { root: './dist/static/user_guides' });
   }
+  @UseGuards(JwtAuthGuard)
+  @Get('group')
+  getReportsByGroupType(@Query() query, @Request() req) {
+    return this.reportsService.getReportsByGroupType(query, req.user);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('/remove')

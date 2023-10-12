@@ -44,10 +44,10 @@ export class Report extends Model<Report, ReportCreateAttrs> {
   content: object;
 
   @Column({ type: DataType.DATE })
-  sendDate: Date;
+  send_date: Date;
 
   @Column({ type: DataType.DATE })
-  confirmDate: Date;
+  confirm_date: Date;
 
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER })

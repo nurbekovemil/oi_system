@@ -252,19 +252,19 @@ function NewReports() {
           <div className="author-info">
             <p>
               {report.status.id == 1 || report.status.id == 5 ? (
-                moment(report?.updatedAt).fromNow()
+                moment(report.updatedAt).fromNow()
               ) : (
                 <>
-                  {report?.sendDate != null && (
+                  {report?.send_date != null && (
                     <Tooltip title="Дата отправки">
-                      <Text>{report?.sendDate && report.sendDate}</Text>
+                      <Text>{report.send_date && report.send_date}</Text>
                     </Tooltip>
                   )}
-                  {report?.confirmDate != null && (
+                  {report?.confirm_date != null && (
                     <Tooltip title="Дата принятия">
                       <Text>
                         {" "}
-                        | {report?.confirmDate && report.confirmDate}
+                        | {report.confirm_date && report.confirm_date}
                       </Text>
                     </Tooltip>
                   )}
