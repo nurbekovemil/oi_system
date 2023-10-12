@@ -53,7 +53,7 @@ export class OiKseService {
       return [];
     }
     if (typeString == 'oi') {
-      data = reports.map(({ content, typeId, type, id, confirmDate }) => {
+      data = reports.map(({ content, typeId, type, id, confirm_date }) => {
         // typeId == 2 - Листинговый отчет
         if (typeId == 2) {
           const { listing_period, listing_year } = content;
@@ -69,7 +69,7 @@ export class OiKseService {
           }
           return {
             content: contentData,
-            confirmDate,
+            confirm_date,
             period: listing_period,
             year: listing_year,
             group: type.groupId,
@@ -79,7 +79,7 @@ export class OiKseService {
           const { period, year } = content;
           return {
             content: { label: type.title, url },
-            confirmDate,
+            confirm_date,
             period,
             year,
             group: type.groupId,
@@ -100,7 +100,7 @@ export class OiKseService {
         'auditreport',
         'emission',
       ];
-      data = reports.map(({ content, typeId, type, id, confirmDate }) => {
+      data = reports.map(({ content, typeId, type, id, confirm_date }) => {
         const contentData = {};
         for (const key in content) {
           if (accessibleFields.includes(key)) {
@@ -116,7 +116,7 @@ export class OiKseService {
 
         return {
           content: contentData,
-          confirmDate,
+          confirm_date,
           period: content.listing_period,
           year: content.listing_year,
           group: type.groupId,
