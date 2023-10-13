@@ -7,6 +7,7 @@ import {
   IdcardOutlined,
   BankOutlined,
   BookOutlined,
+  AuditOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/images/oi_logo.png";
 import { useSelector } from "react-redux";
@@ -45,6 +46,12 @@ const menuList = [
     path: "/dashboard/user-guide",
     label: "Руководство",
     icon: <BookOutlined />,
+    role: ["ADMIN", "USER"],
+  },
+  {
+    path: "/dashboard/regulations",
+    label: "Нормативные акты",
+    icon: <AuditOutlined />,
     role: ["ADMIN", "USER"],
   },
 ];

@@ -173,6 +173,7 @@ export class ReportsService {
     const isAdmin = roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),
     );
+    const isModer = roles.some((role) => ['MODERATOR'].includes(role.title));
     const allowedReportStatusIds = [2, 4];
     const offset = (page - 1) * limit;
     const reports = await this.reportRepository.findAndCountAll({

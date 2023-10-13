@@ -38,6 +38,7 @@ import ListingView from "./pages/public/reports/ListingView";
 import Receipt from "./pages/private/Receipt";
 import UserGuide from "./pages/private/UserGuide";
 import ChangeAccess from "./components/profile/ChangeUserPass";
+import Regulations from "./pages/private/Regulations";
 
 function App() {
   moment.locale("ru");
@@ -110,6 +111,7 @@ function App() {
             />
             <Route path="/dashboard/receipt/:receiptId" element={<Receipt />} />
             <Route path="/dashboard/user-guide" element={<UserGuide />} />
+            <Route path="/dashboard/regulations" element={<Regulations />} />
             <Route path="*" element={<Navigate to="/dashboard/" />} />
           </Route>
         </Routes>

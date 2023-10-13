@@ -70,6 +70,18 @@ const ReportForm = () => {
 
   const { user } = useSelector((state) => state.auth);
 
+  const listingFieldsNotes = [
+    {
+      field: "auditreport",
+      value:
+        "Предоставлять в полном формате, включая примечания, по итогам года.",
+    },
+    {
+      field: "corporate",
+      value: "Предоставлять в случае внесенных и утвержденных изменений.",
+    },
+  ];
+
   const {
     data: dataReportTemplate,
     isSuccess: isSuccessReportTemplate,
@@ -618,7 +630,16 @@ const ReportForm = () => {
                         {lists.map((list) => (
                           <Fragment key={list.field}>
                             <Col span={12}>
-                              <Text>{list.label}</Text>
+                              <Text>
+                                {list.label}{" "}
+                                <Text type="secondary">
+                                  {
+                                    listingFieldsNotes.filter(
+                                      (note) => note.field == list.field
+                                    )[0]?.value
+                                  }
+                                </Text>
+                              </Text>
                             </Col>
                             <Col
                               span={12}

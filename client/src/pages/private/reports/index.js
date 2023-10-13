@@ -32,7 +32,7 @@ const tabList = [
     tab: (
       <span>
         <ContainerOutlined />
-        Старые документы
+        Архив
       </span>
     ),
   },
