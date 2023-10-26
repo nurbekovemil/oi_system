@@ -100,13 +100,6 @@ const UserGuide = () => {
           <List itemLayout="vertical">
             <List.Item>
               <List.Item.Meta
-                avatar={
-                  <Avatar
-                    icon={"0"}
-                    shape="square"
-                    style={{ ...avatarStyle }}
-                  />
-                }
                 title={""}
                 description={
                   <Space direction="vertical">

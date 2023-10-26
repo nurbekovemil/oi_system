@@ -29,6 +29,7 @@ import { ReceiptsModule } from './receipts/receipts.module';
 import { Receipt } from './receipts/entities/receipt.entity';
 import { OiKseModule } from './oi_kse/oi_kse.module';
 import { OiKse } from './oi_kse/entities/oi_kse.entity';
+import { RoleAllowedReports } from './roles/entities/role-allowed-reports.entity';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { OiKse } from './oi_kse/entities/oi_kse.entity';
         Token,
         Roles,
         RoleUsers,
+        RoleAllowedReports,
         Eds,
         EdsTypes,
         Receipt,

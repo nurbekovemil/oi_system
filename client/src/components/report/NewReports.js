@@ -110,7 +110,7 @@ const items = [
     description: "Отменить отправку документа",
     color: "#ffa940",
     status: [2, 5],
-    roles: ["USER", "ADMIN"],
+    roles: ["USER", "ADMIN", "MODERATOR"],
   },
   {
     key: "confirm",
@@ -119,7 +119,7 @@ const items = [
     description: "Принять документа",
     color: "#57b6c0",
     status: [2],
-    roles: ["ADMIN"],
+    roles: ["ADMIN", "MODERATOR"],
   },
 
   {
@@ -129,7 +129,7 @@ const items = [
     description: "Посмотреть квитанцию",
     color: "#bfbfbf",
     status: [4],
-    roles: ["USER", "ADMIN"],
+    roles: ["USER", "ADMIN", "MODERATOR"],
   },
   {
     key: "remove",

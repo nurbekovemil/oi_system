@@ -16,6 +16,7 @@ import { Eds } from 'src/eds/entities/ed.entity';
 import sequelize from 'sequelize';
 import { Receipt } from 'src/receipts/entities/receipt.entity';
 import { group } from 'console';
+import { RoleAllowedReports } from 'src/roles/entities/role-allowed-reports.entity';
 
 @Injectable()
 export class ReportsService {
@@ -34,6 +35,8 @@ export class ReportsService {
     @InjectModel(Eds)
     private edsRepository: typeof Eds,
     @InjectModel(Receipt) private receiptRepository: typeof Receipt,
+    @InjectModel(RoleAllowedReports)
+    private roleAllowedReportsRepository: typeof RoleAllowedReports,
 
     private filesService: FilesService,
   ) {
@@ -169,12 +172,14 @@ export class ReportsService {
   }
 
   async getReports({ roles, userId }, { limit, page }) {
-    // const { title } = roles[0];
+    const { id } = roles[0];
     const isAdmin = roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),
     );
-    const isModer = roles.some((role) => ['MODERATOR'].includes(role.title));
-    const allowedReportStatusIds = [2, 4];
+    const { report_types, report_status } =
+      await this.roleAllowedReportsRepository.findOne({
+        where: { roleId: id },
+      });
     const offset = (page - 1) * limit;
     const reports = await this.reportRepository.findAndCountAll({
       include: [
@@ -218,7 +223,9 @@ export class ReportsService {
           ],
         ],
       },
-      where: isAdmin ? { statusId: allowedReportStatusIds } : { userId },
+      where: isAdmin
+        ? { statusId: report_status, typeId: report_types }
+        : { userId },
       limit,
       offset,
       order: [['updatedAt', 'DESC']],

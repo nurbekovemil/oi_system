@@ -16,19 +16,19 @@ const menuList = [
     path: "/dashboard/profile",
     label: "Профиль",
     icon: <IdcardOutlined />,
-    role: ["ADMIN", "USER"],
+    role: ["ADMIN", "USER", "MODERATOR"],
   },
   {
     path: "/dashboard",
     label: "Панель управления",
     icon: <LayoutOutlined />,
-    role: ["ADMIN"],
+    role: ["ADMIN", "MODERATOR"],
   },
   {
     path: "/dashboard/reports",
     label: "Документы",
     icon: <ReconciliationOutlined />,
-    role: ["ADMIN", "USER"],
+    role: ["ADMIN", "USER", "MODERATOR"],
   },
   {
     path: "/dashboard/users",
@@ -46,13 +46,13 @@ const menuList = [
     path: "/dashboard/user-guide",
     label: "Руководство",
     icon: <BookOutlined />,
-    role: ["ADMIN", "USER"],
+    role: ["ADMIN", "USER", "MODERATOR"],
   },
   {
     path: "/dashboard/regulations",
     label: "Нормативные акты",
     icon: <AuditOutlined />,
-    role: ["ADMIN", "USER"],
+    role: ["ADMIN", "USER", "MODERATOR"],
   },
 ];
 function Sidenav({ color }) {

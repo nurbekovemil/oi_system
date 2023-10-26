@@ -71,7 +71,7 @@ export class ReportsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles('ADMIN', 'USER')
+  @Roles('ADMIN', 'USER', 'MODERATOR')
   @UseGuards(RolesGuard)
   @Get('/sort/:page/:limit')
   getReports(@Param() param: any, @Request() req) {

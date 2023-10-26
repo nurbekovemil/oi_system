@@ -15,6 +15,7 @@ import {
   Modal,
   Radio,
   List,
+  notification,
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -49,9 +50,9 @@ const btnStyle = {
   background: "#57b6c0",
   borderColor: "#57b6c0",
 };
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
-
+const uploadFileSize = 8 * 1024 * 1024; // 8 мб
 const ReportForm = () => {
   const [loadedReport, setLoadedReport] = useState();
   const navigate = useNavigate();
@@ -69,18 +70,6 @@ const ReportForm = () => {
   const [listingField, setListingField] = useState("");
 
   const { user } = useSelector((state) => state.auth);
-
-  const listingFieldsNotes = [
-    {
-      field: "auditreport",
-      value:
-        "Предоставлять в полном формате, включая примечания, по итогам года.",
-    },
-    {
-      field: "corporate",
-      value: "Предоставлять в случае внесенных и утвержденных изменений.",
-    },
-  ];
 
   const {
     data: dataReportTemplate,
@@ -194,6 +183,9 @@ const ReportForm = () => {
     return file instanceof File || file instanceof Blob;
   };
   const uploadReportFileHandler = async (file, field) => {
+    if (file.size > uploadFileSize) {
+      return notification.error({ message: "Файл не должен превышать 8 мб" });
+    }
     const { label } = template[2].lists.filter(
       (item) => item.field === field
     )[0];
@@ -270,6 +262,13 @@ const ReportForm = () => {
       return e;
     }
     return e?.fileList;
+  };
+  const checkFileSize = ({ file }) => {
+    if (file.size > uploadFileSize) {
+      return (file.status = "error");
+    } else {
+      return (file.status = "uploading");
+    }
   };
   const setCompanyFields = async () => {
     const company = await getCompanyById(user.companyId);
@@ -606,7 +605,7 @@ const ReportForm = () => {
                         </Row>
                       </>
                     )}
-                    {element === "textarea" && (
+                    {element === "textarea" && field != "audit_report" && (
                       <Form.Item
                         label={label}
                         name={field}
@@ -625,21 +624,40 @@ const ReportForm = () => {
                         )}
                       </Form.Item>
                     )}
+                    {element === "textarea" &&
+                      form.getFieldValue("period") == 5 &&
+                      field == "audit_report" && (
+                        <Form.Item
+                          label={label}
+                          name={field}
+                          rules={[
+                            {
+                              required: required,
+                              message: `${label} обязательно`,
+                              whitespace: true,
+                            },
+                          ]}
+                        >
+                          {formType === "view" ? (
+                            <Text>{form.getFieldValue(field)}</Text>
+                          ) : (
+                            <TextArea rows={4} placeholder="Введите данные" />
+                          )}
+                        </Form.Item>
+                      )}
                     {element === "list_group" && (
                       <Row gutter={[16, 16]}>
                         {lists.map((list) => (
                           <Fragment key={list.field}>
                             <Col span={12}>
-                              <Text>
-                                {list.label}{" "}
-                                <Text type="secondary">
-                                  {
-                                    listingFieldsNotes.filter(
-                                      (note) => note.field == list.field
-                                    )[0]?.value
-                                  }
-                                </Text>
-                              </Text>
+                              <Text>{list.label}</Text>
+                              <Paragraph
+                                type="secondary"
+                                italic
+                                style={{ fontSize: "12px" }}
+                              >
+                                {list.note && `(${list.note})`}
+                              </Paragraph>
                             </Col>
                             <Col
                               span={12}
@@ -754,9 +772,7 @@ const ReportForm = () => {
                                             file,
                                             onSuccess,
                                           }) => onSuccess("ok")}
-                                          onChange={({ file }) =>
-                                            (file.status = "uploading")
-                                          }
+                                          onChange={checkFileSize}
                                           accept=".pdf, .doc, .docx"
                                         >
                                           <Button

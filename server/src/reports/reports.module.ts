@@ -13,6 +13,7 @@ import { ReportGroups } from './entities/report-groups.entity';
 import { FilesModule } from 'src/files/files.module';
 import { Eds } from 'src/eds/entities/ed.entity';
 import { Receipt } from 'src/receipts/entities/receipt.entity';
+import { RoleAllowedReports } from 'src/roles/entities/role-allowed-reports.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Receipt } from 'src/receipts/entities/receipt.entity';
       ReportStatus,
       Report,
       Receipt,
+      RoleAllowedReports,
     ]),
     JwtModule,
     FilesModule,
