@@ -1282,6 +1282,7 @@ img {
 .copyright {
   color: #8c8c8c;
   margin-top: 7px;
+  text-align: right;
 }
 .copyright .anticon-heart {
   color: #f5222d;
@@ -3116,4 +3117,8 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
 .ant-modal-content {
   border-radius: 12px !important;
 
+}
+.header-control-btn {
+  display: flex;
+  align-items: center;
 }

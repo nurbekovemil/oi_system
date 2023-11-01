@@ -10,9 +10,9 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 @media (min-width: 992px) {
-  .layout-dashboard .ant-layout-footer {
+  /* .layout-dashboard .ant-layout-footer {
     margin: 0 0 20px 20px;
-  }
+  } */
   .layout-dashboard .ant-layout-sider.sider-primary {
     margin: 20px 0 0 20px;
     padding: 13px 20px;
@@ -80,5 +80,17 @@
 @media (max-width: 768px) {
   .layout-dashboard.layout-dashboard-rtl .header-control {
     justify-content: flex-end;
+  }
+}
+/* custom css */
+@media (min-width: 1600px) {
+  .content-ant {
+    width: 1000px !important;
+    margin: 0 auto !important;
+  }
+}
+@media (max-width: 576px) {
+  .copyright {
+    text-align: center;
   }
 }

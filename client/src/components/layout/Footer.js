@@ -6,7 +6,7 @@ function Footer() {
   return (
     <AntFooter style={{ background: "#fafafa" }}>
       <Row className="just">
-        <Col xs={24} md={12} lg={12}>
+        <Col span={24}>
           <div className="copyright">
             ЗАО Кыргызская фондовая биржа © 2023 Центр раскрытия информации
           </div>
