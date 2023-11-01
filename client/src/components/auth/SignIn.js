@@ -51,8 +51,20 @@ const SignIn = () => {
       <Col span={20}>
         <Row justify="center">
           <Col span={8} xs={24} sm={24} md={10} lg={8}>
-            <Space direction="vertical" style={{ width: "100%" }}>
-              <img src={logo} />
+            <Space
+              direction="vertical"
+              style={{
+                width: "100%",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <img
+                  src={logo}
+                  style={{
+                    width: 300,
+                  }}
+                />
+              </div>
               <Card
                 title={<Title level={4}>Войти в личный кабинет</Title>}
                 bordered={false}
