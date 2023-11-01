@@ -10,7 +10,12 @@ import {
   Space,
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import { SaveOutlined, BulbOutlined, CopyOutlined } from "@ant-design/icons";
+import {
+  SaveOutlined,
+  BulbOutlined,
+  CopyOutlined,
+  UndoOutlined,
+} from "@ant-design/icons";
 import {
   useGetCompaniesForOptionQuery,
   useLazyGetCompanyByIdQuery,
@@ -20,6 +25,7 @@ import {
   useCreateUserMutation,
   useGetUserTemplateQuery,
   useLazyGetUserByIdQuery,
+  useLazyResetUserPassQuery,
   useUpdateUserMutation,
 } from "../../../store/services/user-service";
 import { useEffect } from "react";
@@ -59,6 +65,8 @@ const UserForm = () => {
   // Сервис - Получить пользователя по id
   const [getUserById, { data: userData, isSuccess: isSuccessUser }] =
     useLazyGetUserByIdQuery();
+
+  const [resetUserPass, {}] = useLazyResetUserPassQuery();
 
   // Вызвать функции после того как компонент готов к работе
   useEffect(() => {
@@ -113,6 +121,9 @@ const UserForm = () => {
     if (formType === "upd") {
       updateUser({ ...values, id: userData.id });
     }
+  };
+  const resetUserPassHandler = () => {
+    resetUserPass({ userId: userData.id });
   };
 
   // Скопировать данные при создании нового пользователя
@@ -260,6 +271,14 @@ const UserForm = () => {
                 {formType === "add" && (
                   <Button icon={<CopyOutlined />} onClick={copyData}>
                     Скопировать
+                  </Button>
+                )}
+                {formType === "upd" && (
+                  <Button
+                    icon={<UndoOutlined />}
+                    onClick={resetUserPassHandler}
+                  >
+                    Сброс пароля
                   </Button>
                 )}
                 <Button onClick={() => navigate(-1)} danger>

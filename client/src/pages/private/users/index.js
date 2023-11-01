@@ -31,15 +31,15 @@ const btnStyle = {
 };
 const columns = [
   {
+    title: "Компания",
+    dataIndex: "name",
+    key: "name",
+  },
+  {
     title: "Логин пользователя",
     dataIndex: "login",
     key: "user",
     width: "30%",
-  },
-  {
-    title: "Компания",
-    dataIndex: "name",
-    key: "name",
   },
   {
     title: "Действие",
@@ -58,13 +58,13 @@ const items = [
     description: "Изменить пользователя",
     color: "#ffa940",
   },
-  {
-    key: "delete",
-    label: "Удалить",
-    icon: <DeleteOutlined />,
-    description: "Удалить пользователя",
-    color: "#ff7a45",
-  },
+  // {
+  //   key: "delete",
+  //   label: "Удалить",
+  //   icon: <DeleteOutlined />,
+  //   description: "Удалить пользователя",
+  //   color: "#ff7a45",
+  // },
 ];
 
 function Users() {
@@ -86,7 +86,7 @@ function Users() {
     isSuccess &&
     data?.rows.map((user) => ({
       key: user.id,
-      login: (
+      name: (
         <>
           <Avatar.Group>
             <Avatar
@@ -99,18 +99,16 @@ function Users() {
               }}
             ></Avatar>
             <div className="avatar-info">
-              <Link to={`/dashboard/users/view/${user.id}`}>{user.login}</Link>
+              <Link to={`/dashboard/companies/view/${user.company.id}`}>
+                {user?.company?.name.length > 50
+                  ? user?.company?.name.slice(0, 50) + "..."
+                  : user?.company?.name}
+              </Link>
             </div>
           </Avatar.Group>
         </>
       ),
-      name: (
-        <Link to={`/dashboard/companies/view/${user.company.id}`}>
-          {user?.company?.name.length > 50
-            ? user?.company?.name.slice(0, 50) + "..."
-            : user?.company?.name}
-        </Link>
-      ),
+      login: <Link to={`/dashboard/users/view/${user.id}`}>{user.login}</Link>,
       action: (
         <Space>
           {items.map((action) => (

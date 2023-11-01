@@ -124,6 +124,7 @@ export class UsersService {
         },
       ],
       attributes: ['id', 'login'],
+      order: [['login', 'ASC']],
       limit,
       offset,
     });
@@ -131,5 +132,11 @@ export class UsersService {
   async deleteUser({ id }: { id: number }) {
     const user = await this.userRepository.destroy({ where: { id } });
     return user;
+  }
+  async resetUserPass({ userId }) {
+    const user = await this.userRepository.findByPk(userId);
+    const hashPassword = await bcrypt.hash('123', 3);
+    user.password = hashPassword;
+    await user.save();
   }
 }

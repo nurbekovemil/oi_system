@@ -39,6 +39,7 @@ export class CompaniesService {
     console.log(page, limit);
     const companies = await this.companyRepository.findAndCountAll({
       attributes: ['id', 'name', 'activity'],
+      order: [['name', 'asc']],
       limit,
       offset,
     });
@@ -108,7 +109,6 @@ export class CompaniesService {
       // const users = await this.userRepository.bulkCreate(data);
       return 'users';
     } catch (error) {
-      console.log('mock data insert error ----- ', error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }

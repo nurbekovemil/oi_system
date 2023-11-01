@@ -52,7 +52,7 @@ const btnStyle = {
 };
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
-const uploadFileSize = 8 * 1024 * 1024; // 8 мб
+const uploadFileSize = 15 * 1024 * 1024; // 15 мб
 const ReportForm = () => {
   const [loadedReport, setLoadedReport] = useState();
   const navigate = useNavigate();

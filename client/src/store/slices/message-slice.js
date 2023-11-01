@@ -62,6 +62,12 @@ const messageSlice = createSlice({
         showMessage("Неверный пароль", "error");
       }
     );
+    builder.addMatcher(
+      userApi.endpoints.resetUserPass.matchFulfilled,
+      (state, {}) => {
+        showMessage("Пароль сброшен", "success");
+      }
+    );
     // Eds messages
     builder.addMatcher(edsApi.endpoints.sendPinCode.matchFulfilled, () => {
       showMessage("Пин код отправлен", "success");

@@ -29,6 +29,9 @@ const userApi = api.injectEndpoints({
       query: ({ page, limit }) => `users?page=${page}&limit=${limit}`,
       providesTags: ["UserUpdate"],
     }),
+    resetUserPass: builder.query({
+      query: ({ userId }) => `users/reset/pass?userId=${userId}`,
+    }),
     getUserById: builder.query({
       query: (id) => `users/${id}`,
     }),
@@ -46,5 +49,6 @@ export const {
   useUpdateUserPasswordMutation,
   useGetUsersQuery,
   useLazyGetUserByIdQuery,
+  useLazyResetUserPassQuery,
   useGetUserByIdQuery,
 } = userApi;

@@ -11,11 +11,10 @@ import {
   Post,
   Put,
   UseGuards,
-  Request,
   Query,
 } from '@nestjs/common';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
@@ -50,9 +49,13 @@ export class UsersController {
     return this.usersService.getTemplate(form_type);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('/delete')
-  deleteCompany(@Body() removeUserDto: { id: number }) {
+  deleteUser(@Body() removeUserDto: { id: number }) {
     return this.usersService.deleteUser(removeUserDto);
+  }
+
+  @Get('/reset/pass')
+  resetUserPass(@Query() query) {
+    return this.usersService.resetUserPass(query);
   }
 }

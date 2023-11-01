@@ -87,7 +87,7 @@ const SignIn = () => {
                 type="secondary"
                 style={{ padding: "16px", textAlign: "center" }}
               >
-                Кыргызская фондовая биржа © 2023
+                ЗАО Кыргызская фондовая биржа © 2023
               </Title>
             </Space>
           </Col>
