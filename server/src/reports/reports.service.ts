@@ -336,6 +336,9 @@ export class ReportsService {
         {
           model: this.reportTypesRepository,
         },
+        {
+          model: this.companyRepository,
+        },
       ],
       attributes: [
         'content',

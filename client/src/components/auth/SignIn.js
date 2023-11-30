@@ -1,41 +1,12 @@
 import React, { useState } from "react";
-import {
-  Layout,
-  Button,
-  Typography,
-  Card,
-  Form,
-  Input,
-  Menu,
-  Row,
-  Col,
-  Affix,
-  Breadcrumb,
-  Space,
-  Avatar,
-} from "antd";
-import { Link } from "react-router-dom";
+import { Button, Typography, Card, Form, Input, Row, Col, Space } from "antd";
 import { useLoginMutation } from "../../store/services/auth-service";
 import logo from "../../assets/images/auth_logo.png";
 
-import {
-  DribbbleOutlined,
-  TwitterOutlined,
-  InstagramOutlined,
-  GithubOutlined,
-  ArrowLeftOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { Header } from "antd/lib/layout/layout";
-import Footer from "../layout/Footer";
-import Meta from "antd/lib/card/Meta";
-const { Title, Text } = Typography;
-// const { Content, Footer, Header } = Layout;
-const { Header: AntHeader, Content, Sider } = Layout;
-// const logo = <GithubOutlined />;
-const SignIn = () => {
-  const [passwordVisible, setPasswordVisible] = useState(false);
+import { UserOutlined } from "@ant-design/icons";
 
+const { Title } = Typography;
+const SignIn = () => {
   const [login, { isLoading }] = useLoginMutation();
 
   const onLogin = (values) => {

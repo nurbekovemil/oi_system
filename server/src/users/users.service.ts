@@ -62,7 +62,7 @@ export class UsersService {
     return await this.userRepository.findOne({
       where: { id },
       attributes: {
-        exclude: ['password', 'createdAt', 'updatedAt'],
+        exclude: ['createdAt', 'updatedAt'],
       },
       // include: { all: true },
       include: [
@@ -114,6 +114,7 @@ export class UsersService {
     }
     throw new HttpException('Неверный пароль', HttpStatus.BAD_REQUEST);
   }
+
   async findAll({ page, limit }) {
     const offset = (page - 1) * limit;
     return await this.userRepository.findAndCountAll({

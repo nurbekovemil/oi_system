@@ -11,6 +11,7 @@ const baseQuery = fetchBaseQuery({
     "UserUpdate",
     "Reports",
     "UploadFile",
+    "getMe",
     "ReportById",
   ],
   prepareHeaders: (headers, { getState }) => {

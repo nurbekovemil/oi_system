@@ -51,7 +51,12 @@ const Profile = () => {
       </Col>
       <Col span={8} xs={24} sm={24} md={8} lg={8}>
         <ProfileUser user={user} btnStyle={btnStyle} />
-        <ChangeUserPass user={user} btnStyle={btnStyle} />
+        <ChangeUserPass
+          user={user}
+          btnStyle={btnStyle}
+          title="Сменить пароль"
+          col="24"
+        />
       </Col>
       <Col span={16} xs={24} sm={24} md={16} lg={16}>
         <ProfileCompany user={user} btnStyle={btnStyle} />

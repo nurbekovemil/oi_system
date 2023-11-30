@@ -15,6 +15,7 @@ const authApi = api.injectEndpoints({
         url: "auth/refresh",
         method: "GET",
       }),
+      providesTags: ["getMe"],
     }),
     logout: builder.query({
       query: () => ({

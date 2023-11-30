@@ -2,23 +2,12 @@ import { SaveOutlined } from "@ant-design/icons";
 import { Card, Col, Input, Row, Typography, Form, Button } from "antd";
 import React, { useEffect } from "react";
 import { useUpdateUserPasswordMutation } from "../../store/services/user-service";
-const { Title } = Typography;
-const ChangeUserPass = ({ btnStyle, user }) => {
+const { Title, Text } = Typography;
+const ChangeUserPass = ({ btnStyle, user, title, col, description }) => {
   const [accessForm] = Form.useForm();
   const [updateUserPassword, {}] = useUpdateUserPasswordMutation();
   const updateAccessHandler = (values) => {
     updateUserPassword({ ...values, userId: user.id });
-  };
-  const valid = (rule, value) => {
-    return new Promise((resolve, reject) => {
-      const regex = /^[a-zA-Z]+$/;
-      console.log(rule);
-      if (regex.test(value) && rule.required) {
-        resolve();
-      } else {
-        reject(false);
-      }
-    });
   };
   useEffect(() => {
     if (user) {
@@ -29,7 +18,7 @@ const ChangeUserPass = ({ btnStyle, user }) => {
     <Card
       bordered={false}
       className="criclebox mt-16"
-      title={<Title level={5}>Сменить пароль</Title>}
+      title={<Title level={5}>{title}</Title>}
     >
       <Form
         layout="vertical"
@@ -37,8 +26,13 @@ const ChangeUserPass = ({ btnStyle, user }) => {
         onFinish={updateAccessHandler}
         form={accessForm}
       >
-        <Row justify={"end"}>
-          <Col span={24}>
+        <Row justify={"end"} gutter={16}>
+          {description && (
+            <Col span={24} style={{ marginBottom: "10px" }}>
+              <Text type="secondary">{description}</Text>
+            </Col>
+          )}
+          <Col span={col}>
             <Form.Item
               name="password"
               label="Введите новый пароль"
@@ -54,7 +48,7 @@ const ChangeUserPass = ({ btnStyle, user }) => {
               <Input placeholder="Пароль" />
             </Form.Item>
           </Col>
-          <Col span={24}>
+          <Col span={col}>
             <Form.Item
               name="confirmPassword"
               label="Текущий пароль для подтверждения"

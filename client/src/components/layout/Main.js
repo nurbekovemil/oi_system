@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Layout, Drawer, Affix, Modal, Col, Row, Typography } from "antd";
 import Sidenav from "./Sidenav";
 import Header from "./Header";
@@ -14,6 +15,7 @@ const { Header: AntHeader, Content, Sider } = Layout;
 
 function Main({ children }) {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
   const [visible, setVisible] = useState(false);
   const [placement, setPlacement] = useState("right");
   const [sidenavColor, setSidenavColor] = useState("#57b6c0");
@@ -28,6 +30,9 @@ function Main({ children }) {
   let { pathname } = useLocation();
   pathname = pathname.replace("/", "");
   useEffect(() => {
+    if (user?.changePass) {
+      navigate("/dashboard/change-pass");
+    }
     if (!localStorage.getItem("info")) {
       Modal.info({
         width: "40%",

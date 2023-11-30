@@ -39,6 +39,7 @@ import Receipt from "./pages/private/Receipt";
 import UserGuide from "./pages/private/UserGuide";
 import ChangeAccess from "./components/profile/ChangeUserPass";
 import Regulations from "./pages/private/Regulations";
+import ChangeDefaultPass from "./pages/private/ChangeDefaultPass";
 
 function App() {
   moment.locale("ru");
@@ -68,35 +69,26 @@ function App() {
 
           <Route path="/dashboard/" element={<Private />}>
             <Route index element={<Home />} />
-
             <Route path="/dashboard/users" element={<Users />} />
-
             <Route path="/dashboard/users/:formType" element={<UserForm />} />
-
             <Route
               path="/dashboard/users/:formType/:id"
               element={<UserForm />}
             />
-
             <Route path="/dashboard/users/view/:id" element={<UserView />} />
-
             <Route path="/dashboard/companies" element={<Companies />} />
-
             <Route
               path="/dashboard/companies/:formType"
               element={<CompanyForm />}
             />
-
             <Route
               path="/dashboard/companies/:formType/:cid"
               element={<CompanyForm />}
             />
-
             <Route
               path="/dashboard/companies/view/:id"
               element={<CompanyView />}
             />
-
             <Route path="/dashboard/reports" element={<Reports />} />
             <Route path="/dashboard/reports/types" element={<ReportTypes />} />
             <Route
@@ -112,6 +104,10 @@ function App() {
             <Route path="/dashboard/receipt/:receiptId" element={<Receipt />} />
             <Route path="/dashboard/user-guide" element={<UserGuide />} />
             <Route path="/dashboard/regulations" element={<Regulations />} />
+            <Route
+              path="/dashboard/change-pass"
+              element={<ChangeDefaultPass />}
+            />
             <Route path="*" element={<Navigate to="/dashboard/" />} />
           </Route>
         </Routes>

@@ -33,6 +33,10 @@ export class AuthService {
           roles: user.roles,
           inn: user.inn,
           companyId: user.companyId,
+          changePass: await bcrypt.compare(
+            process.env.DEFAULT_PASS,
+            user.password,
+          ),
         },
         tokens,
       };
@@ -64,7 +68,7 @@ export class AuthService {
       roles: user.roles,
     });
     await this.TokenService.saveToken(user.id, tokens.refreshToken);
-
+    console.log('user password regreash ---- ', user.password);
     return {
       user: {
         id: user.id,
@@ -74,6 +78,10 @@ export class AuthService {
         roles: user.roles,
         inn: user.inn,
         companyId: user.companyId,
+        changePass: await bcrypt.compare(
+          process.env.DEFAULT_PASS,
+          user.password,
+        ),
       },
       tokens,
     };

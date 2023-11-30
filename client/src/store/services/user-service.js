@@ -24,6 +24,7 @@ const userApi = api.injectEndpoints({
         method: "PUT",
         body: data,
       }),
+      invalidatesTags: ["getMe"],
     }),
     getUsers: builder.query({
       query: ({ page, limit }) => `users?page=${page}&limit=${limit}`,

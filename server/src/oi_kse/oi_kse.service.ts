@@ -53,39 +53,41 @@ export class OiKseService {
       return [];
     }
     if (typeString == 'oi') {
-      data = reports.map(({ content, typeId, type, id, confirm_date }) => {
-        // typeId == 2 - Листинговый отчет
-        if (typeId == 2) {
-          const { listing_period, listing_year } = content;
-          let contentData = {};
-          for (const key in content) {
-            // attachment_2_1 - Листинг отчет Приложение 2-1
-            if (key == 'attachment_2_1') {
-              if (typeof content[key] == 'object') {
-                let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
-                contentData = { label: 'Приложение 2-1', url };
+      data = reports.map(
+        ({ content, typeId, type, id, confirm_date, company }) => {
+          // typeId == 2 - Листинговый отчет
+          if (typeId == 2) {
+            const { listing_period, listing_year } = content;
+            let contentData = {};
+            for (const key in content) {
+              // attachment_2_1 - Листинг отчет Приложение 2-1
+              if (key == 'attachment_2_1') {
+                if (typeof content[key] == 'object') {
+                  let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
+                  contentData = { label: 'Приложение 2-1', url };
+                }
               }
             }
+            return {
+              content: contentData,
+              confirm_date,
+              period: listing_period,
+              year: listing_year,
+              group: type.groupId,
+            };
+          } else {
+            const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
+            const { period, year } = content;
+            return {
+              content: { label: `${company.name} : ${type.title}`, url },
+              confirm_date,
+              period,
+              year,
+              group: type.groupId,
+            };
           }
-          return {
-            content: contentData,
-            confirm_date,
-            period: listing_period,
-            year: listing_year,
-            group: type.groupId,
-          };
-        } else {
-          const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
-          const { period, year } = content;
-          return {
-            content: { label: type.title, url },
-            confirm_date,
-            period,
-            year,
-            group: type.groupId,
-          };
-        }
-      });
+        },
+      );
     }
     if (typeString == 'listing') {
       // accessibleFields - Доступные поля листинг отчета
@@ -100,28 +102,30 @@ export class OiKseService {
         'auditreport',
         'emission',
       ];
-      data = reports.map(({ content, typeId, type, id, confirm_date }) => {
-        const contentData = {};
-        for (const key in content) {
-          if (accessibleFields.includes(key)) {
-            if (Array.isArray(content[key]) && content[key].length > 0) {
-              let { label, url } = content[key][0];
-              contentData[key] = { label, url };
-            } else if (typeof content[key] == 'object') {
-              let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
-              contentData[key] = { label: key, url };
+      data = reports.map(
+        ({ content, typeId, type, id, confirm_date, company }) => {
+          const contentData = {};
+          for (const key in content) {
+            if (accessibleFields.includes(key)) {
+              if (Array.isArray(content[key]) && content[key].length > 0) {
+                let { label, url } = content[key][0];
+                contentData[key] = { label, url };
+              } else if (typeof content[key] == 'object') {
+                let url = `${client_host}/report/${key}/${typeId}/${type.tempId}/${id}`;
+                contentData[key] = { label: key, url };
+              }
             }
           }
-        }
 
-        return {
-          content: contentData,
-          confirm_date,
-          period: content.listing_period,
-          year: content.listing_year,
-          group: type.groupId,
-        };
-      });
+          return {
+            content: contentData,
+            confirm_date,
+            period: content.listing_period,
+            year: content.listing_year,
+            group: type.groupId,
+          };
+        },
+      );
     }
     return data.filter(({ content }) => Object.keys(content).length);
   }
