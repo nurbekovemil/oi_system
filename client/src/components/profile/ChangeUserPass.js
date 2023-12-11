@@ -3,7 +3,7 @@ import { Card, Col, Input, Row, Typography, Form, Button } from "antd";
 import React, { useEffect } from "react";
 import { useUpdateUserPasswordMutation } from "../../store/services/user-service";
 const { Title, Text } = Typography;
-const ChangeUserPass = ({ btnStyle, user, title, col, description }) => {
+const ChangeUserPass = ({ btnStyle, user, title, description, col }) => {
   const [accessForm] = Form.useForm();
   const [updateUserPassword, {}] = useUpdateUserPasswordMutation();
   const updateAccessHandler = (values) => {
@@ -32,7 +32,7 @@ const ChangeUserPass = ({ btnStyle, user, title, col, description }) => {
               <Text type="secondary">{description}</Text>
             </Col>
           )}
-          <Col span={col}>
+          <Col span={col} xs={24} sm={24} md={12} lg={12} xxl={12}>
             <Form.Item
               name="password"
               label="Введите новый пароль"
@@ -48,7 +48,7 @@ const ChangeUserPass = ({ btnStyle, user, title, col, description }) => {
               <Input placeholder="Пароль" />
             </Form.Item>
           </Col>
-          <Col span={col}>
+          <Col span={col} xs={24} sm={24} md={12} lg={12} xxl={12}>
             <Form.Item
               name="confirmPassword"
               label="Текущий пароль для подтверждения"

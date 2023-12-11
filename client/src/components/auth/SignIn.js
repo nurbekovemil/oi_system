@@ -21,7 +21,7 @@ const SignIn = () => {
     >
       <Col span={20}>
         <Row justify="center">
-          <Col span={8} xs={24} sm={24} md={10} lg={8}>
+          <Col span={8} xs={24} sm={24} md={10} lg={6}>
             <Space
               direction="vertical"
               style={{
@@ -37,7 +37,11 @@ const SignIn = () => {
                 />
               </div>
               <Card
-                title={<Title level={4}>Войти в личный кабинет</Title>}
+                title={
+                  <Title level={4} style={{ textAlign: "center" }}>
+                    Войти в личный кабинет
+                  </Title>
+                }
                 bordered={false}
                 className="criclebox"
               >
