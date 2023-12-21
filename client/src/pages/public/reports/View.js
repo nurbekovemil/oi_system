@@ -148,7 +148,7 @@ const ReportPublicView = () => {
       <Col span={20}>
         <Card
           bordered={false}
-          className="criclebox mb-24 content-ant-public"
+          className="criclebox content-ant-public"
           title={
             <Title level={4}>
               {dataReportById?.company?.name} : {dataReportType?.title}
@@ -325,6 +325,7 @@ const ReportPublicView = () => {
                           <Form.Item
                             label={<Title level={5}>{label}</Title>}
                             name={field}
+                            style={{ marginBottom: 0 }}
                           >
                             <Text>{form.getFieldValue(field)}</Text>
                             <Divider orientation="left" plain />
