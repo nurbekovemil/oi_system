@@ -1,0 +1,48 @@
+version: "3"
+services:
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "80:80"
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: "./server"
+    ports:
+      - "8088:8088"
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - port=3132
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  database:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    ports:
+      - 5434:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    restart: always
+volumes:
+  db-data:
