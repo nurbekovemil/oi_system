@@ -1,54 +1,44 @@
 import React from "react";
-import { Card, Descriptions, Row, Col } from "antd";
-
+import { Descriptions, Row, Col } from "antd";
+const descriptionFields = [
+  {
+    rows: [
+      { label: "Названия компании", field: "name" },
+      { label: "Деятельность", field: "activity" },
+      { label: "Руководитель", field: "director" },
+      { label: "Бухгалтер", field: "accounting" },
+    ],
+  },
+  {
+    rows: [
+      { label: "Почта", field: "email" },
+      { label: "Адрес", field: "address" },
+      { label: "Телефон", field: "phone_number" },
+      { label: "ИНН", field: "inn" },
+    ],
+  },
+];
 const AboutCompany = ({ data }) => {
   return (
     <Row>
-      <Col
-        span={12}
-        xs={{ span: 24 }}
-        sm={{ span: 24 }}
-        md={{ span: 12 }}
-        lg={{ span: 12 }}
-      >
-        <Descriptions>
-          <Descriptions.Item label="Названия компании" span={3}>
-            {data.name}
-          </Descriptions.Item>
-          <Descriptions.Item label="Деятельность" span={3}>
-            {data.activity}
-          </Descriptions.Item>
-          <Descriptions.Item label="Руководитель" span={3}>
-            {data.director}
-          </Descriptions.Item>
-          <Descriptions.Item label="Бухгалтер" span={3}>
-            {data.accounting}
-          </Descriptions.Item>
-        </Descriptions>
-      </Col>
-      <Col
-        span={12}
-        xs={{ span: 24 }}
-        sm={{ span: 24 }}
-        md={{ span: 12 }}
-        lg={{ span: 12 }}
-      >
-        <Descriptions>
-          <Descriptions.Item label="Почта" span={3}>
-            {data.email}
-          </Descriptions.Item>
-          <Descriptions.Item label="Адрес" span={3}>
-            {data.address}
-          </Descriptions.Item>
-          <Descriptions.Item label="Телефон" span={3}>
-            {data.phone_number}
-          </Descriptions.Item>
-
-          <Descriptions.Item label="ИНН" span={3}>
-            {data.inn}
-          </Descriptions.Item>
-        </Descriptions>
-      </Col>
+      {descriptionFields.map(({ rows }, index) => (
+        <Col
+          span={12}
+          xs={{ span: 24 }}
+          sm={{ span: 24 }}
+          md={{ span: 12 }}
+          lg={{ span: 12 }}
+          key={index}
+        >
+          <Descriptions>
+            {rows.map(({ label, field }) => (
+              <Descriptions.Item label={label} span={3} key={field}>
+                {data[field]}
+              </Descriptions.Item>
+            ))}
+          </Descriptions>
+        </Col>
+      ))}
     </Row>
   );
 };

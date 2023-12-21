@@ -88,6 +88,20 @@
     width: 1000px !important;
     margin: 0 auto !important;
   }
+  .public_logo {
+    width: 300px;
+  }
+}
+@media (max-width: 400px) {
+  .public_logo {
+    width: 200px;
+  }
+}
+@media (min-width: 1600px) {
+  .content-ant-public {
+    width: 1000px !important;
+    margin: 0 auto;
+  }
 }
 @media (max-width: 576px) {
   .copyright {

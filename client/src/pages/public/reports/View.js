@@ -8,7 +8,8 @@ import {
   Space,
   Spin,
   Table,
-  Popover,
+  Avatar,
+  Divider,
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -23,11 +24,20 @@ import {
   useGetReportTypeByIdQuery,
   useLazyGetReportsQuery,
 } from "../../../store/services/report-service";
+import public_logo from "../../../assets/images/public_view_logo.png";
 
-import EdsCert from "../../../components/eds/EdsCert";
-
+const { Meta } = Card;
 const { Title, Text } = Typography;
-
+const currentYear = new Date().getFullYear();
+const CopyrightText = (
+  <Title
+    level={5}
+    type="secondary"
+    style={{ padding: "16px", textAlign: "center" }}
+  >
+    Центр раскрытия информации ЗАО "Кыргызская фондовая биржа" © {currentYear}
+  </Title>
+);
 const ReportPublicView = () => {
   const navigate = useNavigate();
   const { reportType, tempId, reportId } = useParams();
@@ -102,12 +112,48 @@ const ReportPublicView = () => {
 
   return (
     <Row justify="center">
-      <Col span={18}>
+      <Col span={20}>
         <Card
           bordered={false}
-          className="criclebox mb-24"
-          title={<Title level={4}>{dataReportType?.title}</Title>}
-          extra={dataReportById?.company?.name}
+          className="criclebox content-ant-public"
+          style={{ marginBottom: "22px", marginTop: "22px" }}
+        >
+          <Row align={"middle"}>
+            <Col span={12}>
+              <div className="public_logo">
+                <img src={public_logo}></img>
+              </div>
+            </Col>
+            <Col span={12} align="end">
+              <Space size={"small"} split={<Divider type="vertical" />}>
+                <Button
+                  type="link"
+                  href="https://www.kse.kg/ru"
+                  target="_blank"
+                >
+                  Главная
+                </Button>
+                <Button
+                  type="link"
+                  href="https://www.kse.kg/ru/PublicInfo"
+                  target="_blank"
+                >
+                  Центр раскрытия информации
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+      <Col span={20}>
+        <Card
+          bordered={false}
+          className="criclebox mb-24 content-ant-public"
+          title={
+            <Title level={4}>
+              {dataReportById?.company?.name} : {dataReportType?.title}
+            </Title>
+          }
         >
           <Form.Provider>
             <Form
@@ -281,6 +327,7 @@ const ReportPublicView = () => {
                             name={field}
                           >
                             <Text>{form.getFieldValue(field)}</Text>
+                            <Divider orientation="left" plain />
                           </Form.Item>
                         )}
                         {element === "list_group" && (
@@ -357,27 +404,10 @@ const ReportPublicView = () => {
                     )
                   )}
               </Row>
-              <Row justify="space-between" align="middle">
-                <Col className="px-2">
-                  {edsData && (
-                    <Popover
-                      placement="topLeft"
-                      content={<EdsCert data={edsData} type={edsType} />}
-                    >
-                      <Button
-                        type="dashed"
-                        style={{}}
-                        icon={<SafetyCertificateOutlined />}
-                      >
-                        Подписан ЭЦП: {edsData.commonName}
-                      </Button>
-                    </Popover>
-                  )}
-                </Col>
-              </Row>
             </Form>
           </Form.Provider>
         </Card>
+        {CopyrightText}
       </Col>
     </Row>
   );
