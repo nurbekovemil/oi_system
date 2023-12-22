@@ -21,7 +21,6 @@ export class BotService {
     const message = `<b>Новый документ</b>\n\n${company?.name}\n${type.title}`;
     this.botAdmin.sendMessage(tg_bot_admin_id, message, {
       parse_mode: 'HTML',
-      disable_notification: true,
     });
   }
 
@@ -35,7 +34,6 @@ export class BotService {
     const message = `${company?.name} : ${type.title}\n\n<a href="${url}">Источник: Кыргызская Фондовая Биржа</a>`;
     this.botChannel.sendMessage(tg_bot_channel_id, message, {
       parse_mode: 'HTML',
-      disable_notification: true,
     });
   }
 }
