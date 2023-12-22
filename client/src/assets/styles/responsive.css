@@ -85,7 +85,7 @@
 /* custom css */
 @media (min-width: 1600px) {
   .content-ant {
-    width: 1000px !important;
+    width: 1100px !important;
     margin: 0 auto !important;
   }
   .public_logo {
@@ -99,7 +99,7 @@
 }
 @media (min-width: 1600px) {
   .content-ant-public {
-    width: 1000px !important;
+    width: 1100px !important;
     margin: 0 auto;
   }
 }

@@ -1,3 +1,4 @@
+import { BotService } from './../bot/bot.service';
 import { FilesService } from './../files/files.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -39,6 +40,7 @@ export class ReportsService {
     private roleAllowedReportsRepository: typeof RoleAllowedReports,
 
     private filesService: FilesService,
+    private botService: BotService,
   ) {
     this.oi_old = new Sequelize({
       dialect: 'postgres',
@@ -164,7 +166,7 @@ export class ReportsService {
         },
         {
           model: this.reportTypesRepository,
-          attributes: ['title'],
+          attributes: ['title', 'tempId', 'groupId'],
         },
       ],
     });
@@ -283,12 +285,18 @@ export class ReportsService {
   }
 
   async updateReportStatus(reportId, status) {
-    const report = await this.reportRepository.findByPk(reportId);
+    // const report = await this.reportRepository.findByPk(reportId);
+    const report = await this.getReportById(reportId);
     if (status == 2) {
       report.send_date = new Date();
+      this.botService.sendNoticeForAdmin(report);
     }
     if (status == 4) {
       report.confirm_date = new Date();
+    }
+    if (status == 4 && report.type.groupId == 2) {
+      report.confirm_date = new Date();
+      this.botService.sendNoticeForKseNewsChannel(report);
     }
     if (status == 3) {
       report.send_date = null;

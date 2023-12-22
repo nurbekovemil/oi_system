@@ -68,7 +68,6 @@ export class AuthService {
       roles: user.roles,
     });
     await this.TokenService.saveToken(user.id, tokens.refreshToken);
-    console.log('user password regreash ---- ', user.password);
     return {
       user: {
         id: user.id,

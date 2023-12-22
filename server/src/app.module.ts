@@ -30,7 +30,7 @@ import { Receipt } from './receipts/entities/receipt.entity';
 import { OiKseModule } from './oi_kse/oi_kse.module';
 import { OiKse } from './oi_kse/entities/oi_kse.entity';
 import { RoleAllowedReports } from './roles/entities/role-allowed-reports.entity';
-
+import { BotModule } from './bot/bot.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -75,6 +75,7 @@ import { RoleAllowedReports } from './roles/entities/role-allowed-reports.entity
     EdsModule,
     ReceiptsModule,
     OiKseModule,
+    BotModule,
   ],
   controllers: [],
   providers: [FilesService],
