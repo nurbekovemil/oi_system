@@ -36,7 +36,7 @@ const CopyrightText = (
     type="secondary"
     style={{ padding: "16px", textAlign: "center" }}
   >
-    ЗАО Кыргызская фондовая биржа © {currentYear}
+    Центр раскрытия информации ЗАО "Кыргызская фондовая биржа" © {currentYear}
   </Title>
 );
 

@@ -11,7 +11,7 @@ import {
   Avatar,
   Divider,
 } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   EditOutlined,
   FileTextOutlined,
@@ -100,7 +100,6 @@ const ReportPublicView = () => {
   };
 
   useEffect(() => {
-    console.log(dataReportType);
     if (isSuccessGetReportById && isSuccessReportTemplate) {
       setTemplateAndOtherFileFields();
     }
@@ -121,7 +120,9 @@ const ReportPublicView = () => {
           <Row align={"middle"}>
             <Col span={12}>
               <div className="public_logo">
-                <img src={public_logo}></img>
+                <a href="https://www.kse.kg/ru" target="_blank">
+                  <img src={public_logo}></img>
+                </a>
               </div>
             </Col>
             <Col span={12} align="end">
@@ -150,7 +151,7 @@ const ReportPublicView = () => {
           bordered={false}
           className="criclebox content-ant-public"
           title={
-            <Title level={4}>
+            <Title level={4} style={{ whiteSpace: "wrap" }}>
               {dataReportById?.company?.name} : {dataReportType?.title}
             </Title>
           }
@@ -327,7 +328,9 @@ const ReportPublicView = () => {
                             name={field}
                             style={{ marginBottom: 0 }}
                           >
-                            <Text>{form.getFieldValue(field)}</Text>
+                            <Text style={{ whiteSpace: "pre-wrap" }}>
+                              {form.getFieldValue(field)}
+                            </Text>
                             <Divider orientation="left" plain />
                           </Form.Item>
                         )}

@@ -35,7 +35,6 @@ function Main({ children }) {
     }
     if (!localStorage.getItem("info")) {
       Modal.info({
-        width: "40%",
         title: (
           <Title level={5}>
             Рекомендуем ознакомиться с правилами программы

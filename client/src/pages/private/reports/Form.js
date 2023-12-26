@@ -320,8 +320,11 @@ const ReportForm = () => {
     <Card
       bordered={false}
       className="criclebox mb-24"
-      title={<Title level={4}>{dataReportType?.title}</Title>}
-      extra={dataReportById?.company?.name}
+      title={
+        <Title level={4}>
+          {dataReportById?.company?.name} : {dataReportType?.title}
+        </Title>
+      }
     >
       <Form.Provider>
         <Form
@@ -607,7 +610,7 @@ const ReportForm = () => {
                     )}
                     {element === "textarea" && field != "audit_report" && (
                       <Form.Item
-                        label={label}
+                        label={<Title level={5}>{label}</Title>}
                         name={field}
                         rules={[
                           {
@@ -618,7 +621,9 @@ const ReportForm = () => {
                         ]}
                       >
                         {formType === "view" ? (
-                          <Text>{form.getFieldValue(field)}</Text>
+                          <Text style={{ whiteSpace: "pre-wrap" }}>
+                            {form.getFieldValue(field)}
+                          </Text>
                         ) : (
                           <TextArea rows={4} placeholder="Введите данные" />
                         )}
@@ -628,7 +633,7 @@ const ReportForm = () => {
                       form.getFieldValue("period") == 5 &&
                       field == "audit_report" && (
                         <Form.Item
-                          label={label}
+                          label={<Title level={5}>{label}</Title>}
                           name={field}
                           rules={[
                             {
@@ -639,7 +644,9 @@ const ReportForm = () => {
                           ]}
                         >
                           {formType === "view" ? (
-                            <Text>{form.getFieldValue(field)}</Text>
+                            <Text style={{ whiteSpace: "pre-wrap" }}>
+                              {form.getFieldValue(field)}
+                            </Text>
                           ) : (
                             <TextArea rows={4} placeholder="Введите данные" />
                           )}

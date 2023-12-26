@@ -132,6 +132,15 @@ const items = [
     roles: ["USER", "ADMIN", "MODERATOR"],
   },
   {
+    key: "upd",
+    label: "Изменить",
+    icon: <FormOutlined />,
+    description: "Изменить документ",
+    color: "#ffa940",
+    status: [4],
+    roles: ["ADMIN"],
+  },
+  {
     key: "remove",
     label: "Удалить",
     icon: <DeleteOutlined />,

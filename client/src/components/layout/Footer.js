@@ -1,8 +1,9 @@
 import { Layout, Row, Col } from "antd";
 const { Footer: AntFooter } = Layout;
+const currentYear = new Date().getFullYear();
 const copyrightText = (
   <div className="copyright">
-    ЗАО Кыргызская фондовая биржа © 2023 Центр раскрытия информации
+    Центр раскрытия информации ЗАО "Кыргызская фондовая биржа" © {currentYear}
   </div>
 );
 function Footer() {
