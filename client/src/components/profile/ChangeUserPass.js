@@ -40,7 +40,6 @@ const ChangeUserPass = ({ btnStyle, user, title, description }) => {
               <Text type="secondary">{description}</Text>
             </Col>
           )}
-          {pathname}
           <Col {...cols}>
             <Form.Item
               name="password"
