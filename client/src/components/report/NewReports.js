@@ -48,7 +48,7 @@ const columns = [
     width: "25%",
   },
   {
-    title: "Дата",
+    title: "Дата отправки/принятия",
     dataIndex: "date",
     key: "date",
     width: "20%",
@@ -151,8 +151,8 @@ const items = [
   },
 ];
 function NewReports() {
-  const pageSizeOptions = [5, 10, 20];
-  const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 15, 20, 30];
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -239,12 +239,17 @@ function NewReports() {
             icon={<FileTextOutlined />}
           />
           <div className="avatar-info">
-            <Tooltip placement="right" title={report.type.title}>
+            <Tooltip
+              placement="right"
+              title={`${report.company.name} : ${report.type.title}`}
+            >
               <Title level={5} type="link">
                 <Link
                   to={`/dashboard/reports/view/${report.type.id}/${report.type.tempId}/${report.id}`}
                 >
-                  {report.company.name}
+                  {report.company.name > 35
+                    ? report.company.name.slice(0, 35) + "..."
+                    : report.company.name}
                 </Link>
               </Title>
               <Text type="secondary">
@@ -272,7 +277,6 @@ function NewReports() {
                   {report?.confirm_date != null && (
                     <Tooltip title="Дата принятия">
                       <Text>
-                        {" "}
                         | {report.confirm_date && report.confirm_date}
                       </Text>
                     </Tooltip>

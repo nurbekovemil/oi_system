@@ -3,10 +3,11 @@ import {
   CheckCircleOutlined,
   SyncOutlined,
   ClockCircleOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import { useGetOldReportsQuery } from "../../store/services/report-service";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const StatusTag = ({ type, title }) => {
   const statusToTag = {
@@ -26,27 +27,29 @@ const StatusTag = ({ type, title }) => {
 
 const columns = [
   {
-    title: "Тип отчета",
+    title: "Документ",
     dataIndex: "report",
     key: "report",
-    width: "32%",
+    width: "10%",
   },
   {
-    title: "Дата",
+    title: "Дата отправки / принятия",
     dataIndex: "date",
     key: "date",
+    width: "20%",
   },
 
   {
     title: "Статус",
     key: "status",
     dataIndex: "status",
+    width: "10%",
   },
-  {
-    title: "Действие",
-    key: "action",
-    dataIndex: "action",
-  },
+  // {
+  //   title: "Действие",
+  //   key: "action",
+  //   dataIndex: "action",
+  // },
 ];
 
 function OldReports() {
@@ -62,14 +65,35 @@ function OldReports() {
       report: (
         <>
           <Avatar.Group>
-            <Avatar className="shape-avatar" shape="square" size={40}></Avatar>
+            <Avatar
+              className="shape-avatar"
+              shape="square"
+              size={40}
+              style={{
+                backgroundColor: "#57b6c0",
+              }}
+              icon={<FileTextOutlined />}
+            ></Avatar>
             <div className="avatar-info">
-              <Title level={5}>{report.company_name}</Title>
-              <p>
+              <Title level={5}>
+                <a
+                  target="_blank"
+                  href={`http://www.kse.kg/${
+                    report.type == 2
+                      ? `files/BusinessReports/${report.linkkse}`
+                      : report.type == 1
+                      ? "ru/Listing"
+                      : `ru/RussianAllNewsBlog/${report.linkkse}`
+                  }`}
+                >
+                  {report.company_name}
+                </a>
+              </Title>
+              <Text type="secondary">
                 {report.typedoc.length > 35
                   ? report.typedoc.slice(0, 35) + "..."
                   : report.typedoc}
-              </p>
+              </Text>
             </div>
           </Avatar.Group>
         </>
@@ -78,7 +102,7 @@ function OldReports() {
         <>
           <div className="author-info">
             <p>
-              {report.datasend}/{report.confirmdate}
+              {report.datesend} | {report.confirmdate}
             </p>
           </div>
         </>
@@ -88,23 +112,23 @@ function OldReports() {
           <StatusTag type={"confirm"} title={"принят"} />
         </>
       ),
-      action: (
-        <>
-          <Button
-            type="link"
-            href={`http://www.kse.kg/${
-              report.type == 2
-                ? `files/BusinessReports/${report.linkkse}`
-                : report.type == 1
-                ? "ru/Listing"
-                : `ru/RussianAllNewsBlog/${report.linkkse}`
-            }`}
-            target="_blank"
-          >
-            Посмотреть
-          </Button>
-        </>
-      ),
+      // action: (
+      //   <>
+      //     <Button
+      //       type="link"
+      //       href={`http://www.kse.kg/${
+      //         report.type == 2
+      //           ? `files/BusinessReports/${report.linkkse}`
+      //           : report.type == 1
+      //           ? "ru/Listing"
+      //           : `ru/RussianAllNewsBlog/${report.linkkse}`
+      //       }`}
+      //       target="_blank"
+      //     >
+      //       Посмотреть
+      //     </Button>
+      //   </>
+      // ),
     }));
   return (
     <>
@@ -119,7 +143,6 @@ function OldReports() {
         <Table
           columns={columns}
           dataSource={reports}
-          pagination={false}
           className="ant-border-space"
         />
       )}

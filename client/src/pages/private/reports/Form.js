@@ -16,6 +16,7 @@ import {
   Radio,
   List,
   notification,
+  Divider,
 } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -448,6 +449,9 @@ const ReportForm = () => {
                                 whitespace: true,
                               },
                             ]}
+                            style={{
+                              marginBottom: "0px",
+                            }}
                           >
                             <Input placeholder="Введите данные" />
                           </Form.Item>
@@ -619,11 +623,17 @@ const ReportForm = () => {
                             whitespace: true,
                           },
                         ]}
+                        style={{
+                          marginBottom: "0px",
+                        }}
                       >
                         {formType === "view" ? (
-                          <Text style={{ whiteSpace: "pre-wrap" }}>
-                            {form.getFieldValue(field)}
-                          </Text>
+                          <>
+                            <Text style={{ whiteSpace: "pre-wrap" }}>
+                              {form.getFieldValue(field)}
+                            </Text>
+                            <Divider orientation="left" plain />
+                          </>
                         ) : (
                           <TextArea rows={4} placeholder="Введите данные" />
                         )}

@@ -45,6 +45,12 @@ const messageSlice = createSlice({
       }
     );
     builder.addMatcher(
+      userApi.endpoints.updateUser.matchFulfilled,
+      (state, { payload }) => {
+        showMessage("Данные пользователя успешно обновлены", "success");
+      }
+    );
+    builder.addMatcher(
       userApi.endpoints.createUser.matchRejected,
       (state, { payload }) => {
         showMessage(payload?.data?.response?.message, "error");

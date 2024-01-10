@@ -3122,3 +3122,13 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
   display: flex;
   align-items: center;
 }
+/* custom style */
+.ant-form-item {
+  /* margin-bottom: 0px !important; */
+}
+.ant-divider-horizontal {
+  margin: 10px 0 !important;
+}
+.ant-btn-link {
+  color: #57b6c0 !important;
+}

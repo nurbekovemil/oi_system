@@ -2,9 +2,17 @@ import { SaveOutlined } from "@ant-design/icons";
 import { Card, Col, Input, Row, Typography, Form, Button } from "antd";
 import React, { useEffect } from "react";
 import { useUpdateUserPasswordMutation } from "../../store/services/user-service";
+import { useLocation } from "react-router-dom";
+
 const { Title, Text } = Typography;
-const ChangeUserPass = ({ btnStyle, user, title, description, col }) => {
+
+const ChangeUserPass = ({ btnStyle, user, title, description }) => {
+  let { pathname } = useLocation();
   const [accessForm] = Form.useForm();
+  const cols =
+    pathname == "/dashboard/profile"
+      ? { span: 24 }
+      : { span: 12, xs: 24, sm: 24, md: 12, lg: 12, xxl: 12 };
   const [updateUserPassword, {}] = useUpdateUserPasswordMutation();
   const updateAccessHandler = (values) => {
     updateUserPassword({ ...values, userId: user.id });
@@ -32,7 +40,8 @@ const ChangeUserPass = ({ btnStyle, user, title, description, col }) => {
               <Text type="secondary">{description}</Text>
             </Col>
           )}
-          <Col span={col} xs={24} sm={24} md={12} lg={12} xxl={12}>
+          {pathname}
+          <Col {...cols}>
             <Form.Item
               name="password"
               label="Введите новый пароль"
@@ -48,7 +57,7 @@ const ChangeUserPass = ({ btnStyle, user, title, description, col }) => {
               <Input placeholder="Пароль" />
             </Form.Item>
           </Col>
-          <Col span={col} xs={24} sm={24} md={12} lg={12} xxl={12}>
+          <Col {...cols}>
             <Form.Item
               name="confirmPassword"
               label="Текущий пароль для подтверждения"

@@ -20,7 +20,6 @@ const ChangeDefaultPass = () => {
         <ChangeUserPass
           btnStyle={btnStyle}
           title="Придумайте новый пароль"
-          col="12"
           user={user}
           description="Введите более сложный пароль, стандартный пароль ненаденжный"
         />

@@ -55,7 +55,6 @@ const Profile = () => {
           user={user}
           btnStyle={btnStyle}
           title="Сменить пароль"
-          col="24"
         />
       </Col>
       <Col span={16} xs={24} sm={24} md={16} lg={16}>
