@@ -247,7 +247,7 @@ function NewReports() {
                 <Link
                   to={`/dashboard/reports/view/${report.type.id}/${report.type.tempId}/${report.id}`}
                 >
-                  {report.company.name > 35
+                  {report.company.name.length > 35
                     ? report.company.name.slice(0, 35) + "..."
                     : report.company.name}
                 </Link>
