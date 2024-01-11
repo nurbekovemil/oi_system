@@ -429,7 +429,6 @@ export class ReportsService {
       ],
       limit,
       offset,
-      order: [['confirm_date', 'DESC']],
     });
     return reports;
   }
