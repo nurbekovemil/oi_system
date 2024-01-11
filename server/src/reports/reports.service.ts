@@ -390,10 +390,7 @@ export class ReportsService {
           'confirm_date',
         ],
       ],
-      order: [
-        // Will escape title and validate DESC against a list of valid direction parameters 2022-08-26 16:51:44"
-        ['confirm_date', 'desc'],
-      ],
+      order: [['confirm_date', 'desc']],
       limit: 3,
     });
     return reports;
@@ -430,9 +427,9 @@ export class ReportsService {
           'confirm_date',
         ],
       ],
-      order: [['confirm_date', 'desc']],
       limit,
       offset,
+      order: [['confirm_date', 'DESC']],
     });
     return reports;
   }
