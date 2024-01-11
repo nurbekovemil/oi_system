@@ -46,6 +46,27 @@ export class OiKseService {
     return news;
   }
 
+  async getAllNews({ page, limit }) {
+    const client_host = process.env.CLIENT_HOST;
+    const reports = await this.reportsService.getOiKseAllNews({
+      page,
+      limit,
+    });
+    const news = reports.map(
+      ({ typeId, type, id, confirm_date: date, company, content }) => {
+        const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
+        let description = Object.values(content).join(', ');
+        return {
+          url,
+          title: `${company.name} : ${type.title}`,
+          description,
+          date,
+        };
+      },
+    );
+    return news;
+  }
+
   private async reportsByType(reports, typeString) {
     let data;
     const client_host = process.env.CLIENT_HOST;

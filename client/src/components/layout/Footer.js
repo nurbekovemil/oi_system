@@ -8,7 +8,7 @@ const copyrightText = (
 );
 function Footer() {
   return (
-    <AntFooter style={{ background: "#fafafa" }}>
+    <AntFooter>
       <Row className="just">
         <Col span={24}>{copyrightText}</Col>
       </Row>

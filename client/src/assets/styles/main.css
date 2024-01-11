@@ -35,7 +35,9 @@ body {
 }
 .layout-dashboard .ant-layout-sider.sider-primary {
   width: 250px;
-  position: fixed;
+  /* here custom style adaptive */
+  /* position: fixed; */
+  /* here custom style adaptive */
   left: 0;
   z-index: 99;
   height: 100vh;
@@ -50,7 +52,7 @@ body {
   margin: 18px 0;
   border: none;
   height: 1px;
-  background-color: #f5f5f5;
+  /* background-color: #f5f5f5; */
 }
 .layout-dashboard .ant-layout-sider.sider-primary .brand {
   font-weight: 600;
@@ -783,7 +785,9 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav
   margin-top: 15px;
 }
 .ant-layout {
-  background: #fafafa;
+  /* here custom style adaptive */
+  /* background: #fafafa; */
+  /* here custom style adaptive */
 }
 .pageheader {
   display: flex;

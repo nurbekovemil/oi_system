@@ -21,7 +21,9 @@
   .layout-dashboard .ant-layout {
     width: auto;
     flex-shrink: 1;
-    margin-left: 270px;
+    /* here custom style adaptive */
+    /* margin-left: 270px; */
+    /* here custom style adaptive */
   }
   .layout-dashboard .header-control .sidebar-toggler {
     display: none;
@@ -84,6 +86,13 @@
 }
 /* custom css */
 @media (min-width: 1600px) {
+  .ant-layout.ant-layout-has-sider {
+    /* here custom style adaptive */
+    width: 1400px;
+    margin: 0 auto;
+    /* here custom style adaptive */
+  
+  }
   .content-ant {
     width: 1100px !important;
     margin: 0 auto !important;

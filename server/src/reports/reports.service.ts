@@ -385,7 +385,7 @@ export class ReportsService {
           sequelize.fn(
             'TO_CHAR',
             sequelize.col('confirm_date'),
-            'YYYY-MM-DD HH24:MI:SS',
+            'DD.MM.YYYY HH24:MI:SS',
           ),
           'confirm_date',
         ],
@@ -395,6 +395,44 @@ export class ReportsService {
         ['confirm_date', 'desc'],
       ],
       limit: 3,
+    });
+    return reports;
+  }
+  async getOiKseAllNews({ page, limit }) {
+    const offset = (page - 1) * limit;
+    const reports = await this.reportRepository.findAll({
+      where: {
+        statusId: 4,
+      },
+      include: [
+        {
+          model: this.reportTypesRepository,
+          where: {
+            groupId: 2,
+          },
+          attributes: ['tempId', 'title'],
+        },
+        {
+          model: this.companyRepository,
+          attributes: ['name'],
+        },
+      ],
+      attributes: [
+        'id',
+        'typeId',
+        'content',
+        [
+          sequelize.fn(
+            'TO_CHAR',
+            sequelize.col('confirm_date'),
+            'DD.MM.YYYY HH24:MI:SS',
+          ),
+          'confirm_date',
+        ],
+      ],
+      order: [['confirm_date', 'desc']],
+      limit,
+      offset,
     });
     return reports;
   }
