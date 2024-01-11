@@ -385,7 +385,7 @@ export class ReportsService {
           sequelize.fn(
             'TO_CHAR',
             sequelize.col('confirm_date'),
-            'DD.MM.YYYY HH24:MI:SS',
+            'DD-MM-YYYY HH24:MI:SS',
           ),
           'confirm_date',
         ],
@@ -397,6 +397,9 @@ export class ReportsService {
   }
   async getOiKseAllNews({ page, limit }) {
     const offset = (page - 1) * limit;
+    console.log('page', page);
+    console.log('limit', limit);
+    console.log('offset', offset);
     const reports = await this.reportRepository.findAll({
       where: {
         statusId: 4,
@@ -422,13 +425,14 @@ export class ReportsService {
           sequelize.fn(
             'TO_CHAR',
             sequelize.col('confirm_date'),
-            'DD.MM.YYYY HH24:MI:SS',
+            'DD-MM-YYYY HH24:MI:SS',
           ),
           'confirm_date',
         ],
       ],
-      limit,
+      order: [['confirm_date', 'desc']],
       offset,
+      limit,
     });
     return reports;
   }
