@@ -381,14 +381,15 @@ export class ReportsService {
       attributes: [
         'id',
         'typeId',
-        [
-          sequelize.fn(
-            'TO_CHAR',
-            sequelize.col('confirm_date'),
-            'DD-MM-YYYY HH24:MI:SS',
-          ),
-          'confirm_date',
-        ],
+        'confirm_date',
+        // [
+        //   sequelize.fn(
+        //     'TO_CHAR',
+        //     sequelize.col('confirm_date'),
+        //     'DD-MM-YYYY HH24:MI:SS',
+        //   ),
+        //   'confirm_date',
+        // ],
       ],
       order: [['confirm_date', 'desc']],
       limit: 3,
@@ -417,14 +418,15 @@ export class ReportsService {
       attributes: [
         'id',
         'typeId',
-        [
-          sequelize.fn(
-            'TO_CHAR',
-            sequelize.col('confirm_date'),
-            'DD-MM-YYYY HH24:MI:SS',
-          ),
-          'confirm_date',
-        ],
+        'confirm_date',
+        // [
+        //   sequelize.fn(
+        //     'TO_CHAR',
+        //     sequelize.col('confirm_date'),
+        //     'DD-MM-YYYY HH24:MI:SS',
+        //   ),
+        //   'confirm_date',
+        // ],
       ],
       order: [['confirm_date', 'desc']],
       offset,
