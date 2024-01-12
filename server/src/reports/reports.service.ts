@@ -419,6 +419,7 @@ export class ReportsService {
         'id',
         'typeId',
         'confirm_date',
+        'content',
         // [
         //   sequelize.fn(
         //     'TO_CHAR',
