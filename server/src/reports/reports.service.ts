@@ -397,9 +397,6 @@ export class ReportsService {
   }
   async getOiKseAllNews({ page, limit }) {
     const offset = (page - 1) * limit;
-    console.log('page', page);
-    console.log('limit', limit);
-    console.log('offset', offset);
     const reports = await this.reportRepository.findAll({
       where: {
         statusId: 4,
@@ -420,7 +417,6 @@ export class ReportsService {
       attributes: [
         'id',
         'typeId',
-        'content',
         [
           sequelize.fn(
             'TO_CHAR',

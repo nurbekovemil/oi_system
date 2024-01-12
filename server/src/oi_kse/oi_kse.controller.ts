@@ -25,7 +25,7 @@ export class OiKseController {
     return this.oiKseService.getLastNews();
   }
 
-  @Get('/news/all')
+  @Get('/all-news')
   getAllNews(@Query() query) {
     return this.oiKseService.getAllNews(query);
   }

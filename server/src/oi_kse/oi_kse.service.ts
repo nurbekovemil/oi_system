@@ -55,7 +55,7 @@ export class OiKseService {
     const news = reports.map(
       ({ typeId, type, id, confirm_date: date, company, content }) => {
         const url = `${client_host}/report/${typeId}/${type.tempId}/${id}`;
-        let description = Object.values(content).join(', ');
+        let description = content ? Object.values(content).join(', ') : '';
         return {
           url,
           title: `${company.name} : ${type.title}`,
