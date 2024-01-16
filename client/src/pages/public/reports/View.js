@@ -15,9 +15,10 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   EditOutlined,
   FileTextOutlined,
+  PrinterOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment, useRef } from "react";
 import {
   useGetReportTemplateQuery,
   useGetReportByIdQuery,
@@ -25,7 +26,11 @@ import {
   useLazyGetReportsQuery,
 } from "../../../store/services/report-service";
 import public_logo from "../../../assets/images/public_view_logo.png";
-
+import { useReactToPrint } from "react-to-print";
+const btnStyle = {
+  background: "#57b6c0",
+  borderColor: "#57b6c0",
+};
 const { Meta } = Card;
 const { Title, Text } = Typography;
 const currentYear = new Date().getFullYear();
@@ -104,7 +109,10 @@ const ReportPublicView = () => {
       setTemplateAndOtherFileFields();
     }
   }, [isSuccessReportTemplate, isSuccessGetReportById, template.length]);
-
+  const printContentRef = useRef();
+  const printHandler = useReactToPrint({
+    content: () => printContentRef.current,
+  });
   if (reportType == 2) {
     return false;
   }
@@ -155,6 +163,16 @@ const ReportPublicView = () => {
               {dataReportById?.company?.name} : {dataReportType?.title}
             </Title>
           }
+          // extra={
+          //   <Button
+          //     type="primary"
+          //     style={{ ...btnStyle }}
+          //     onClick={printHandler}
+          //     icon={<PrinterOutlined />}
+          //   >
+          //     Печать
+          //   </Button>
+          // }
         >
           <Form.Provider>
             <Form
@@ -163,7 +181,7 @@ const ReportPublicView = () => {
               name="basicForm"
               form={form}
             >
-              <Row>
+              <Row ref={printContentRef}>
                 {isLoadingReportTemplate && (
                   <Col span={24} className="d-flex justify-content-center">
                     <Spin />
@@ -282,9 +300,7 @@ const ReportPublicView = () => {
                                   {list.element === "input" &&
                                     list.disabled && (
                                       <Form.Item>
-                                        <Text style={{ padding: "0px 25px" }}>
-                                          {list.value}
-                                        </Text>
+                                        <Text>{list.value}</Text>
                                       </Form.Item>
                                     )}
                                   {list.element === "input" &&
@@ -293,7 +309,7 @@ const ReportPublicView = () => {
                                         name={list.field}
                                         initialValue={list.value}
                                       >
-                                        <Text style={{ padding: "0px 25px" }}>
+                                        <Text>
                                           {form.getFieldValue(list.field)}
                                         </Text>
                                       </Form.Item>
@@ -302,11 +318,11 @@ const ReportPublicView = () => {
                                     <Form.Item>
                                       <Text
                                         strong
-                                        style={
-                                          formType === "view" && {
-                                            padding: "0px 25px",
-                                          }
-                                        }
+                                        // style={
+                                        //   formType === "view" && {
+                                        //     padding: "0px 25px",
+                                        //   }
+                                        // }
                                       >
                                         {list.value}
                                       </Text>

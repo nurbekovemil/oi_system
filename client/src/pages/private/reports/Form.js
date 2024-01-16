@@ -868,11 +868,7 @@ const ReportForm = () => {
                   placement="topLeft"
                   content={<EdsCert data={edsData} type={edsType} />}
                 >
-                  <Button
-                    type="dashed"
-                    style={{}}
-                    icon={<SafetyCertificateOutlined />}
-                  >
+                  <Button type="dashed" icon={<SafetyCertificateOutlined />}>
                     Подписан ЭЦП: {edsData.commonName}
                   </Button>
                 </Popover>
