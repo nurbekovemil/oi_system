@@ -31,6 +31,7 @@ const btnStyle = {
   background: "#57b6c0",
   borderColor: "#57b6c0",
 };
+
 const { Meta } = Card;
 const { Title, Text } = Typography;
 const currentYear = new Date().getFullYear();
@@ -109,9 +110,12 @@ const ReportPublicView = () => {
       setTemplateAndOtherFileFields();
     }
   }, [isSuccessReportTemplate, isSuccessGetReportById, template.length]);
+
   const printContentRef = useRef();
   const printHandler = useReactToPrint({
+    bodyClass: "print-agreement",
     content: () => printContentRef.current,
+    documentTitle: `Центр раскрытия информации - ${dataReportType?.title}`,
   });
   if (reportType == 2) {
     return false;
@@ -163,269 +167,278 @@ const ReportPublicView = () => {
               {dataReportById?.company?.name} : {dataReportType?.title}
             </Title>
           }
-          // extra={
-          //   <Button
-          //     type="primary"
-          //     style={{ ...btnStyle }}
-          //     onClick={printHandler}
-          //     icon={<PrinterOutlined />}
-          //   >
-          //     Печать
-          //   </Button>
-          // }
-        >
-          <Form.Provider>
-            <Form
-              layout="vertical"
-              className="row-col"
-              name="basicForm"
-              form={form}
+          extra={
+            <Button
+              type="primary"
+              style={{ ...btnStyle }}
+              onClick={printHandler}
+              icon={<PrinterOutlined />}
             >
-              <Row ref={printContentRef}>
-                {isLoadingReportTemplate && (
-                  <Col span={24} className="d-flex justify-content-center">
-                    <Spin />
-                  </Col>
-                )}
-                {isSuccessReportTemplate &&
-                  isSuccessGetReportById &&
-                  template.map(
-                    (
-                      {
-                        label,
-                        element,
-                        field,
-                        headers,
-                        lists,
-                        options,
-                        type,
-                        level,
-                        required,
-                      },
-                      i
-                    ) => (
-                      <Col
-                        className="px-2"
-                        xs={{
-                          span: 24,
-                        }}
-                        sm={{
-                          span: 24,
-                        }}
-                        md={{
-                          span: ["input", "select"].includes(element) ? 12 : 24,
-                        }}
-                        lg={{
-                          span: ["input", "select"].includes(element) ? 12 : 24,
-                        }}
-                        key={`${field}-${i}`}
-                      >
-                        {element === "title" && (
-                          <Title
-                            type={type}
-                            level={level}
-                            style={{ paddingTop: "20px" }}
-                          >
-                            {label}
-                          </Title>
-                        )}
-                        {element === "text" && (
-                          <Space direction="vertical">
-                            <Text>{label}</Text>
-                          </Space>
-                        )}
-                        {element === "select" && (
-                          <Title level={5}>
-                            {`${label}: ${
-                              options.filter(
-                                (item) =>
-                                  item.value === form.getFieldValue(field)
-                              )[0]?.label
-                            }`}
-                          </Title>
-                        )}
-                        {element === "input" && (
-                          <Text level={5}>{`${label}: ${
-                            form.getFieldValue(field) || ""
-                          }`}</Text>
-                        )}
-                        {element === "list" && (
-                          <Table
-                            columns={headers.map((h, i) => ({
-                              title: h.title,
-                              dataIndex: i + 1,
-                              ellipsis: {
-                                showTitle: false,
-                              },
-                            }))}
-                            locale={{
-                              emptyText: "Пусто",
-                            }}
-                            dataSource={onViewTableHandler(
-                              form.getFieldValue(field)
-                            )}
-                            bordered
-                            pagination={false}
-                          />
-                        )}
-                        {element === "rows" && (
-                          <>
-                            <Row gutter={16} align="middle">
-                              {headers.map((head, i) => (
-                                <Col span={head.span} key={`${field}-${i}`}>
-                                  <div>{head.title}</div>
-                                </Col>
-                              ))}
-                            </Row>
-                            <Row
-                              gutter={formType != "view" && 16}
-                              style={
-                                formType == "view" && {
-                                  border: "1px solid #f0f0f0",
-                                }
-                              }
+              Печать
+            </Button>
+          }
+        >
+          <div ref={printContentRef}>
+            <Form.Provider>
+              <Form
+                layout="vertical"
+                className="row-col"
+                name="basicForm"
+                form={form}
+              >
+                <Row>
+                  {isLoadingReportTemplate && (
+                    <Col span={24} className="d-flex justify-content-center">
+                      <Spin />
+                    </Col>
+                  )}
+                  {isSuccessReportTemplate &&
+                    isSuccessGetReportById &&
+                    template.map(
+                      (
+                        {
+                          label,
+                          element,
+                          field,
+                          headers,
+                          lists,
+                          options,
+                          type,
+                          level,
+                          required,
+                        },
+                        i
+                      ) => (
+                        <Col
+                          className="px-2"
+                          xs={{
+                            span: 24,
+                          }}
+                          sm={{
+                            span: 24,
+                          }}
+                          md={{
+                            span: ["input", "select"].includes(element)
+                              ? 12
+                              : 24,
+                          }}
+                          lg={{
+                            span: ["input", "select"].includes(element)
+                              ? 12
+                              : 24,
+                          }}
+                          key={`${field}-${i}`}
+                        >
+                          {element === "title" && (
+                            <Title
+                              type={type}
+                              level={level}
+                              style={{ paddingTop: "20px" }}
                             >
-                              {lists.map((list, i) => (
-                                <Col
-                                  span={list.span}
-                                  offset={
-                                    (list.element === "title" && 2) ||
-                                    (list.offset && list.offset)
+                              {label}
+                            </Title>
+                          )}
+                          {element === "text" && (
+                            <Space direction="vertical">
+                              <Text>{label}</Text>
+                            </Space>
+                          )}
+                          {element === "select" && (
+                            <Title level={5}>
+                              {`${label}: ${
+                                options.filter(
+                                  (item) =>
+                                    item.value === form.getFieldValue(field)
+                                )[0]?.label
+                              }`}
+                            </Title>
+                          )}
+                          {element === "input" && (
+                            <Text level={5}>{`${label}: ${
+                              form.getFieldValue(field) || ""
+                            }`}</Text>
+                          )}
+                          {element === "list" && (
+                            <Table
+                              columns={headers.map((h, i) => ({
+                                title: h.title,
+                                dataIndex: i + 1,
+                                ellipsis: {
+                                  showTitle: false,
+                                },
+                              }))}
+                              locale={{
+                                emptyText: "Пусто",
+                              }}
+                              dataSource={onViewTableHandler(
+                                form.getFieldValue(field)
+                              )}
+                              bordered
+                              pagination={false}
+                            />
+                          )}
+                          {element === "rows" && (
+                            <>
+                              <Row gutter={16} align="middle">
+                                {headers.map((head, i) => (
+                                  <Col span={head.span} key={`${field}-${i}`}>
+                                    <div>{head.title}</div>
+                                  </Col>
+                                ))}
+                              </Row>
+                              <Row
+                                gutter={formType != "view" && 16}
+                                style={
+                                  formType == "view" && {
+                                    border: "1px solid #f0f0f0",
                                   }
-                                  style={{
-                                    border: "0.5px solid #f0f0f0",
-                                  }}
-                                  key={`${list.field}-${i}`}
-                                >
-                                  {list.element === "input" &&
-                                    list.disabled && (
+                                }
+                              >
+                                {lists.map((list, i) => (
+                                  <Col
+                                    span={list.span}
+                                    offset={
+                                      (list.element === "title" && 2) ||
+                                      (list.offset && list.offset)
+                                    }
+                                    style={{
+                                      border: "0.5px solid #f0f0f0",
+                                    }}
+                                    key={`${list.field}-${i}`}
+                                  >
+                                    {list.element === "input" &&
+                                      list.disabled && (
+                                        <Form.Item>
+                                          <Text>{list.value}</Text>
+                                        </Form.Item>
+                                      )}
+                                    {list.element === "input" &&
+                                      !list.disabled && (
+                                        <Form.Item
+                                          name={list.field}
+                                          initialValue={list.value}
+                                        >
+                                          <Text>
+                                            {form.getFieldValue(list.field)}
+                                          </Text>
+                                        </Form.Item>
+                                      )}
+                                    {list.element === "title" && (
+                                      <Form.Item>
+                                        <Text
+                                          strong
+                                          // style={
+                                          //   formType === "view" && {
+                                          //     padding: "0px 25px",
+                                          //   }
+                                          // }
+                                        >
+                                          {list.value}
+                                        </Text>
+                                      </Form.Item>
+                                    )}
+                                    {list.element === "text" && (
                                       <Form.Item>
                                         <Text>{list.value}</Text>
                                       </Form.Item>
                                     )}
-                                  {list.element === "input" &&
-                                    !list.disabled && (
-                                      <Form.Item
-                                        name={list.field}
-                                        initialValue={list.value}
-                                      >
-                                        <Text>
-                                          {form.getFieldValue(list.field)}
-                                        </Text>
-                                      </Form.Item>
+                                  </Col>
+                                ))}
+                              </Row>
+                            </>
+                          )}
+                          {element === "textarea" && (
+                            <Form.Item
+                              label={<Title level={5}>{label}</Title>}
+                              name={field}
+                              style={{ marginBottom: 0 }}
+                            >
+                              <Text style={{ whiteSpace: "pre-wrap" }}>
+                                {form.getFieldValue(field)}
+                              </Text>
+                              <Divider orientation="left" plain />
+                            </Form.Item>
+                          )}
+                          {element === "list_group" && (
+                            <Row gutter={[16, 16]}>
+                              {lists.map((list) => (
+                                <Fragment key={list.field}>
+                                  <Col span={12}>
+                                    <Text>{list.label}</Text>
+                                  </Col>
+                                  <Col
+                                    span={12}
+                                    className="my-2"
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {list.element === "form" && (
+                                      <Space align="start">
+                                        <Form.Item
+                                          name={list.field}
+                                          shouldUpdate={(
+                                            prevValues,
+                                            curValues
+                                          ) => curValues[list.field]}
+                                        >
+                                          <>
+                                            <Button
+                                              type={
+                                                formType === "view" && "link"
+                                              }
+                                              icon={<EditOutlined />}
+                                              style={{
+                                                width: "155px",
+                                                textAlign: "start",
+                                              }}
+                                            >
+                                              {formType === "view"
+                                                ? "Отчет"
+                                                : "Заполнить"}
+                                            </Button>
+                                          </>
+                                        </Form.Item>
+                                      </Space>
                                     )}
-                                  {list.element === "title" && (
-                                    <Form.Item>
-                                      <Text
-                                        strong
-                                        // style={
-                                        //   formType === "view" && {
-                                        //     padding: "0px 25px",
-                                        //   }
-                                        // }
-                                      >
-                                        {list.value}
-                                      </Text>
-                                    </Form.Item>
-                                  )}
-                                  {list.element === "text" && (
-                                    <Form.Item>
-                                      <Text>{list.value}</Text>
-                                    </Form.Item>
-                                  )}
-                                </Col>
-                              ))}
-                            </Row>
-                          </>
-                        )}
-                        {element === "textarea" && (
-                          <Form.Item
-                            label={<Title level={5}>{label}</Title>}
-                            name={field}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Text style={{ whiteSpace: "pre-wrap" }}>
-                              {form.getFieldValue(field)}
-                            </Text>
-                            <Divider orientation="left" plain />
-                          </Form.Item>
-                        )}
-                        {element === "list_group" && (
-                          <Row gutter={[16, 16]}>
-                            {lists.map((list) => (
-                              <Fragment key={list.field}>
-                                <Col span={12}>
-                                  <Text>{list.label}</Text>
-                                </Col>
-                                <Col
-                                  span={12}
-                                  className="my-2"
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  {list.element === "form" && (
-                                    <Space align="start">
-                                      <Form.Item
-                                        name={list.field}
-                                        shouldUpdate={(prevValues, curValues) =>
-                                          curValues[list.field]
-                                        }
-                                      >
-                                        <>
+                                    {list.element === "file" && (
+                                      <Space align="start">
+                                        {form.getFieldValue(list.field) && (
                                           <Button
-                                            type={formType === "view" && "link"}
-                                            icon={<EditOutlined />}
+                                            type="link"
+                                            icon={<FileTextOutlined />}
                                             style={{
                                               width: "155px",
                                               textAlign: "start",
                                             }}
+                                            href={
+                                              form.getFieldValue(list.field)[0]
+                                                .url
+                                            }
+                                            target="_blank"
                                           >
-                                            {formType === "view"
-                                              ? "Отчет"
-                                              : "Заполнить"}
+                                            {
+                                              form.getFieldValue(list.field)[0]
+                                                .name
+                                            }
                                           </Button>
-                                        </>
-                                      </Form.Item>
-                                    </Space>
-                                  )}
-                                  {list.element === "file" && (
-                                    <Space align="start">
-                                      {form.getFieldValue(list.field) && (
-                                        <Button
-                                          type="link"
-                                          icon={<FileTextOutlined />}
-                                          style={{
-                                            width: "155px",
-                                            textAlign: "start",
-                                          }}
-                                          href={
-                                            form.getFieldValue(list.field)[0]
-                                              .url
-                                          }
-                                          target="_blank"
-                                        >
-                                          {
-                                            form.getFieldValue(list.field)[0]
-                                              .name
-                                          }
-                                        </Button>
-                                      )}
-                                    </Space>
-                                  )}
-                                </Col>
-                              </Fragment>
-                            ))}
-                          </Row>
-                        )}
-                      </Col>
-                    )
-                  )}
-              </Row>
-            </Form>
-          </Form.Provider>
+                                        )}
+                                      </Space>
+                                    )}
+                                  </Col>
+                                </Fragment>
+                              ))}
+                            </Row>
+                          )}
+                        </Col>
+                      )
+                    )}
+                </Row>
+              </Form>
+            </Form.Provider>
+          </div>
         </Card>
         {CopyrightText}
       </Col>

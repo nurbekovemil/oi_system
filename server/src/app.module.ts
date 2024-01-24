@@ -31,6 +31,7 @@ import { OiKseModule } from './oi_kse/oi_kse.module';
 import { OiKse } from './oi_kse/entities/oi_kse.entity';
 import { RoleAllowedReports } from './roles/entities/role-allowed-reports.entity';
 import { BotModule } from './bot/bot.module';
+import { SearchModule } from './search/search.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -76,6 +77,7 @@ import { BotModule } from './bot/bot.module';
     ReceiptsModule,
     OiKseModule,
     BotModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [FilesService],

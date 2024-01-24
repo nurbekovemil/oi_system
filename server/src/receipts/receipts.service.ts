@@ -29,10 +29,12 @@ export class ReceiptsService {
         ],
       },
     );
-    const { company, type } = await this.ReportsService.getReportById(reportId);
+    const { company, type, content } = await this.ReportsService.getReportById(
+      reportId,
+    );
     return {
       receipt: { reportId, cert, createdAt },
-      report: { company, type },
+      report: { company, type, content },
     };
   }
 }

@@ -29,8 +29,9 @@ import {
   FileTextOutlined,
   SafetyCertificateOutlined,
   OrderedListOutlined,
+  PrinterOutlined,
 } from "@ant-design/icons";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment, useRef } from "react";
 import {
   useGetReportTemplateQuery,
   useUpdateReportMutation,
@@ -45,6 +46,7 @@ import { debounce } from "../../../hooks/useDebounce";
 import EdsCert from "../../../components/eds/EdsCert";
 import { useDispatch, useSelector } from "react-redux";
 import { useLazyGetCompanyByIdQuery } from "../../../store/services/company-service";
+import { useReactToPrint } from "react-to-print";
 const { Meta } = Card;
 // через класс или id не работает стили так как шаблон стили загружает динамически
 const btnStyle = {
@@ -317,6 +319,12 @@ const ReportForm = () => {
     navigate("/dashboard/reports");
   };
 
+  const printContentRef = useRef();
+  const printHandler = useReactToPrint({
+    bodyClass: "print-agreement",
+    content: () => printContentRef.current,
+    documentTitle: `Центр раскрытия информации - ${dataReportType?.title}`,
+  });
   return (
     <Card
       bordered={false}
@@ -326,322 +334,301 @@ const ReportForm = () => {
           {dataReportById?.company?.name} : {dataReportType?.title}
         </Title>
       }
+      extra={
+        formType == "view" && (
+          <Button
+            type="primary"
+            style={{ ...btnStyle }}
+            onClick={printHandler}
+            icon={<PrinterOutlined />}
+          >
+            Печать
+          </Button>
+        )
+      }
     >
-      <Form.Provider>
-        <Form
-          layout="vertical"
-          className="row-col"
-          name="basicForm"
-          form={form}
-          onValuesChange={debounce(updateField, 1000)}
-        >
-          <Row>
-            {isLoadingReportTemplate && (
-              <Col span={24} className="d-flex justify-content-center">
-                <Spin />
-              </Col>
-            )}
-            {isSuccessReportTemplate &&
-              isSuccessGetReportById &&
-              template.map(
-                (
-                  {
-                    label,
-                    element,
-                    field,
-                    headers,
-                    lists,
-                    options,
-                    type,
-                    level,
-                    required,
-                  },
-                  i
-                ) => (
-                  <Col
-                    className="px-2"
-                    xs={{
-                      span: 24,
-                    }}
-                    sm={{
-                      span: 24,
-                    }}
-                    md={{
-                      span: ["input", "select"].includes(element) ? 12 : 24,
-                    }}
-                    lg={{
-                      span: ["input", "select"].includes(element) ? 12 : 24,
-                    }}
-                    key={`${field}-${i}`}
-                  >
-                    {element === "title" && (
-                      <Title
-                        type={type}
-                        level={level}
-                        style={formType === "view" && { paddingTop: "50px" }}
-                      >
-                        {label}
-                      </Title>
-                    )}
-                    {element === "text" && (
-                      <Space direction="vertical">
-                        <Text>{label}</Text>
-                      </Space>
-                    )}
-                    {element === "select" && (
-                      <>
-                        {formType === "view" ? (
-                          <Text level={5}>
-                            {`${label}: ${
-                              options.filter(
-                                (item) =>
-                                  item.value == form.getFieldValue(field)
-                              )[0]?.label || ""
-                            }`}
-                          </Text>
-                        ) : (
-                          <Form.Item
-                            name={field}
-                            label={label}
-                            hasFeedback
-                            rules={[
-                              {
-                                required: required,
-                                message: `${label} обязательно`,
-                              },
-                            ]}
-                          >
-                            <Select
-                              showSearch
-                              placeholder={`${label} из списка`}
-                              className="header-search"
-                              options={options}
-                              optionFilterProp="children"
-                              filterOption={(input, opt) =>
-                                (opt?.label ?? "").includes(input)
-                              }
-                              filterSort={(optA, optB) =>
-                                (optA?.label ?? "")
-                                  .toLowerCase()
-                                  .localeCompare(
-                                    (optB?.label ?? "").toLowerCase()
-                                  )
-                              }
+      <div ref={printContentRef}>
+        <Form.Provider>
+          <Form
+            layout="vertical"
+            className="row-col"
+            name="basicForm"
+            form={form}
+            onValuesChange={debounce(updateField, 1000)}
+          >
+            <Row>
+              {isLoadingReportTemplate && (
+                <Col span={24} className="d-flex justify-content-center">
+                  <Spin />
+                </Col>
+              )}
+              {isSuccessReportTemplate &&
+                isSuccessGetReportById &&
+                template.map(
+                  (
+                    {
+                      label,
+                      element,
+                      field,
+                      headers,
+                      lists,
+                      options,
+                      type,
+                      level,
+                      required,
+                    },
+                    i
+                  ) => (
+                    <Col
+                      className="px-2"
+                      xs={{
+                        span: 24,
+                      }}
+                      sm={{
+                        span: 24,
+                      }}
+                      md={{
+                        span: ["input", "select"].includes(element) ? 12 : 24,
+                      }}
+                      lg={{
+                        span: ["input", "select"].includes(element) ? 12 : 24,
+                      }}
+                      key={`${field}-${i}`}
+                    >
+                      {element === "title" && (
+                        <Title
+                          type={type}
+                          level={level}
+                          style={formType === "view" && { paddingTop: "50px" }}
+                        >
+                          {label}
+                        </Title>
+                      )}
+                      {element === "text" && (
+                        <Space direction="vertical">
+                          <Text>{label}</Text>
+                        </Space>
+                      )}
+                      {element === "select" && (
+                        <>
+                          {formType === "view" ? (
+                            <Title level={5}>
+                              {`${label}: ${
+                                options.filter(
+                                  (item) =>
+                                    item.value == form.getFieldValue(field)
+                                )[0]?.label || ""
+                              }`}
+                            </Title>
+                          ) : (
+                            <Form.Item
+                              name={field}
+                              label={label}
+                              hasFeedback
+                              rules={[
+                                {
+                                  required: required,
+                                  message: `${label} обязательно`,
+                                },
+                              ]}
+                            >
+                              <Select
+                                showSearch
+                                placeholder={`${label} из списка`}
+                                className="header-search"
+                                options={options}
+                                optionFilterProp="children"
+                                filterOption={(input, opt) =>
+                                  (opt?.label ?? "").includes(input)
+                                }
+                                filterSort={(optA, optB) =>
+                                  (optA?.label ?? "")
+                                    .toLowerCase()
+                                    .localeCompare(
+                                      (optB?.label ?? "").toLowerCase()
+                                    )
+                                }
+                              />
+                            </Form.Item>
+                          )}
+                        </>
+                      )}
+                      {element === "input" && (
+                        <>
+                          {formType === "view" ? (
+                            <Text level={5}>{`${label}: ${
+                              form.getFieldValue(field) || ""
+                            }`}</Text>
+                          ) : (
+                            <Form.Item
+                              label={label}
+                              name={field}
+                              rules={[
+                                {
+                                  required: required,
+                                  message: `${label} обязательно`,
+                                  whitespace: true,
+                                },
+                              ]}
+                              style={{
+                                marginBottom: "0px",
+                              }}
+                            >
+                              <Input placeholder="Введите данные" />
+                            </Form.Item>
+                          )}
+                        </>
+                      )}
+                      {element === "list" && (
+                        <>
+                          {formType === "view" ? (
+                            <Table
+                              columns={headers.map((h, i) => ({
+                                title: h.title,
+                                dataIndex: i + 1,
+                                ellipsis: {
+                                  showTitle: false,
+                                },
+                              }))}
+                              locale={{
+                                emptyText: "Пусто",
+                              }}
+                              dataSource={onViewTableHandler(
+                                form.getFieldValue(field)
+                              )}
+                              bordered
+                              pagination={false}
                             />
-                          </Form.Item>
-                        )}
-                      </>
-                    )}
-                    {element === "input" && (
-                      <>
-                        {formType === "view" ? (
-                          <Text level={5}>{`${label}: ${
-                            form.getFieldValue(field) || ""
-                          }`}</Text>
-                        ) : (
-                          <Form.Item
-                            label={label}
-                            name={field}
-                            rules={[
-                              {
-                                required: required,
-                                message: `${label} обязательно`,
-                                whitespace: true,
-                              },
-                            ]}
-                            style={{
-                              marginBottom: "0px",
-                            }}
-                          >
-                            <Input placeholder="Введите данные" />
-                          </Form.Item>
-                        )}
-                      </>
-                    )}
-                    {element === "list" && (
-                      <>
-                        {formType === "view" ? (
-                          <Table
-                            columns={headers.map((h, i) => ({
-                              title: h.title,
-                              dataIndex: i + 1,
-                              ellipsis: {
-                                showTitle: false,
-                              },
-                            }))}
-                            locale={{
-                              emptyText: "Пусто",
-                            }}
-                            dataSource={onViewTableHandler(
-                              form.getFieldValue(field)
-                            )}
-                            bordered
-                            pagination={false}
-                          />
-                        ) : (
-                          <Form.List name={field}>
-                            {(fields, { add, remove }) => (
-                              <>
-                                <Row gutter={16} align="middle">
-                                  {headers.map((head, i) => (
-                                    <Col span={head.span} key={`${field}-${i}`}>
-                                      <div>{head.title}</div>
-                                    </Col>
-                                  ))}
-                                </Row>
-
-                                {fields.map(({ key, name, ...restField }) => (
-                                  <Row gutter={16} key={key}>
-                                    {lists.map((list) => (
-                                      <Col span={list.span} key={list.field}>
-                                        <Form.Item
-                                          {...restField}
-                                          name={[name, list.field]}
-                                        >
-                                          <Input placeholder="Введите данные" />
-                                        </Form.Item>
+                          ) : (
+                            <Form.List name={field}>
+                              {(fields, { add, remove }) => (
+                                <>
+                                  <Row gutter={16} align="middle">
+                                    {headers.map((head, i) => (
+                                      <Col
+                                        span={head.span}
+                                        key={`${field}-${i}`}
+                                      >
+                                        <div>{head.title}</div>
                                       </Col>
                                     ))}
-                                    <Col span={1}>
-                                      <Form.Item>
-                                        <MinusCircleOutlined
-                                          color="primary"
-                                          onClick={() => remove(name)}
-                                        />
-                                      </Form.Item>
-                                    </Col>
                                   </Row>
-                                ))}
 
-                                <Form.Item>
-                                  <Button
-                                    type="dashed"
-                                    style={{
-                                      color: "#1890ff",
-                                    }}
-                                    onClick={() => add()}
-                                    block
-                                    icon={<PlusOutlined />}
-                                  >
-                                    Добавить поле для ввода данных
-                                  </Button>
-                                </Form.Item>
-                              </>
-                            )}
-                          </Form.List>
-                        )}
-                      </>
-                    )}
-                    {element === "rows" && (
-                      <>
-                        <Row gutter={16} align="middle">
-                          {headers.map((head, i) => (
-                            <Col span={head.span} key={`${field}-${i}`}>
-                              <div>{head.title}</div>
-                            </Col>
-                          ))}
-                        </Row>
-                        <Row
-                          gutter={formType != "view" && 16}
-                          style={
-                            formType == "view" && {
-                              border: "1px solid #f0f0f0",
+                                  {fields.map(({ key, name, ...restField }) => (
+                                    <Row gutter={16} key={key}>
+                                      {lists.map((list) => (
+                                        <Col span={list.span} key={list.field}>
+                                          <Form.Item
+                                            {...restField}
+                                            name={[name, list.field]}
+                                          >
+                                            <Input placeholder="Введите данные" />
+                                          </Form.Item>
+                                        </Col>
+                                      ))}
+                                      <Col span={1}>
+                                        <Form.Item>
+                                          <MinusCircleOutlined
+                                            color="primary"
+                                            onClick={() => remove(name)}
+                                          />
+                                        </Form.Item>
+                                      </Col>
+                                    </Row>
+                                  ))}
+
+                                  <Form.Item>
+                                    <Button
+                                      type="dashed"
+                                      style={{
+                                        color: "#1890ff",
+                                      }}
+                                      onClick={() => add()}
+                                      block
+                                      icon={<PlusOutlined />}
+                                    >
+                                      Добавить поле для ввода данных
+                                    </Button>
+                                  </Form.Item>
+                                </>
+                              )}
+                            </Form.List>
+                          )}
+                        </>
+                      )}
+                      {element === "rows" && (
+                        <>
+                          <Row gutter={16} align="middle">
+                            {headers.map((head, i) => (
+                              <Col span={head.span} key={`${field}-${i}`}>
+                                <div>{head.title}</div>
+                              </Col>
+                            ))}
+                          </Row>
+                          <Row
+                            gutter={formType != "view" && 16}
+                            style={
+                              formType == "view" && {
+                                border: "1px solid #f0f0f0",
+                              }
                             }
-                          }
-                        >
-                          {lists.map((list, i) => (
-                            <Col
-                              span={list.span}
-                              offset={
-                                (list.element === "title" && 2) ||
-                                (list.offset && list.offset)
-                              }
-                              style={
-                                formType == "view" && {
-                                  border: "0.5px solid #f0f0f0",
+                          >
+                            {lists.map((list, i) => (
+                              <Col
+                                span={list.span}
+                                offset={
+                                  (list.element === "title" && 2) ||
+                                  (list.offset && list.offset)
                                 }
-                              }
-                              key={`${list.field}-${i}`}
-                            >
-                              {list.element === "input" && list.disabled && (
-                                <Form.Item>
-                                  {formType === "view" ? (
-                                    <Text style={{ padding: "0px 25px" }}>
-                                      {list.value}
-                                    </Text>
-                                  ) : (
-                                    <Input disabled={true} value={list.value} />
-                                  )}
-                                </Form.Item>
-                              )}
-                              {list.element === "input" && !list.disabled && (
-                                <Form.Item
-                                  name={list.field}
-                                  initialValue={list.value}
-                                >
-                                  {formType === "view" ? (
-                                    <Text style={{ padding: "0px 25px" }}>
-                                      {form.getFieldValue(list.field)}
-                                    </Text>
-                                  ) : (
-                                    <Input placeholder="Введите данные" />
-                                  )}
-                                </Form.Item>
-                              )}
-                              {list.element === "title" && (
-                                <Form.Item>
-                                  <Text
-                                    strong
-                                    style={
-                                      formType === "view" && {
-                                        padding: "0px 25px",
-                                      }
-                                    }
+                                style={
+                                  formType == "view" && {
+                                    border: "0.5px solid #f0f0f0",
+                                  }
+                                }
+                                key={`${list.field}-${i}`}
+                              >
+                                {list.element === "input" && list.disabled && (
+                                  <Form.Item>
+                                    {formType === "view" ? (
+                                      <Text>{list.value}</Text>
+                                    ) : (
+                                      <Input
+                                        disabled={true}
+                                        value={list.value}
+                                      />
+                                    )}
+                                  </Form.Item>
+                                )}
+                                {list.element === "input" && !list.disabled && (
+                                  <Form.Item
+                                    name={list.field}
+                                    initialValue={list.value}
                                   >
-                                    {list.value}
-                                  </Text>
-                                </Form.Item>
-                              )}
-                              {list.element === "text" && (
-                                <Form.Item>
-                                  <Text>{list.value}</Text>
-                                </Form.Item>
-                              )}
-                            </Col>
-                          ))}
-                        </Row>
-                      </>
-                    )}
-                    {element === "textarea" && field != "audit_report" && (
-                      <Form.Item
-                        label={<Title level={5}>{label}</Title>}
-                        name={field}
-                        rules={[
-                          {
-                            required: required,
-                            message: `${label} обязательно`,
-                            whitespace: true,
-                          },
-                        ]}
-                        style={{
-                          marginBottom: "0px",
-                        }}
-                      >
-                        {formType === "view" ? (
-                          <>
-                            <Text style={{ whiteSpace: "pre-wrap" }}>
-                              {form.getFieldValue(field)}
-                            </Text>
-                            <Divider orientation="left" plain />
-                          </>
-                        ) : (
-                          <TextArea rows={4} placeholder="Введите данные" />
-                        )}
-                      </Form.Item>
-                    )}
-                    {element === "textarea" &&
-                      form.getFieldValue("period") == 5 &&
-                      field == "audit_report" && (
+                                    {formType === "view" ? (
+                                      <Text>
+                                        {form.getFieldValue(list.field)}
+                                      </Text>
+                                    ) : (
+                                      <Input placeholder="Введите данные" />
+                                    )}
+                                  </Form.Item>
+                                )}
+                                {list.element === "title" && (
+                                  <Form.Item>
+                                    <Text strong>{list.value}</Text>
+                                  </Form.Item>
+                                )}
+                                {list.element === "text" && (
+                                  <Form.Item>
+                                    <Text>{list.value}</Text>
+                                  </Form.Item>
+                                )}
+                              </Col>
+                            ))}
+                          </Row>
+                        </>
+                      )}
+                      {element === "textarea" && field != "audit_report" && (
                         <Form.Item
                           label={<Title level={5}>{label}</Title>}
                           name={field}
@@ -652,248 +639,280 @@ const ReportForm = () => {
                               whitespace: true,
                             },
                           ]}
+                          style={{
+                            marginBottom: "0px",
+                          }}
                         >
                           {formType === "view" ? (
-                            <Text style={{ whiteSpace: "pre-wrap" }}>
-                              {form.getFieldValue(field)}
-                            </Text>
+                            <>
+                              <Text style={{ whiteSpace: "pre-wrap" }}>
+                                {form.getFieldValue(field)}
+                              </Text>
+                              <Divider orientation="left" plain />
+                            </>
                           ) : (
-                            <TextArea rows={4} placeholder="Введите данные" />
+                            <TextArea rows={3} placeholder="Введите данные" />
                           )}
                         </Form.Item>
                       )}
-                    {element === "list_group" && (
-                      <Row gutter={[16, 16]}>
-                        {lists.map((list) => (
-                          <Fragment key={list.field}>
-                            <Col span={12}>
-                              <Text>{list.label}</Text>
-                              <Paragraph
-                                type="secondary"
-                                italic
-                                style={{ fontSize: "12px" }}
+                      {element === "textarea" &&
+                        form.getFieldValue("period") == 5 &&
+                        field == "audit_report" && (
+                          <Form.Item
+                            label={<Title level={5}>{label}</Title>}
+                            name={field}
+                            rules={[
+                              {
+                                required: required,
+                                message: `${label} обязательно`,
+                                whitespace: true,
+                              },
+                            ]}
+                          >
+                            {formType === "view" ? (
+                              <Text style={{ whiteSpace: "pre-wrap" }}>
+                                {form.getFieldValue(field)}
+                              </Text>
+                            ) : (
+                              <TextArea rows={3} placeholder="Введите данные" />
+                            )}
+                          </Form.Item>
+                        )}
+                      {element === "list_group" && (
+                        <Row gutter={[16, 16]}>
+                          {lists.map((list) => (
+                            <Fragment key={list.field}>
+                              <Col span={12}>
+                                <Text>{list.label}</Text>
+                                <Paragraph
+                                  type="secondary"
+                                  italic
+                                  style={{ fontSize: "12px" }}
+                                >
+                                  {list.note && `(${list.note})`}
+                                </Paragraph>
+                              </Col>
+                              <Col
+                                span={12}
+                                className="my-2"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
                               >
-                                {list.note && `(${list.note})`}
-                              </Paragraph>
-                            </Col>
-                            <Col
-                              span={12}
-                              className="my-2"
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                              }}
-                            >
-                              {list.element === "form" && (
-                                <Space align="start">
-                                  <Form.Item
-                                    name={list.field}
-                                    shouldUpdate={(prevValues, curValues) =>
-                                      curValues[list.field]
-                                    }
-                                  >
-                                    <>
-                                      <Button
-                                        type={formType === "view" && "link"}
-                                        icon={<EditOutlined />}
-                                        style={{
-                                          width: "155px",
-                                          textAlign: "start",
-                                        }}
-                                        onClick={() =>
-                                          toggleListingReportModal(
-                                            list.field,
-                                            true
-                                          )
-                                        }
-                                      >
-                                        {formType === "view"
-                                          ? "Отчет"
-                                          : "Заполнить"}
-                                      </Button>
-
-                                      <ListingModalForm
-                                        open={listingTemplate[list.field]}
-                                        name={list.field}
-                                        label={list.label}
-                                        onCancel={() =>
-                                          toggleListingReportModal(
-                                            list.field,
-                                            false
-                                          )
-                                        }
-                                        template={list.template}
-                                        reportId={reportId}
-                                        formType={formType}
-                                        updData={form.getFieldValue(list.field)}
-                                      />
-                                    </>
-                                  </Form.Item>
-                                  {formType != "view" && (
-                                    <Button
-                                      icon={<CopyOutlined />}
-                                      style={{
-                                        width: "200px",
-                                        textAlign: "start",
-                                      }}
-                                      onClick={loadReportFromTemplate}
+                                {list.element === "form" && (
+                                  <Space align="start">
+                                    <Form.Item
+                                      name={list.field}
+                                      shouldUpdate={(prevValues, curValues) =>
+                                        curValues[list.field]
+                                      }
                                     >
-                                      Загрузить из шаблона
-                                    </Button>
-                                  )}
-                                </Space>
-                              )}
-                              {list.element === "file" && (
-                                <>
-                                  {formType === "view" ? (
-                                    <Space align="start">
-                                      {form.getFieldValue(list.field) && (
+                                      <>
                                         <Button
-                                          type="link"
-                                          icon={<FileTextOutlined />}
-                                          style={{
-                                            width: "155px",
-                                            textAlign: "start",
-                                          }}
-                                          href={
-                                            form.getFieldValue(list.field)[0]
-                                              ?.url
-                                          }
-                                          target="_blank"
-                                        >
-                                          {
-                                            form.getFieldValue(list.field)[0]
-                                              ?.name
-                                          }
-                                        </Button>
-                                      )}
-                                    </Space>
-                                  ) : (
-                                    <Space align="start">
-                                      <Form.Item
-                                        name={list.field}
-                                        valuePropName="fileList"
-                                        getValueFromEvent={normFile}
-                                        style={{
-                                          display: "flex",
-                                          flexDirection: "column",
-                                        }}
-                                      >
-                                        <Upload
-                                          name={list.field}
-                                          maxCount={1}
-                                          listType="picture"
-                                          onRemove={deleteRemoveFile}
-                                          customRequest={({
-                                            file,
-                                            onSuccess,
-                                          }) => onSuccess("ok")}
-                                          onChange={checkFileSize}
-                                          accept=".pdf, .doc, .docx"
-                                        >
-                                          <Button
-                                            icon={<UploadOutlined />}
-                                            style={{
-                                              width: "155px",
-                                              textAlign: "start",
-                                            }}
-                                          >
-                                            Загрузить файл
-                                          </Button>
-                                        </Upload>
-                                      </Form.Item>
-
-                                      {list.delete && (
-                                        <Button
-                                          icon={<MinusCircleOutlined />}
-                                          type=""
+                                          type={formType === "view" && "link"}
+                                          icon={<EditOutlined />}
                                           style={{
                                             width: "155px",
                                             textAlign: "start",
                                           }}
                                           onClick={() =>
-                                            deleteListingField(
-                                              field,
-                                              list.field
+                                            toggleListingReportModal(
+                                              list.field,
+                                              true
                                             )
                                           }
-                                          danger
                                         >
-                                          Удалить поле
+                                          {formType === "view"
+                                            ? "Отчет"
+                                            : "Заполнить"}
                                         </Button>
-                                      )}
-                                    </Space>
-                                  )}
-                                </>
-                              )}
-                            </Col>
-                          </Fragment>
-                        ))}
-                        {formType != "view" && (
-                          <>
-                            <Col span={12}>
-                              <Input
-                                placeholder="Введите название"
-                                onChange={(e) =>
-                                  setListingField(e.target.value)
-                                }
-                              />
-                            </Col>
-                            <Col span={12}>
-                              <Button
-                                icon={<PlusOutlined />}
-                                style={{
-                                  width: "155px",
-                                  textAlign: "start",
-                                  marginRight: "1rem",
-                                }}
-                                onClick={addListingField}
-                              >
-                                Добавить поле
-                              </Button>
-                            </Col>
-                          </>
-                        )}
-                      </Row>
-                    )}
-                  </Col>
-                )
-              )}
-          </Row>
-          <Row justify="space-between" align="middle">
-            <Col className="px-2">
-              {edsData && (
-                <Popover
-                  placement="topLeft"
-                  content={<EdsCert data={edsData} type={edsType} />}
-                >
-                  <Button type="dashed" icon={<SafetyCertificateOutlined />}>
-                    Подписан ЭЦП: {edsData.commonName}
-                  </Button>
-                </Popover>
-              )}
-            </Col>
-            <Col className="px-2">
-              <Space>
-                <Button onClick={back}>Назад</Button>
-                {formType != "view" && (
-                  <Button
-                    type="primary"
-                    icon={<SaveOutlined />}
-                    style={{
-                      ...btnStyle,
-                    }}
-                    onClick={back}
-                  >
-                    {formType === "add" ? "Сохранить" : "Обновить"}
-                  </Button>
+
+                                        <ListingModalForm
+                                          open={listingTemplate[list.field]}
+                                          name={list.field}
+                                          label={list.label}
+                                          onCancel={() =>
+                                            toggleListingReportModal(
+                                              list.field,
+                                              false
+                                            )
+                                          }
+                                          template={list.template}
+                                          reportId={reportId}
+                                          formType={formType}
+                                          updData={form.getFieldValue(
+                                            list.field
+                                          )}
+                                        />
+                                      </>
+                                    </Form.Item>
+                                    {formType != "view" && (
+                                      <Button
+                                        icon={<CopyOutlined />}
+                                        style={{
+                                          width: "200px",
+                                          textAlign: "start",
+                                        }}
+                                        onClick={loadReportFromTemplate}
+                                      >
+                                        Загрузить из шаблона
+                                      </Button>
+                                    )}
+                                  </Space>
+                                )}
+                                {list.element === "file" && (
+                                  <>
+                                    {formType === "view" ? (
+                                      <Space align="start">
+                                        {form.getFieldValue(list.field) && (
+                                          <Button
+                                            type="link"
+                                            icon={<FileTextOutlined />}
+                                            style={{
+                                              width: "155px",
+                                              textAlign: "start",
+                                            }}
+                                            href={
+                                              form.getFieldValue(list.field)[0]
+                                                ?.url
+                                            }
+                                            target="_blank"
+                                          >
+                                            {
+                                              form.getFieldValue(list.field)[0]
+                                                ?.name
+                                            }
+                                          </Button>
+                                        )}
+                                      </Space>
+                                    ) : (
+                                      <Space align="start">
+                                        <Form.Item
+                                          name={list.field}
+                                          valuePropName="fileList"
+                                          getValueFromEvent={normFile}
+                                          style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                          }}
+                                        >
+                                          <Upload
+                                            name={list.field}
+                                            maxCount={1}
+                                            listType="picture"
+                                            onRemove={deleteRemoveFile}
+                                            customRequest={({
+                                              file,
+                                              onSuccess,
+                                            }) => onSuccess("ok")}
+                                            onChange={checkFileSize}
+                                            accept=".pdf, .doc, .docx"
+                                          >
+                                            <Button
+                                              icon={<UploadOutlined />}
+                                              style={{
+                                                width: "155px",
+                                                textAlign: "start",
+                                              }}
+                                            >
+                                              Загрузить файл
+                                            </Button>
+                                          </Upload>
+                                        </Form.Item>
+
+                                        {list.delete && (
+                                          <Button
+                                            icon={<MinusCircleOutlined />}
+                                            type=""
+                                            style={{
+                                              width: "155px",
+                                              textAlign: "start",
+                                            }}
+                                            onClick={() =>
+                                              deleteListingField(
+                                                field,
+                                                list.field
+                                              )
+                                            }
+                                            danger
+                                          >
+                                            Удалить поле
+                                          </Button>
+                                        )}
+                                      </Space>
+                                    )}
+                                  </>
+                                )}
+                              </Col>
+                            </Fragment>
+                          ))}
+                          {formType != "view" && (
+                            <>
+                              <Col span={12}>
+                                <Input
+                                  placeholder="Введите название"
+                                  onChange={(e) =>
+                                    setListingField(e.target.value)
+                                  }
+                                />
+                              </Col>
+                              <Col span={12}>
+                                <Button
+                                  icon={<PlusOutlined />}
+                                  style={{
+                                    width: "155px",
+                                    textAlign: "start",
+                                    marginRight: "1rem",
+                                  }}
+                                  onClick={addListingField}
+                                >
+                                  Добавить поле
+                                </Button>
+                              </Col>
+                            </>
+                          )}
+                        </Row>
+                      )}
+                    </Col>
+                  )
                 )}
-              </Space>
-            </Col>
-          </Row>
-        </Form>
-      </Form.Provider>
+            </Row>
+            <Row justify="space-between" align="middle">
+              <Col className="px-2">
+                {edsData && (
+                  <Popover
+                    placement="topLeft"
+                    content={<EdsCert data={edsData} type={edsType} />}
+                  >
+                    <Button type="dashed" icon={<SafetyCertificateOutlined />}>
+                      Подписан ЭЦП: {edsData.commonName}
+                    </Button>
+                  </Popover>
+                )}
+              </Col>
+              {formType != "view" && (
+                <Col className="px-2">
+                  <Space>
+                    <Button onClick={back}>Назад</Button>
+                    <Button
+                      type="primary"
+                      icon={<SaveOutlined />}
+                      style={{
+                        ...btnStyle,
+                      }}
+                      onClick={back}
+                    >
+                      {formType === "add" ? "Сохранить" : "Обновить"}
+                    </Button>
+                  </Space>
+                </Col>
+              )}
+            </Row>
+          </Form>
+        </Form.Provider>
+      </div>
     </Card>
   );
 };

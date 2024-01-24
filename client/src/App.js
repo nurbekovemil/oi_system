@@ -40,6 +40,7 @@ import UserGuide from "./pages/private/UserGuide";
 import ChangeAccess from "./components/profile/ChangeUserPass";
 import Regulations from "./pages/private/Regulations";
 import ChangeDefaultPass from "./pages/private/ChangeDefaultPass";
+import Saerch from "./pages/private/Search";
 
 function App() {
   moment.locale("ru");
@@ -108,6 +109,7 @@ function App() {
               path="/dashboard/change-pass"
               element={<ChangeDefaultPass />}
             />
+            <Route path="/dashboard/search" element={<Saerch />} />
             <Route path="*" element={<Navigate to="/dashboard/" />} />
           </Route>
         </Routes>

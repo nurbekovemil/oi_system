@@ -10,6 +10,7 @@ import {
   Modal,
   Table,
   Card,
+  Divider,
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -18,9 +19,19 @@ import {
   useGetReportByIdQuery,
   useGetReportTemplateQuery,
 } from "../../../store/services/report-service";
+import public_logo from "../../../assets/images/public_view_logo.png";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-
+const currentYear = new Date().getFullYear();
+const CopyrightText = (
+  <Title
+    level={5}
+    type="secondary"
+    style={{ padding: "16px", textAlign: "center" }}
+  >
+    Центр раскрытия информации ЗАО "Кыргызская фондовая биржа" © {currentYear}
+  </Title>
+);
 const ListingView = () => {
   const [form] = Form.useForm();
   const [template, setTemplate] = useState([]);
@@ -58,7 +69,7 @@ const ListingView = () => {
 
     if (temp) {
       const report = listingData?.content[name];
-      setTitle(temp.label);
+      setTitle(`${listingData?.company?.name} : ${temp?.label}`);
       setTemplate(temp.template);
       form.setFieldsValue(report);
     }
@@ -75,7 +86,42 @@ const ListingView = () => {
       <Col span={20}>
         <Card
           bordered={false}
-          className="criclebox mb-24"
+          className="criclebox content-ant-public"
+          style={{ marginBottom: "22px", marginTop: "22px" }}
+        >
+          <Row align={"middle"}>
+            <Col span={12}>
+              <div className="public_logo">
+                <a href="https://www.kse.kg/ru" target="_blank">
+                  <img src={public_logo}></img>
+                </a>
+              </div>
+            </Col>
+            <Col span={12} align="end">
+              <Space size={"small"} split={<Divider type="vertical" />}>
+                <Button
+                  type="link"
+                  href="https://www.kse.kg/ru"
+                  target="_blank"
+                >
+                  Главная
+                </Button>
+                <Button
+                  type="link"
+                  href="https://www.kse.kg/ru/PublicInfo"
+                  target="_blank"
+                >
+                  Центр раскрытия информации
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+      <Col span={20}>
+        <Card
+          bordered={false}
+          className="criclebox mb-24 content-ant-public"
           title={<Title level={4}>{title}</Title>}
         >
           <Form form={form} layout="vertical">
@@ -374,6 +420,7 @@ const ListingView = () => {
             </Row>
           </Form>
         </Card>
+        {CopyrightText}
       </Col>
     </Row>
   );

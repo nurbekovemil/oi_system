@@ -82,7 +82,9 @@ const Receipt = () => {
                     {data?.report?.company?.name}
                   </div>
                   <div style={{ fontSize: "14pt" }}>
-                    Основание документа : {data?.report?.type?.title}
+                    Основание документа : {data?.report?.type?.title}{" "}
+                    {data?.report?.type?.groupId == 1 &&
+                      `(${data?.report?.content?.period} квартал ${data?.report?.content?.year} года)`}
                   </div>
                   <div style={{ fontSize: "14pt" }}>
                     Дата размещения : {data?.receipt?.createdAt}

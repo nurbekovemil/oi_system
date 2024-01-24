@@ -3136,3 +3136,28 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
 .ant-btn-link {
   color: #57b6c0 !important;
 }
+
+
+.print-agreement {
+  padding: 50px 50px;
+}
+@media print {
+  html,
+  body {
+    height: initial !important;
+    font-size: 8px !important;
+    overflow: initial !important;
+    box-sizing: border-box;
+  }
+}
+
+.ant-input-search > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button {
+  border-radius: 0 6px 6px 0;
+  background: #57b6c0;
+  border-color: #57b6c0;
+}
+
+.ant-input-group > .ant-input:first-child, .ant-input-group-addon:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
