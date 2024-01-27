@@ -84,7 +84,11 @@ const Receipt = () => {
                   <div style={{ fontSize: "14pt" }}>
                     Основание документа : {data?.report?.type?.title}{" "}
                     {data?.report?.type?.groupId == 1 &&
+                      data?.report?.type?.tempId == 1 &&
                       `(${data?.report?.content?.period} квартал ${data?.report?.content?.year} года)`}
+                    {data?.report?.type?.groupId == 1 &&
+                      data?.report?.type?.tempId == 2 &&
+                      `(${data?.report?.content?.listing_period} квартал ${data?.report?.content?.listing_year} года)`}
                   </div>
                   <div style={{ fontSize: "14pt" }}>
                     Дата размещения : {data?.receipt?.createdAt}

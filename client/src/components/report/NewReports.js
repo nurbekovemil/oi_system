@@ -132,6 +132,16 @@ const items = [
     roles: ["USER", "ADMIN", "MODERATOR"],
   },
   {
+    key: "remove",
+    label: "Удалить",
+    icon: <DeleteOutlined />,
+    description: "Удалить документ",
+    color: "#ff4d4f",
+    status: [1, 3, 5],
+    roles: ["USER", "ADMIN"],
+  },
+  // Изменить после подтверждение
+  {
     key: "upd",
     label: "Изменить",
     icon: <FormOutlined />,
@@ -141,14 +151,24 @@ const items = [
     roles: ["ADMIN"],
   },
   {
-    key: "remove",
-    label: "Удалить",
-    icon: <DeleteOutlined />,
-    description: "Удалить документ",
-    color: "#ff4d4f",
-    status: [1, 3, 5],
-    roles: ["USER", "ADMIN"],
+    key: "back",
+    label: "Отклонить",
+    icon: <CloseOutlined />,
+    description: "Отменить документ",
+    color: "#ad4e00",
+    status: [4],
+    roles: ["ADMIN"],
   },
+  // // Удалить после подтверждение
+  // {
+  //   key: "remove",
+  //   label: "Удалить",
+  //   icon: <DeleteOutlined />,
+  //   description: "Удалить документ",
+  //   color: "#ff4d4f",
+  //   status: [4],
+  //   roles: ["ADMIN"],
+  // },
 ];
 function NewReports() {
   const pageSizeOptions = [5, 10, 15, 20, 30];
