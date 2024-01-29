@@ -111,10 +111,11 @@ const Receipt = () => {
                   }}
                 >
                   <span data-v-5b637425="">
-                    Подписан ЭЦП: {data.receipt.cert.commonName}
+                    Подписан ЭЦП: {data?.receipt?.cert?.commonName}
                   </span>
                   <span data-v-5b637425="">
-                    Cрок действия ЭЦП: {data.receipt.createdAt}
+                    Cрок действия ЭЦП:{" "}
+                    {data?.receipt?.cert?.validNotAfter?.split(" ")[0]}
                   </span>
                 </div>
               </Col>
