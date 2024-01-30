@@ -399,7 +399,7 @@ const ReportForm = () => {
                         <Title
                           type={type}
                           level={level}
-                          style={formType === "view" && { paddingTop: "50px" }}
+                          style={formType === "view" && { paddingTop: "10px" }}
                         >
                           {label}
                         </Title>
@@ -483,6 +483,7 @@ const ReportForm = () => {
                         <>
                           {formType === "view" ? (
                             <Table
+                              className="custom-table"
                               columns={headers.map((h, i) => ({
                                 title: h.title,
                                 dataIndex: i + 1,

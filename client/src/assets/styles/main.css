@@ -1714,9 +1714,19 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav
 .ant-progress-project .ant-progress-bg {
   height: 3px !important;
 }
+
+/* custom-table */
+
+.custom-table > .ant-table-tbody > tr > td,
+.custom-table > .ant-table-thead > tr > th {
+   white-space: none !important;
+}
+.custom-table .ant-table-cell-ellipsis {
+  white-space: initial;
+}
 .ant-table-tbody > tr > td,
 .ant-table-thead > tr > th {
-  white-space: nowrap;
+   white-space: nowrap;
 }
 .h-full {
   height: 100%;

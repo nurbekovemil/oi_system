@@ -260,6 +260,7 @@ const ReportPublicView = () => {
                           )}
                           {element === "list" && (
                             <Table
+                              className="custom-table"
                               columns={headers.map((h, i) => ({
                                 title: h.title,
                                 dataIndex: i + 1,
