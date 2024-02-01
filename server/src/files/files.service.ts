@@ -7,8 +7,10 @@ import * as uuid from 'uuid';
 export class FilesService {
   async createFile(file) {
     try {
-      const fileExtension = file.originalname.split('.')[1];
-      const name = uuid.v4() + `.${fileExtension}`;
+      const parts = file.originalname.split('.');
+      const format = parts[parts.length - 1];
+      // const fileExtension = file.originalname.split('.')[1];
+      const name = uuid.v4() + `.${format}`;
       const filePath = path.resolve(__dirname, '..', 'static');
       const mimetype = file.mimetype;
       if (!fs.existsSync(filePath)) {
