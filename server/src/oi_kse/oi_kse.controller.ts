@@ -20,6 +20,11 @@ export class OiKseController {
     return this.oiKseService.getReportsByCompanyId(query);
   }
 
+  @Get('/listing')
+  getListingLastReport() {
+    return this.oiKseService.getListingPropectReports();
+  }
+
   @Get('/news')
   getLastNews() {
     return this.oiKseService.getLastNews();

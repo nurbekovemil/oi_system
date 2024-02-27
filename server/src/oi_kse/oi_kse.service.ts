@@ -30,6 +30,32 @@ export class OiKseService {
     return data;
   }
 
+  async getListingPropectReports() {
+    const report_list = await this.reportsService.getOiKseListingProspectReports();
+    const company_list = await this.oikseRepository.findAll({
+      where: {
+        type: 'listing'
+      }
+    })
+    const lastReports = {};
+
+    let reports = JSON.parse(JSON.stringify(report_list))
+    let companies = JSON.parse(JSON.stringify(company_list))
+
+    await reports.forEach(report => {
+        const companyId = report.companyId;
+        if ((!lastReports[companyId] || report.confirm_date > lastReports[companyId].confirmDate) && report.prospect) {
+            lastReports[companyId] = {
+                kseCompanyId: companies.find(company => company.oi_company_id === companyId).kse_company_id,
+                confirmDate: report.confirm_date,
+                url: report.prospect[0].url
+            };
+        }
+    });
+    const result = await Object.values(lastReports);
+    return result;
+  }
+
   async getLastNews() {
     const client_host = process.env.CLIENT_HOST;
     const reports = await this.reportsService.getOiKseLastNews();
@@ -150,4 +176,6 @@ export class OiKseService {
     }
     return data.filter(({ content }) => Object.keys(content).length);
   }
+
+  
 }

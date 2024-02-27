@@ -435,4 +435,22 @@ export class ReportsService {
     });
     return reports;
   }
+  async getOiKseListingProspectReports(){
+  const reports = await this.reportRepository.findAll({
+    where: {
+      statusId: 4,
+      typeId: 2,
+    },
+    attributes: [
+      'companyId',
+      'id',
+      [
+        sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
+        'confirm_date',
+      ],
+      [sequelize.literal(`content->'prospect'`), 'prospect'],
+    ],
+  });
+  return reports;
+  }
 }
