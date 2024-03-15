@@ -23,9 +23,30 @@ const authApi = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    rutoken: builder.mutation({
+      query: (data) => ({
+        url: "auth/rutoken",
+        method: "POST",
+        body: data
+      }),
+    }),
+    cloudEdsSendPinCode: builder.mutation({
+      query: (data) => ({
+        url: "auth/cloud-eds-pin",
+        method: "POST",
+        body: data
+      }),
+    }),
+    cloudEdsConfirmPinCode: builder.mutation({
+      query: (data) => ({
+        url: "auth/cloud-eds-confirm",
+        method: "POST",
+        body: data
+      }),
+    }),
   }),
 });
 
 export default authApi;
-export const { useLoginMutation, useLazyCheckAuthQuery, useLazyLogoutQuery } =
+export const { useLoginMutation, useLazyCheckAuthQuery, useLazyLogoutQuery, useRutokenMutation, useCloudEdsSendPinCodeMutation, useCloudEdsConfirmPinCodeMutation } =
   authApi;

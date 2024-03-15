@@ -26,10 +26,9 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addMatcher(authApi.endpoints.login.matchFulfilled, setCredentials);
-    builder.addMatcher(
-      authApi.endpoints.checkAuth.matchFulfilled,
-      setCredentials
-    );
+    builder.addMatcher(authApi.endpoints.rutoken.matchFulfilled, setCredentials);
+    builder.addMatcher(authApi.endpoints.cloudEdsConfirmPinCode.matchFulfilled, setCredentials);
+    builder.addMatcher(authApi.endpoints.checkAuth.matchFulfilled, setCredentials);
     builder.addMatcher(authApi.endpoints.logout.matchFulfilled, logoutHandler);
   },
 });

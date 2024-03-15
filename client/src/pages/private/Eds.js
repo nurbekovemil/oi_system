@@ -138,7 +138,6 @@ const Eds = () => {
   useEffect(() => {
     if (eds && eds === 1 && !isSuccessSendPin) {
       sendPinCode();
-      console.log("send pin code");
     }
     if (eds && eds === 2 && !isSuccessSignRutoken) {
       rutokenplugin.ready

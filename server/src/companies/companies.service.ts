@@ -102,6 +102,15 @@ export class CompaniesService {
     throw new HttpException('Некорректный пароль!', HttpStatus.BAD_REQUEST);
   }
 
+  async getCompanyByInn(inn: string){
+    const company = await this.companyRepository.findOne({
+      where: {
+        inn
+      }
+    })
+    return company
+  }
+
   async createMockData() {
     const data = [];
     try {

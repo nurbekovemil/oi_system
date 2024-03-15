@@ -140,4 +140,21 @@ export class UsersService {
     user.password = hashPassword;
     await user.save();
   }
+  async getUserByCompanyId(companyId, inn){
+    const user = await this.userRepository.findOne({
+      where: {
+        companyId,
+        inn
+      },
+      include: [
+        {
+          model: this.roleRepository,
+          attributes: {
+            exclude: ['updatedAt', 'createdAt'],
+          },
+        },
+      ]
+    })
+    return user
+  }
 }

@@ -37,6 +37,19 @@ const messageSlice = createSlice({
         showMessage(payload.data.message, "error");
       }
     );
+    builder.addMatcher(
+      authApi.endpoints.cloudEdsSendPinCode.matchFulfilled,
+      (state, { payload }) => {
+        showMessage('Пин код отправлен на почту', "success");
+      }
+    );
+    builder.addMatcher(
+      authApi.endpoints.cloudEdsSendPinCode.matchRejected,
+      (state, { payload }) => {
+        console.log(payload)
+        showMessage(payload.data.message, "error");
+      }
+    );
     // User messages
     builder.addMatcher(
       userApi.endpoints.createUser.matchFulfilled,
@@ -76,7 +89,7 @@ const messageSlice = createSlice({
     );
     // Eds messages
     builder.addMatcher(edsApi.endpoints.sendPinCode.matchFulfilled, () => {
-      showMessage("Пин код отправлен", "success");
+      showMessage("Пин код отправлен на почту", "success");
     });
     builder.addMatcher(
       edsApi.endpoints.sendPinCode.matchRejected,
