@@ -148,25 +148,26 @@ export class AuthService {
     try {
       const edsAccessToken = process.env.EDS_ACCESS_TOKEN;
       const url = 'https://cdsapi.srs.kg/api/get-pin-code';
-      const company = await this.CompaniesService.getCompanyByInn(edsDto.company_inn)
-      if(!company){
-        throw new HttpException(
-          'ИНН организации не найдено',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      const user = await this.UsersService.getUserByCompanyId(company.id, edsDto.user_inn)
+
+      const user = await this.UsersService.getUserByInn(edsDto.user_inn)
       if(!user){
           throw new HttpException(
             'ИНН пользователя не найдено',
             HttpStatus.BAD_REQUEST,
           );
       }
+      const company = await this.CompaniesService.findOne(user.companyId)
+      if(!company){
+        throw new HttpException(
+          'Организация не найдено',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const response = await axios.post(
         url,
         {
           personIdnp: edsDto.user_inn,
-          organizationInn: edsDto.company_inn,
+          organizationInn: company.inn,
           method: 'email',
         },
         {
@@ -188,11 +189,13 @@ export class AuthService {
     try {
       const edsAccessToken = process.env.EDS_ACCESS_TOKEN;
       const url = 'https://cdsapi.srs.kg/api/account/auth';
+      const user = await this.UsersService.getUserByInn(edsDto.user_inn)
+      const company = await this.CompaniesService.findOne(user.companyId)
       await axios.post(
         url,
         {
           personIdnp: edsDto.user_inn,
-          organizationInn: edsDto.company_inn,
+          organizationInn: company.inn,
           byPin: edsDto.pin,
         },
         {
@@ -202,8 +205,6 @@ export class AuthService {
           },
         },
       );
-      const company = await this.CompaniesService.getCompanyByInn(edsDto.company_inn)
-      const user = await this.UsersService.getUserByCompanyId(company.id, edsDto.user_inn)
       const tokens = await this.TokenService.generateToken({
         userId: user.id,
         companyId: user.companyId,

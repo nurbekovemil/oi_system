@@ -6,22 +6,22 @@ import { useCloudEdsConfirmPinCodeMutation, useCloudEdsSendPinCodeMutation } fro
 const Eds = () => {
   const [cloudEdsSendPinCode, {isLoading: isLoadingPinCode, isSuccess: isSuccessPinCode}] = useCloudEdsSendPinCodeMutation()
   const [cloudEdsConfirmPinCode, {isLoading: isLoadingConfirmPinCode, isSuccess: isSuccessConfirmPinCode}] = useCloudEdsConfirmPinCodeMutation()
-  const [userData, setUserData] = useState({})
+  const [userInn, setUserInn] = useState('')
   const [pinCode, setPinCode] = useState()
 
   const onSendPinCode = () => {
-    cloudEdsSendPinCode(userData)
+    cloudEdsSendPinCode({user_inn: userInn})
   };
   const onConfirmPinCode = () => {
-    cloudEdsConfirmPinCode({...userData, pin: pinCode })
+    cloudEdsConfirmPinCode({user_inn: userInn, pin: pinCode })
   };
   return (
     <Form layout="vertical" className="row-col">
-        <Form.Item label="ИНН компании">
+        {/* <Form.Item label="ИНН компании">
             <Input placeholder="Введите инн компании" onChange={(e) => setUserData({...userData, company_inn: e.target.value})}/>
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label="ИНН пользователя">
-            <Input placeholder="Введите инн пользователя" onChange={(e) => setUserData({...userData, user_inn: e.target.value})} />
+            <Input placeholder="Введите инн пользователя" onChange={(e) => setUserInn(e.target.value)} />
         </Form.Item>
         <Form.Item>
             <Button

@@ -128,47 +128,38 @@ const Rutoken = () => {
       <Form layout="vertical" className="row-col" onFinish={confirmRotokenPinCide}>
         <Row gutter={8}>
           <Col span={24}>
-            <Form.Item label="Выберете устройства">
-            <Select
-                    placeholder="Выберете устройства"
-                    value={currentRutoken}
-                    style={{
-                      width: "100%",
-                    }}
-                    options={deviceList}
-                    onChange={(value, option) => setCurrentRutoken(option)}
-            />
-            </Form.Item>
             <Form.Item>
-            <Button
-              disabled={!plugin}
-                          type="primary"
-                          style={{
-                            width: "100%",
-                            background: "#57b6c0",
-                            borderColor: "#57b6c0",
-                          }}
-                          onClick={checkDevices}
-                          icon={<SyncOutlined />}
-                        >
-                          Обновить список рутокенов
-                  </Button>
+              <Button
+                disabled={!plugin}
+                            type="primary"
+                            style={{
+                              width: "100%",
+                              background: "#57b6c0",
+                              borderColor: "#57b6c0",
+                            }}
+                            onClick={checkDevices}
+                            icon={<SyncOutlined />}
+                          >
+                            Обновить список рутокенов
+                </Button>
+            </Form.Item>
+            <Form.Item label="Выберете устройства">
+              <Select
+                      placeholder="Выберете устройства"
+                      disabled={!Object.keys(currentRutoken).length != 0}
+                      value={currentRutoken}
+                      style={{
+                        width: "100%",
+                      }}
+                      options={deviceList}
+                      onChange={(value, option) => setCurrentRutoken(option)}
+              />
             </Form.Item>
           </Col>
           {
             Object.keys(currentRutoken).length != 0 && <Col span={24}>
-            <Form.Item label="Выберите сертификат">
-              <Select
-                value={currentCert}
-                style={{
-                  width: "100%",
-                }}
-                options={certList}
-                onChange={(value, option) => setCurrentCert(option)}
-              />
-            </Form.Item>
             <Form.Item>
-            <Button
+              <Button
                       icon={<SyncOutlined />}
                       type="primary"
                       style={{
@@ -181,10 +172,21 @@ const Rutoken = () => {
                       Обновить список сертификатов
                     </Button>
             </Form.Item>
+            <Form.Item label="Выберите сертификат">
+              <Select
+                disabled={!Object.keys(currentCert).length != 0}
+                value={currentCert}
+                style={{
+                  width: "100%",
+                }}
+                options={certList}
+                onChange={(value, option) => setCurrentCert(option)}
+              />
+            </Form.Item>
           </Col>
           }
           {
-            Object.keys(currentCert).length != 0 &&           <Col span={24}>
+            Object.keys(currentCert).length != 0 && <Col span={24}>
             <Form.Item label="Введите PIN-код">
               <Input type="text" onChange={(e) => setPin(e.target.value)}/>
             </Form.Item>

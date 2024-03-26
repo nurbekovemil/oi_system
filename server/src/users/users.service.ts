@@ -157,4 +157,20 @@ export class UsersService {
     })
     return user
   }
+  async getUserByInn(inn){
+    const user = await this.userRepository.findOne({
+      where: {
+        inn
+      },
+      include: [
+        {
+          model: this.roleRepository,
+          attributes: {
+            exclude: ['updatedAt', 'createdAt'],
+          },
+        },
+      ]
+    })
+    return user
+  }
 }
