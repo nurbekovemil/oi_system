@@ -88,10 +88,9 @@ const Receipt = () => {
                         : data?.report?.type?.groupId == 1 &&
                         data?.report?.type?.tempId == 1 &&
                         `(${data?.report?.content?.period} квартал ${data?.report?.content?.year} года)`
-                      }
-                    {data?.report?.type?.groupId == 1 &&
-                      data?.report?.type?.tempId == 2 &&
-                      `(${data?.report?.content?.listing_period} квартал ${data?.report?.content?.listing_year} года)`}
+                    }
+                    
+                    {data?.report?.type?.groupId == 1 && data?.report?.type?.tempId == 2 && `(${data?.report?.content?.listing_period == 5 ? `Годовой отчет ${data?.report?.content?.listing_year} года` : `${data?.report?.content?.listing_period} квартал ${data?.report?.content?.listing_year}`})`}
                   </div>
                   <div style={{ fontSize: "14pt" }}>
                     Дата размещения : {data?.receipt?.createdAt}
