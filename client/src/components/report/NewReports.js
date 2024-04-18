@@ -104,15 +104,6 @@ const items = [
     roles: ["USER"],
   },
   {
-    key: "back",
-    label: "Отклонить",
-    icon: <CloseOutlined />,
-    description: "Отменить отправку документа",
-    color: "#ffa940",
-    status: [2, 5],
-    roles: ["USER", "ADMIN", "MODERATOR"],
-  },
-  {
     key: "confirm",
     label: "Принять",
     icon: <CheckOutlined />,
@@ -147,17 +138,26 @@ const items = [
     icon: <FormOutlined />,
     description: "Изменить документ",
     color: "#ffa940",
-    status: [4],
-    roles: ["ADMIN"],
+    status: [2,4],
+    roles: ["ADMIN","MODERATOR"],
+  },
+  {
+    key: "back",
+    label: "Отклонить",
+    icon: <CloseOutlined />,
+    description: "Отменить отправку документа",
+    color: "#f50",
+    status: [2, 5],
+    roles: ["USER", "ADMIN", "MODERATOR"],
   },
   {
     key: "back",
     label: "Отклонить",
     icon: <CloseOutlined />,
     description: "Отменить документ",
-    color: "#ad4e00",
+    color: "#f50",
     status: [4],
-    roles: ["ADMIN"],
+    roles: ["ADMIN","MODERATOR"],
   },
   // // Удалить после подтверждение
   // {
@@ -297,7 +297,7 @@ function NewReports() {
                   {report?.confirm_date != null && (
                     <Tooltip title="Дата принятия">
                       <Text>
-                        | {report.confirm_date && report.confirm_date}
+                          {" | "}{report.confirm_date && report.confirm_date}
                       </Text>
                     </Tooltip>
                   )}

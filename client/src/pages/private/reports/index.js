@@ -63,7 +63,7 @@ function Reports() {
                 onTabChange(key);
               }}
               extra={
-                user.roles[0].title == "USER" && (
+                (
                   <Link to="/dashboard/reports/types">
                     <Button
                       type="primary"

@@ -20,6 +20,16 @@ const companyApi = api.injectEndpoints({
         { type: "ReportById", id: arg.reportId },
       ],
     }),
+    updateReportCompanyId: builder.mutation({
+      query: (data) => ({
+        url: "reports/company",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "ReportById", id: arg.reportId },
+      ],
+    }),
     uploadReportFile: builder.mutation({
       query: (data) => ({
         url: "reports/file",
@@ -108,4 +118,5 @@ export const {
   useSendReportMutation,
   useRemoveReportMutation,
   useRejectReportMutation,
+  useUpdateReportCompanyIdMutation
 } = companyApi;

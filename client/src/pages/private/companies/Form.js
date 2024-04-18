@@ -20,57 +20,6 @@ import {
 import { useEffect, useState } from "react";
 const { Title } = Typography;
 
-// const template = [
-//   {
-//     label: "Название компании",
-//     element: "input",
-//     field: "name",
-//     value: "",
-//   },
-//   {
-//     label: "Вид деятельности",
-//     element: "input",
-//     field: "activity",
-//     value: "",
-//   },
-//   {
-//     label: "Телефон",
-//     element: "input",
-//     field: "phone_number",
-//     value: "",
-//   },
-//   {
-//     label: "Адрес",
-//     element: "input",
-//     field: "address",
-//     value: "",
-//   },
-//   {
-//     label: "Почта",
-//     element: "input",
-//     field: "email",
-//     value: "",
-//   },
-//   {
-//     label: "Руководитель",
-//     element: "input",
-//     field: "director",
-//     value: "",
-//   },
-//   {
-//     label: "Бухгалтер",
-//     element: "input",
-//     field: "accounting",
-//     value: "",
-//   },
-//   {
-//     label: "ИНН",
-//     element: "input",
-//     field: "inn",
-//     value: "",
-//   },
-// ];
-
 const CompanyForm = () => {
   const navigate = useNavigate();
   // Параметры страницы тип формы formType и cid для получение компании по id

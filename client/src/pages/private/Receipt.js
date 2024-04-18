@@ -17,21 +17,58 @@ import {
   Popover,
 } from "antd";
 import Meta from "antd/lib/card/Meta";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import logo from "../../assets/images/kse_img.png";
 import { useGetReceiptByIdQuery } from "../../store/services/receipt-service";
 import { useReactToPrint } from "react-to-print";
+import { useCustomDateFormat } from "../../hooks/useCustomDate";
 const { Title, Text } = Typography;
+
 const Receipt = () => {
   const { receiptId } = useParams();
   const printContentRef = useRef();
+  const [periodTitle, setPeriodTitle] = useState('')
+  const [companyTitle, setCompanyTitle] = useState('')
   const printHandler = useReactToPrint({
     content: () => printContentRef.current,
   });
+  const [periodDate, setPeriodDate] = useCustomDateFormat()
   const { data, isLoading, isSuccess } = useGetReceiptByIdQuery(receiptId);
+  const reportPeriod = () => {
+    const { report, receipt} = data
+    setCompanyTitle(report?.company?.name)
+    setPeriodDate(receipt?.createdAt)
 
-  useEffect(() => {}, []);
+    // Листинговый отчет
+    if(report?.type?.groupId == 1 && report?.type?.tempId == 2){
+      let { listing_period, listing_year } = report.content
+      // Если не указан период
+      if(!listing_period || !listing_year) setPeriodTitle(`${report.type.title} (Не указан период)`)
+      // Годовой отчет
+      if (listing_period == 5) setPeriodTitle(`${report.type.title} (Годовой отчет ${listing_year} года)`)
+      // Квартальный отчет
+      if (listing_period != 5) setPeriodTitle(`${report.type.title} (${listing_period} квартал ${listing_year})`)
+    }
+    // Приложенте 2-1
+    else if(report?.type?.groupId == 1 && report?.type?.tempId == 1) {
+      let {period, year} = report.content
+      // Если не указан период
+      if(!period || !year) setPeriodTitle(`${report.type.title} (Не указан период)`)
+      // Годовой отчет
+      if(period == 5) setPeriodTitle(`${report.type.title} ${report.type.title} (Годовой отчет ${year} года)`)
+      // Квартальный отчет
+      if(period != 5) setPeriodTitle(`${report.type.title} (${period} квартал ${year})`)
+    } else {
+      setPeriodTitle(report.type.title)
+    }
+  }
+  useEffect(() => {
+    if(data && isSuccess){
+      reportPeriod()
+    }
+  },[isSuccess])
+
   return (
     <Row gutter={16}>
       <Col span={24}>
@@ -79,21 +116,13 @@ const Receipt = () => {
                   }}
                 >
                   <div style={{ fontSize: "14pt" }}>
-                    {data?.report?.company?.name}
+                    {companyTitle}
                   </div>
                   <div style={{ fontSize: "14pt" }}>
-                    Основание документа : {data?.report?.type?.title}{" "}
-                    {
-                      data?.report?.content?.period == 5 ? `(годовой отчет ${data?.report?.content?.year} года)`
-                        : data?.report?.type?.groupId == 1 &&
-                        data?.report?.type?.tempId == 1 &&
-                        `(${data?.report?.content?.period} квартал ${data?.report?.content?.year} года)`
-                    }
-                    
-                    {data?.report?.type?.groupId == 1 && data?.report?.type?.tempId == 2 && `(${data?.report?.content?.listing_period == 5 ? `Годовой отчет ${data?.report?.content?.listing_year} года` : `${data?.report?.content?.listing_period} квартал ${data?.report?.content?.listing_year}`})`}
+                    Основание документа : { periodTitle }
                   </div>
                   <div style={{ fontSize: "14pt" }}>
-                    Дата размещения : {data?.receipt?.createdAt}
+                    Дата размещения : {periodDate()}
                   </div>
                 </div>
               </Col>

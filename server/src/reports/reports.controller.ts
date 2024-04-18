@@ -30,12 +30,12 @@ export class ReportsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   createReport(@Request() req, @Body() createReportDto: CreateReportDto) {
-    const { companyId, userId } = req.user;
+    const { companyId, userId, roles } = req.user;
     return this.reportsService.createReport({
       ...createReportDto,
       companyId,
       userId,
-    });
+    }, roles);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -62,6 +62,12 @@ export class ReportsController {
   @Post('/send')
   sendReport(@Body() body) {
     return this.reportsService.sendReport(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/company')
+  updateReportCompanyId(@Body() body) {
+    return this.reportsService.updateReportCompanyId(body);
   }
 
   // @UseGuards(JwtAuthGuard)
@@ -126,4 +132,5 @@ export class ReportsController {
   removeReport(@Body() body) {
     return this.reportsService.removeReport(body);
   }
+
 }

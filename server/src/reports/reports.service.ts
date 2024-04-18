@@ -81,9 +81,26 @@ export class ReportsService {
     return result;
   }
 
-  async createReport(createReportDto: CreateReportDto) {
-    const report = await this.reportRepository.create(createReportDto);
-    return report.id;
+  async createReport(createReportDto: CreateReportDto, roles) {
+    const isAdmin = roles.some((role) =>
+      ['ADMIN', 'MODERATOR'].includes(role.title),
+    );
+    if(isAdmin){
+      const report = await this.reportRepository.create(createReportDto);
+      report.statusId = 2
+      report.save()
+      return report.id;
+    }else {
+      const report = await this.reportRepository.create(createReportDto);
+      return report.id;
+    }
+  }
+
+  async updateReportCompanyId({reportId, companyId}) {
+    const report = await this.reportRepository.findByPk(reportId)
+    report.companyId = companyId
+    report.save()
+    return report.id
   }
 
   mergeObjects(obj1, obj2) {
@@ -173,11 +190,12 @@ export class ReportsService {
     return report;
   }
 
-  async getReports({ roles, userId }, { limit, page }) {
+  async getReports({ roles, userId, companyId }, { limit, page }) {
     const { id } = roles[0];
     const isAdmin = roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),
     );
+    console.log('companyId ------ ', companyId)
     const { report_types, report_status } =
       await this.roleAllowedReportsRepository.findOne({
         where: { roleId: id },
@@ -227,7 +245,7 @@ export class ReportsService {
       },
       where: isAdmin
         ? { statusId: report_status, typeId: report_types }
-        : { userId },
+        : { companyId },
       limit,
       offset,
       order: [['updatedAt', 'DESC']],

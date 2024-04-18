@@ -28,7 +28,6 @@ import {
   CopyOutlined,
   FileTextOutlined,
   SafetyCertificateOutlined,
-  OrderedListOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState, Fragment, useRef } from "react";
@@ -39,15 +38,16 @@ import {
   useRemoveReportFileMutation,
   useGetReportTypeByIdQuery,
   useLazyGetReportByGroupTypeQuery,
+  useUpdateReportCompanyIdMutation,
 } from "../../../store/services/report-service";
 
 import ListingModalForm from "../../../components/report/ListingModalForm";
 import { debounce } from "../../../hooks/useDebounce";
 import EdsCert from "../../../components/eds/EdsCert";
-import { useDispatch, useSelector } from "react-redux";
-import { useLazyGetCompanyByIdQuery } from "../../../store/services/company-service";
+import { useSelector } from "react-redux";
+import { useGetCompaniesForOptionQuery, useLazyGetCompanyByIdQuery } from "../../../store/services/company-service";
 import { useReactToPrint } from "react-to-print";
-const { Meta } = Card;
+
 // через класс или id не работает стили так как шаблон стили загружает динамически
 const btnStyle = {
   background: "#57b6c0",
@@ -56,6 +56,7 @@ const btnStyle = {
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const uploadFileSize = 15 * 1024 * 1024; // 15 мб
+
 const ReportForm = () => {
   const [loadedReport, setLoadedReport] = useState();
   const navigate = useNavigate();
@@ -73,31 +74,22 @@ const ReportForm = () => {
   const [listingField, setListingField] = useState("");
 
   const { user } = useSelector((state) => state.auth);
-
-  const {
-    data: dataReportTemplate,
-    isSuccess: isSuccessReportTemplate,
-    isLoading: isLoadingReportTemplate,
-  } = useGetReportTemplateQuery(tempId);
+  const isAdmin = user?.roles.some((role) =>
+    ['ADMIN', 'MODERATOR'].includes(role.title),
+  );
+  const { data: dataReportTemplate, isSuccess: isSuccessReportTemplate, isLoading: isLoadingReportTemplate } = useGetReportTemplateQuery(tempId);
 
   const [getCompanyById, {}] = useLazyGetCompanyByIdQuery();
+  const [updateCompanyById, {}] = useUpdateReportCompanyIdMutation();
+  const { data: optionCompanies } = useGetCompaniesForOptionQuery("");
 
-  const [
-    getReportByGroupType,
-    { data: reportGroupData, isSuccess: isSuccessReportGroupData },
-  ] = useLazyGetReportByGroupTypeQuery();
+  const [getReportByGroupType, { data: reportGroupData, isSuccess: isSuccessReportGroupData }] = useLazyGetReportByGroupTypeQuery();
 
-  const { data: dataReportById, isSuccess: isSuccessGetReportById } =
-    useGetReportByIdQuery(reportId);
+  const { data: dataReportById, isSuccess: isSuccessGetReportById } = useGetReportByIdQuery(reportId);
 
-  const { cert: edsData, typeId: edsType } =
-    dataReportById?.eds.length > 0 && dataReportById?.eds[0];
+  const { cert: edsData, typeId: edsType } = dataReportById?.eds.length > 0 && dataReportById?.eds[0];
 
-  const {
-    data: dataReportType,
-    isSuccess,
-    isSuccessGetReportType,
-  } = useGetReportTypeByIdQuery(reportType);
+  const { data: dataReportType } = useGetReportTypeByIdQuery(reportType);
 
   const [updateReport, {}] = useUpdateReportMutation();
 
@@ -299,6 +291,9 @@ const ReportForm = () => {
       updateReportFieldHandler(companyData);
     }
   };
+  const setCompanyIdForReport = async (companyId) => {
+    await updateCompanyById({reportId, companyId})
+  }
   useEffect(() => {
     getReportByGroupType({ type: reportType, reportId });
 
@@ -325,6 +320,9 @@ const ReportForm = () => {
     content: () => printContentRef.current,
     documentTitle: `Центр раскрытия информации - ${dataReportType?.title}`,
   });
+
+  
+
   return (
     <Card
       bordered={false}
@@ -357,6 +355,38 @@ const ReportForm = () => {
             onValuesChange={debounce(updateField, 1000)}
           >
             <Row>
+              {
+               isAdmin && dataReportById?.statusId == 2 &&
+                <Col span={24} className="px-2">
+                  <Form.Item
+                    name=""
+                    label="Выберите компанию"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Выберите из списка",
+                      },
+                    ]}
+                  >
+                    <Select
+                      showSearch
+                      placeholder="Выберите из списка"
+                      className="header-search"
+                      options={optionCompanies}
+                      optionFilterProp="children"
+                      filterOption={(input, opt) =>
+                        (opt?.label ?? "").includes(input)
+                      }
+                      filterSort={(optA, optB) =>
+                        (optA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optB?.label ?? "").toLowerCase())
+                      }
+                      onChange={setCompanyIdForReport}
+                    />
+                  </Form.Item>
+                </Col>
+              }
               {isLoadingReportTemplate && (
                 <Col span={24} className="d-flex justify-content-center">
                   <Spin />
@@ -880,6 +910,7 @@ const ReportForm = () => {
                   )
                 )}
             </Row>
+
             <Row justify="space-between" align="middle">
               <Col className="px-2">
                 {edsData && (
