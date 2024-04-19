@@ -203,8 +203,8 @@ const UserForm = () => {
                         }
                       />
                     </Form.Item>
-                  ) : (element === "input" && field === "login") ||
-                    (element === "input" && field === "password") ? (
+                  ) : (element == "input" && field == "login") ||
+                    (element == "input" && field == "password") ? (
                     <Space.Compact
                       direction="horizontal"
                       style={{ width: "100%" }}

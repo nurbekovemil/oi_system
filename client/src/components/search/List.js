@@ -263,6 +263,10 @@ function SearchList() {
       // deleteCompany(id);
     }
   };
+
+  const isAdmin = user?.roles.some((role) =>
+    ['ADMIN', 'MODERATOR'].includes(role.title),
+  );
   const reports =
     dataReports &&
     dataReports?.rows &&
@@ -391,7 +395,7 @@ function SearchList() {
     }));
   const users =
     dataUsers &&
-    user.roles[0].title == "ADMIN" || user.roles[0].title == "MODERATOR" &&
+    isAdmin &&
     dataUsers?.rows &&
     dataUsers?.rows.map((user) => ({
       key: user.id,
@@ -444,7 +448,7 @@ function SearchList() {
 
   return (
     <div className="table-responsive">
-      {user.roles[0].title == "ADMIN" || user.roles[0].title == "MODERATOR" && (
+      {isAdmin && (
         <>
           <Space align="center" style={{ marginLeft: "24px" }}>
             <Title level={5}> Пользователи: {dataUsers?.count}</Title>
