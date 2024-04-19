@@ -34,13 +34,13 @@ const menuList = [
     path: "/dashboard/users",
     label: "Пользователи",
     icon: <TeamOutlined />,
-    role: ["ADMIN"],
+    role: ["ADMIN", "MODERATOR"],
   },
   {
     path: "/dashboard/companies",
     label: "Компании",
     icon: <BankOutlined />,
-    role: ["ADMIN"],
+    role: ["ADMIN", "MODERATOR"],
   },
   {
     path: "/dashboard/user-guide",

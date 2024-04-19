@@ -391,7 +391,7 @@ function SearchList() {
     }));
   const users =
     dataUsers &&
-    user.roles[0].title == "ADMIN" &&
+    user.roles[0].title == "ADMIN" || user.roles[0].title == "MODERATOR" &&
     dataUsers?.rows &&
     dataUsers?.rows.map((user) => ({
       key: user.id,
@@ -444,7 +444,7 @@ function SearchList() {
 
   return (
     <div className="table-responsive">
-      {user.roles[0].title == "ADMIN" && (
+      {user.roles[0].title == "ADMIN" || user.roles[0].title == "MODERATOR" && (
         <>
           <Space align="center" style={{ marginLeft: "24px" }}>
             <Title level={5}> Пользователи: {dataUsers?.count}</Title>
