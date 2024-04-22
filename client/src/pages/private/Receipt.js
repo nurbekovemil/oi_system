@@ -56,7 +56,7 @@ const Receipt = () => {
       // Если не указан период
       if(!period || !year) setPeriodTitle(`${report.type.title} (Не указан период)`)
       // Годовой отчет
-      if(period == 5) setPeriodTitle(`${report.type.title} ${report.type.title} (Годовой отчет ${year} года)`)
+      if(period == 5) setPeriodTitle(`${report.type.title} (Годовой отчет ${year} года)`)
       // Квартальный отчет
       if(period != 5) setPeriodTitle(`${report.type.title} (${period} квартал ${year})`)
     } else {
