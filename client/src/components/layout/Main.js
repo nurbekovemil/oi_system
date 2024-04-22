@@ -29,33 +29,35 @@ function Main({ children }) {
 
   let { pathname } = useLocation();
   pathname = pathname.replace("/", "");
-  useEffect(() => {
-    if (user?.changePass) {
-      navigate("/dashboard/change-pass");
-    }
-    if (!localStorage.getItem("info")) {
-      Modal.info({
-        title: (
-          <Title level={5}>
-            Рекомендуем ознакомиться с правилами программы
-          </Title>
-        ),
-        content:
-          "Руководство содержит практический алгоритм использования электронной системы ЗАО «Кыргызская фондовая биржа»",
-        onOk() {
-          localStorage.setItem("info", true);
-          navigate("/dashboard/user-guide");
-        },
-        okText: "Перейти",
-        okButtonProps: {
-          style: {
-            ...btnStyle,
-          },
-        },
-        maskClosable: true,
-      });
-    }
-  }, []);
+
+  // Если пользователя стандартный пароль и руководство
+  // useEffect(() => {
+  //   if (user?.changePass) {
+  //     navigate("/dashboard/change-pass");
+  //   }
+  //   if (!localStorage.getItem("info")) {
+  //     Modal.info({
+  //       title: (
+  //         <Title level={5}>
+  //           Рекомендуем ознакомиться с правилами программы
+  //         </Title>
+  //       ),
+  //       content:
+  //         "Руководство содержит практический алгоритм использования электронной системы ЗАО «Кыргызская фондовая биржа»",
+  //       onOk() {
+  //         localStorage.setItem("info", true);
+  //         navigate("/dashboard/user-guide");
+  //       },
+  //       okText: "Перейти",
+  //       okButtonProps: {
+  //         style: {
+  //           ...btnStyle,
+  //         },
+  //       },
+  //       maskClosable: true,
+  //     });
+  //   }
+  // }, []);
   return (
     <Layout className={`layout-dashboard`}>
       <Drawer

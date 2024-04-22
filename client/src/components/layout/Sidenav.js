@@ -58,7 +58,7 @@ const menuList = [
 function Sidenav({ color }) {
   const { pathname } = useLocation();
   const { user } = useSelector((state) => state.auth);
-  const isWeakPass = user?.changePass;
+  // const isWeakPass = user?.changePass;
   const menu = menuList
     .filter((menuItem) => {
       // Check if any of the user roles match a role in the menu item
@@ -90,10 +90,11 @@ function Sidenav({ color }) {
       <hr />
 
       <Menu
-        theme={!isWeakPass && "dark"}
+        // theme={!isWeakPass && "dark"}
+        theme={"dark"}
         mode="inline"
         items={menu}
-        disabled={isWeakPass}
+        // disabled={isWeakPass}
       />
     </>
   );

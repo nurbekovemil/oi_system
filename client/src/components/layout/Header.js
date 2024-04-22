@@ -36,7 +36,7 @@ function Header({ onPress }) {
   const handleButtonClick = () => {
     navigate(-1); // Navigate back to the previous page
   };
-  const isWeakPass = user?.changePass;
+  // const isWeakPass = user?.changePass;
   return (
     <>
       <Row gutter={[24, 0]}>
@@ -45,7 +45,7 @@ function Header({ onPress }) {
             icon={<ArrowLeftOutlined />}
             type="text"
             onClick={handleButtonClick}
-            disabled={isWeakPass}
+            // disabled={isWeakPass}
           >
             Назад
           </Button>
@@ -67,7 +67,7 @@ function Header({ onPress }) {
               type="text"
               className="header-control-btn"
               onClick={() => navigate("/dashboard/profile")}
-              disabled={isWeakPass}
+              // disabled={isWeakPass}
             >
               {user.firstName || user.lastName || user.login}
             </Button>
