@@ -375,7 +375,7 @@ export class ReportsService {
           'confirm_date',
         ],
       ],
-      order: [['confirm_date', 'desc']],
+      order: [['confirm_date', 'asc']],
     });
     return reports;
   }
@@ -455,22 +455,21 @@ export class ReportsService {
     return reports;
   }
   async getOiKseListingProspectReports(){
-    const reports = await this.reportRepository.findAll({
-      where: {
-        statusId: 4,
-        typeId: 2,
-      },
-      attributes: [
-        'companyId',
-        'id',
-        [
-          sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
-          'confirm_date',
-        ],
-        [sequelize.literal(`content->'prospect'`), 'prospect'],
+  const reports = await this.reportRepository.findAll({
+    where: {
+      statusId: 4,
+      typeId: 2,
+    },
+    attributes: [
+      'companyId',
+      'id',
+      [
+        sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
+        'confirm_date',
       ],
-      order: [['confirm_date', 'desc']],
-    });
+      [sequelize.literal(`content->'prospect'`), 'prospect'],
+    ],
+  });
   return reports;
   }
 }
