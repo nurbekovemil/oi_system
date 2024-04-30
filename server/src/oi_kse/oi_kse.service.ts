@@ -174,7 +174,12 @@ export class OiKseService {
         },
       );
     }
-    return data.filter(({ content }) => Object.keys(content).length);
+    let list = data.filter(({ content }) => Object.keys(content).length) 
+      return list.sort((a, b) => {
+        const dateA: any = new Date(a.confirm_date.split('.').reverse().join('-'));
+        const dateB: any = new Date(b.confirm_date.split('.').reverse().join('-'));
+        return dateB - dateA;
+    });
   }
 
   

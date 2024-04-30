@@ -375,7 +375,6 @@ export class ReportsService {
           'confirm_date',
         ],
       ],
-      order: [['confirm_date', 'asc']],
     });
     return reports;
   }
