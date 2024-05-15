@@ -120,12 +120,12 @@ const ReportForm = () => {
         const updatedLists = item.lists.filter(
           (item) => item.field !== itemToRemove
         );
-        updateReportFieldHandler({ [itemToRemove]: [] });
+        updateReportFieldHandler({ [itemToRemove]: 'deleted' });
         return { ...item, lists: updatedLists };
       }
       return item;
     });
-    form.setFieldsValue({ [itemToRemove]: [] });
+    form.setFieldsValue({ [itemToRemove]: 'deleted' });
     setTemplate(newTemp);
   };
   const toggleListingReportModal = (field, flag) => {
@@ -179,7 +179,7 @@ const ReportForm = () => {
   };
   const uploadReportFileHandler = async (file, field) => {
     if (file.size > uploadFileSize) {
-      return notification.error({ message: "Файл не должен превышать 8 мб" });
+      return notification.error({ message: "Файл не должен превышать 40 мб" });
     }
     const { label } = template[2].lists.filter(
       (item) => item.field === field
