@@ -97,7 +97,9 @@ export class ReportsService {
     tbldocuments.linkkse, 
     tbldocuments.kvartal, 
     tbldocuments.ref,
-    tbldocuments.doc,
+    CASE
+    WHEN tbldocuments.typedoc = 'Создать отчет' THEN tbldocuments.doc else null
+    END AS doc,
     (SELECT name FROM tblcompany WHERE kod = tbldocuments.sender) AS company_name
     FROM tbldocuments, users, tblcompany
 	  WHERE users.idcompany = tblcompany.id AND (tbldocuments.sender = tblcompany.kod OR tbldocuments.reciver = tblcompany.kod)
