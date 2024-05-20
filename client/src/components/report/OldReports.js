@@ -1,4 +1,4 @@
-import { Table, Avatar, Typography, Tag, Spin, Button } from "antd";
+import { Table, Avatar, Typography, Tag, Spin, Button, Modal } from "antd";
 import {
   CheckCircleOutlined,
   SyncOutlined,
@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import { useGetOldReportsQuery } from "../../store/services/report-service";
 
+import { useState } from "react";
 const { Title, Text } = Typography;
 
 const StatusTag = ({ type, title }) => {
@@ -52,6 +53,19 @@ const columns = [
   // },
 ];
 
+const listingView = (report) => {
+  const config = {
+    title: `${report.company_name} : ${report.typedoc}`,
+    content: (
+      <>
+      {Object.values(JSON.parse(report.doc.docs)).map((file, index) => (
+        <><a href={`https://m.kse.kg/api/${file.file}`} target="_blank" key={index}>{file.title}</a><br/></>
+      ))}
+      </>
+    ),
+  };
+  Modal.info(config)
+}
 function OldReports() {
   const {
     data: dataReports,
@@ -75,20 +89,22 @@ function OldReports() {
               icon={<FileTextOutlined />}
             ></Avatar>
             <div className="avatar-info">
-              <Title level={5}>
-                <a
-                  target="_blank"
-                  href={`http://www.kse.kg/${
-                    report.type == 2
-                      ? `files/BusinessReports/${report.linkkse}`
-                      : report.type == 1
-                      ? "ru/Listing"
-                      : `ru/RussianAllNewsBlog/${report.linkkse}`
-                  }`}
-                >
-                  {report.company_name}
-                </a>
-              </Title>
+                {
+                  report.type == 1 ? <Title level={5} type="link" style={{color:'#1890ff', cursor: 'pointer'}} onClick={() => listingView(report)}>{report.company_name}</Title> : 
+                  <Title level={5}>
+                  <a
+                    target="_blank"
+                    href={`http://www.kse.kg/${
+                      report.type == 2
+                        ? `files/BusinessReports/${report.linkkse}`
+                        : `ru/RussianAllNewsBlog/${report.linkkse}`
+                    }`}
+                  >
+                    {report.company_name}
+                  </a>
+                  </Title>
+                } 
+              
               <Text type="secondary">
                 {report.typedoc.length > 35
                   ? report.typedoc.slice(0, 35) + "..."
@@ -140,11 +156,13 @@ function OldReports() {
           <Spin />
         </div>
       ) : (
-        <Table
-          columns={columns}
-          dataSource={reports}
-          className="ant-border-space"
-        />
+          <Table
+            columns={columns}
+            dataSource={reports}
+            className="ant-border-space"
+          />
+          
+        
       )}
     </>
   );

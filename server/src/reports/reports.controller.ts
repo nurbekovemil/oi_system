@@ -99,8 +99,7 @@ export class ReportsController {
   @UseGuards(JwtAuthGuard)
   @Get('/old')
   getOldReports(@Request() req) {
-    const { userId } = req.user;
-    return this.reportsService.getOldReports(userId);
+    return this.reportsService.getOldReports(req.user);
   }
 
   // @UseGuards(JwtAuthGuard)

@@ -102,17 +102,11 @@ export class AuthService {
     try {
       const company = await this.CompaniesService.getCompanyByInn(rutokenDto.company_inn)
       if(!company){
-        throw new HttpException(
-          'ИНН компании не найдено',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new Error('ИНН компании не найдено');
       }
       const user = await this.UsersService.getUserByCompanyId(company.id, rutokenDto.user_inn)
       if(!user){
-        throw new HttpException(
-          'ИНН пользователя не найдено',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new Error('ИНН пользователя не найдено');
       }
       const tokens = await this.TokenService.generateToken({
         userId: user.id,
@@ -139,7 +133,7 @@ export class AuthService {
       };
     } catch (error) {
       throw new HttpException(
-        error.response.data,
+        error.message,
         HttpStatus.BAD_REQUEST,
       );
     }

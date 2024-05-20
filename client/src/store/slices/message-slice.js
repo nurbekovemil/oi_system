@@ -30,9 +30,18 @@ const messageSlice = createSlice({
     builder.addMatcher(reportApi.endpoints.removeReport.matchFulfilled, () =>
       showMessage("Документ успешно удален", "success")
     );
+    builder.addMatcher(reportApi.endpoints.sendReport.matchRejected, (state, {payload}) =>
+      showMessage(payload.data.message, "error")
+    );
     // Auth messages
     builder.addMatcher(
       authApi.endpoints.login.matchRejected,
+      (state, { payload }) => {
+        showMessage(payload.data.message, "error");
+      }
+    );
+    builder.addMatcher(
+      authApi.endpoints.rutoken.matchRejected,
       (state, { payload }) => {
         showMessage(payload.data.message, "error");
       }

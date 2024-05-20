@@ -53,7 +53,34 @@ export class ReportsService {
   }
 
   // get old company reports from old oi system
-  async getOldReports(userId: number) {
+  async getOldReports({userId, roles}) {
+    // const queryString = `
+    // SELECT 
+    // tbldocuments.id, 
+    // CASE
+    // WHEN tbldocuments.typedoc = 'Создать отчет' THEN concat('Листинговый отчет', ' ', tbldocuments.kvartal) else tbldocuments.typedoc
+    // END,
+    // case
+    // when tbldocuments.typedoc = 'Создать отчет' then 1
+    // when tbldocuments.typedoc = 'Квартальный отчет (Приложение 2-1)' or tbldocuments.typedoc = 'Годовой отчет (Приложение 2-1)' then 2
+    // else 3
+    // end type,
+    // date(tbldocuments.datesend) as datesend, 
+    // date(tbldocuments.confirmdate) as confirmdate, 
+    // tbldocuments.linkkse, 
+    // tbldocuments.kvartal, 
+    // tbldocuments.ref,
+    // (SELECT name FROM tblcompany WHERE kod = tbldocuments.sender) AS company_name
+    // FROM tbldocuments, users, tblcompany
+    // WHERE users.idcompany = tblcompany.id AND (tbldocuments.sender = tblcompany.kod OR
+    // tbldocuments.reciver = tblcompany.kod OR (tblcompany.kod = 'fin' AND tbldocuments.status = 3))
+    // AND users.id = ${userId}  AND tbldocuments.docslayoutid!=28 and tbldocuments.typedoc <> 'Существенный факт (Договор о раскрытии информации)'
+    // ORDER BY datesend DESC,createdate DESC
+    // `;
+    const isAdmin = roles.some((role) =>
+      ['ADMIN','MODERATOR'].includes(role.title),
+    );
+
     const queryString = `
     SELECT 
     tbldocuments.id, 
@@ -70,13 +97,14 @@ export class ReportsService {
     tbldocuments.linkkse, 
     tbldocuments.kvartal, 
     tbldocuments.ref,
+    tbldocuments.doc,
     (SELECT name FROM tblcompany WHERE kod = tbldocuments.sender) AS company_name
     FROM tbldocuments, users, tblcompany
-    WHERE users.idcompany = tblcompany.id AND (tbldocuments.sender = tblcompany.kod OR
-    tbldocuments.reciver = tblcompany.kod OR (tblcompany.kod = 'fin' AND tbldocuments.status = 3))
-    AND users.id = ${userId}  AND tbldocuments.docslayoutid!=28 and tbldocuments.typedoc <> 'Существенный факт (Договор о раскрытии информации)'
+	  WHERE users.idcompany = tblcompany.id AND (tbldocuments.sender = tblcompany.kod OR tbldocuments.reciver = tblcompany.kod)
+    ${isAdmin ? ``: `AND users.id = ${userId}`}
+    AND tbldocuments.docslayoutid!=28 and tbldocuments.typedoc <> 'Существенный факт (Договор о раскрытии информации)' and tbldocuments.status = 3
     ORDER BY datesend DESC,createdate DESC
-    `;
+    `
     const [result] = await this.oi_old.query(queryString);
     return result;
   }
@@ -105,8 +133,11 @@ export class ReportsService {
 
   mergeObjects(obj1, obj2) {
     let mergedObj = { ...obj1 };
-
     for (const key in obj2) {
+      if (obj2[key] == 'deleted') {
+        delete mergedObj[key];
+        continue;
+      }
       if (Array.isArray(obj2[key])) {
         // If obj2[key] is an array, replace obj1[key] with obj2[key]
         mergedObj[key] = obj2[key];
@@ -118,7 +149,6 @@ export class ReportsService {
         mergedObj[key] = obj2[key];
       }
     }
-
     return mergedObj;
   }
 
@@ -147,7 +177,6 @@ export class ReportsService {
       } else {
         newContent = this.mergeObjects(parseContent, content);
       }
-
       report.content = newContent;
       report.save();
       return report;
@@ -302,26 +331,46 @@ export class ReportsService {
     return template;
   }
 
+  checkFinancialStatements(data) {
+    let count = 0;
+    for (const key in data) {
+      if (key.startsWith('financial_statement') && data[key] != "") {
+        count++
+      }
+    }
+    return count >= 68;
+  }
+
   async updateReportStatus(reportId, status) {
-    // const report = await this.reportRepository.findByPk(reportId);
-    const report = await this.getReportById(reportId);
-    if (status == 2) {
-      report.send_date = new Date();
-      this.botService.sendNoticeForAdmin(report);
+    try {
+      const report = await this.getReportById(reportId);
+      if(status == 2 && report.typeId == 1 && !this.checkFinancialStatements(report.content)) {
+        // throw new HttpException('Пункт финансовая отчетность эмитента не все поля заполнены', HttpStatus.BAD_REQUEST);
+        throw new Error('Пункт финансовая отчетность эмитента не все поля заполнены');
+      }
+      if (status == 2) {
+        report.send_date = new Date();
+        // this.botService.sendNoticeForAdmin(report);
+      }
+      if (status == 4) {
+        report.confirm_date = new Date();
+      }
+      if (status == 4 && report.type.groupId == 2) {
+        report.confirm_date = new Date();
+        // this.botService.sendNoticeForKseNewsChannel(report);
+      }
+      if (status == 3) {
+        report.send_date = null;
+        await this.edsRepository.destroy({ where: { reportId } });
+      }
+      report.statusId = status;
+      return await report.save();
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    if (status == 4) {
-      report.confirm_date = new Date();
-    }
-    if (status == 4 && report.type.groupId == 2) {
-      report.confirm_date = new Date();
-      this.botService.sendNoticeForKseNewsChannel(report);
-    }
-    if (status == 3) {
-      report.send_date = null;
-      await this.edsRepository.destroy({ where: { reportId } });
-    }
-    report.statusId = status;
-    return await report.save();
   }
 
   async removeReport({ reportId }) {

@@ -509,6 +509,33 @@ const ReportForm = () => {
                           )}
                         </>
                       )}
+                      {element === "dynamic_textarea" && (
+                        <>
+                          {formType === "view" ? (
+                            <Text style={{ whiteSpace: "pre-wrap" }} level={5}>{`${
+                              form.getFieldValue(field) || ""
+                            }`}</Text>
+                          ) : (
+                            <>
+                              <Form.Item
+                                name={field}
+                                rules={[
+                                  {
+                                    required: required,
+                                    message: `${label} обязательно`,
+                                    whitespace: true,
+                                  },
+                                ]}
+                                style={{
+                                  marginBottom: "0px",
+                                }}
+                              >
+                                <TextArea rows={5} placeholder="Введите данные" />
+                              </Form.Item>
+                            </>
+                          )}
+                        </>
+                      )}
                       {element === "list" && (
                         <>
                           {formType === "view" ? (
@@ -658,7 +685,7 @@ const ReportForm = () => {
                             ))}
                           </Row>
                         </>
-                      )}
+                      )}                  
                       {element === "textarea" && field != "audit_report" && (
                         <Form.Item
                           label={<Title level={5}>{label}</Title>}
