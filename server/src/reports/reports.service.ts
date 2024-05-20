@@ -346,10 +346,10 @@ export class ReportsService {
   async updateReportStatus(reportId, status) {
     try {
       const report = await this.getReportById(reportId);
-      if(status == 2 && report.typeId == 1 && !this.checkFinancialStatements(report.content)) {
-        // throw new HttpException('Пункт финансовая отчетность эмитента не все поля заполнены', HttpStatus.BAD_REQUEST);
-        throw new Error('Пункт финансовая отчетность эмитента не все поля заполнены');
-      }
+      // if(status == 2 && report.typeId == 1 && !this.checkFinancialStatements(report.content)) {
+      //   // throw new HttpException('Пункт финансовая отчетность эмитента не все поля заполнены', HttpStatus.BAD_REQUEST);
+      //   throw new Error('Пункт финансовая отчетность эмитента не все поля заполнены');
+      // }
       if (status == 2) {
         report.send_date = new Date();
         // this.botService.sendNoticeForAdmin(report);
