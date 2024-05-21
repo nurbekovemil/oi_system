@@ -310,8 +310,16 @@ const ReportForm = () => {
     }
   }, [isSuccessReportTemplate, isSuccessGetReportById, template.length]);
 
-  const back = () => {
-    navigate("/dashboard/reports");
+  const back = async () => {
+    try {
+      if(reportType == 1 || reportType == 2) {
+        await form.validateFields();
+      }
+      navigate("/dashboard/reports");
+    } catch (errorInfo) {
+      notification.error({message: 'Не все обязательные поля заполнены'})
+    }
+    
   };
 
   const printContentRef = useRef();
@@ -661,13 +669,19 @@ const ReportForm = () => {
                                   <Form.Item
                                     name={list.field}
                                     initialValue={list.value}
+                                    rules={[
+                                      {
+                                        required: list.required,
+                                        message: 'Поле обязательно'
+                                      },
+                                    ]}
                                   >
                                     {formType === "view" ? (
                                       <Text>
                                         {form.getFieldValue(list.field)}
                                       </Text>
                                     ) : (
-                                      <Input placeholder="Введите данные" />
+                                      <Input placeholder="Введите данные" /> 
                                     )}
                                   </Form.Item>
                                 )}
