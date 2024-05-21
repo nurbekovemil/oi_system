@@ -80,6 +80,7 @@ export class ReportsService {
     const isAdmin = roles.some((role) =>
       ['ADMIN','MODERATOR'].includes(role.title),
     );
+    console.log(roles)
 
     const queryString = `
     SELECT 
@@ -107,6 +108,7 @@ export class ReportsService {
     AND tbldocuments.docslayoutid!=28 and tbldocuments.typedoc <> 'Существенный факт (Договор о раскрытии информации)' and tbldocuments.status = 3
     ORDER BY datesend DESC,createdate DESC
     `
+    console.log('queryString', queryString)
     const [result] = await this.oi_old.query(queryString);
     return result;
   }
@@ -352,14 +354,14 @@ export class ReportsService {
       // }
       if (status == 2) {
         report.send_date = new Date();
-        // this.botService.sendNoticeForAdmin(report);
+        this.botService.sendNoticeForAdmin(report);
       }
       if (status == 4) {
         report.confirm_date = new Date();
       }
       if (status == 4 && report.type.groupId == 2) {
         report.confirm_date = new Date();
-        // this.botService.sendNoticeForKseNewsChannel(report);
+        this.botService.sendNoticeForKseNewsChannel(report);
       }
       if (status == 3) {
         report.send_date = null;
