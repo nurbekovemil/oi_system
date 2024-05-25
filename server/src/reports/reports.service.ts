@@ -424,7 +424,8 @@ export class ReportsService {
         'id',
         'typeId',
         [
-          sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
+          sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'YYYY-MM-DD'), 
+          // sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'), 
           'confirm_date',
         ],
       ],
