@@ -258,6 +258,11 @@ const ReportPublicView = () => {
                               form.getFieldValue(field) || ""
                             }`}</Text>
                           )}
+                        {element === "dynamic_textarea" && (
+                          <Text style={{ whiteSpace: "pre-wrap" }} level={5}>{`${
+                            form.getFieldValue(field) || ""
+                          }`}</Text>
+                      )}
                           {element === "list" && (
                             <Table
                               className="custom-table"

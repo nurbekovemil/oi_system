@@ -77,7 +77,7 @@ const Auth = () => {
     >
       <Col span={24}  xs={20} sm={20} md={24} lg={24}>
         <Row justify="center">
-          <Col span={8} xs={24} sm={24} md={10} lg={4}>
+          <Col span={8} xs={24} sm={24} md={10} lg={5}>
             <Space
               direction="vertical"
               style={{
@@ -92,6 +92,9 @@ const Auth = () => {
                 tabList={tabList}
                 onTabChange={(key) => {
                   onTabChange(key);
+                }}
+                tabProps={{
+                  size: 'small',
                 }}
               >
                 {contentList[activeTab]}
