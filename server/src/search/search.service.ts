@@ -168,7 +168,7 @@ export class SearchService {
     SELECT 
     tbldocuments.id, 
     CASE
-    WHEN tbldocuments.typedoc = 'Создать отчет' THEN concat('Листинговый отчет', ' ', tbldocuments.kvartal) else tbldocuments.typedoc
+    WHEN tbldocuments.typedoc = 'Создать отчет' THEN concat(' hjkjnnj', ' ', tbldocuments.kvartal) else tbldocuments.typedoc
     END,
     case
     when tbldocuments.typedoc = 'Создать отчет' then 1
