@@ -108,7 +108,6 @@ export class ReportsService {
     AND tbldocuments.docslayoutid!=28 and tbldocuments.typedoc <> 'Существенный факт (Договор о раскрытии информации)' and tbldocuments.status = 3
     ORDER BY datesend DESC,createdate DESC
     `
-    console.log('queryString', queryString)
     const [result] = await this.oi_old.query(queryString);
     return result;
   }

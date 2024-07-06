@@ -23,7 +23,15 @@ export class SearchController {
   @Roles('ADMIN', 'USER', 'MODERATOR')
   @UseGuards(RolesGuard)
   @Get()
-  findOne(@Query() query, @Request() req) {
+  searchReports(@Query() query, @Request() req) {
     return this.searchService.findAll(req.user, query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('ADMIN', 'USER', 'MODERATOR')
+  @UseGuards(RolesGuard)
+  @Get('/old')
+  searchOldReports(@Query() query, @Request() req) {
+    return this.searchService.findOldReports(req.user, query);
   }
 }
