@@ -6,6 +6,7 @@ import userSlice from "./slices/user-slice";
 import reportSlice from "./slices/report-slice";
 import messageSlice from "./slices/message-slice";
 import searchSlice from "./slices/search-slice";
+import contractSlice from "./slices/contract-slice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     report: reportSlice,
     message: messageSlice,
     search: searchSlice,
+    contract: contractSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware),

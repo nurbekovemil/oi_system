@@ -8,6 +8,7 @@ import {
   BankOutlined,
   BookOutlined,
   AuditOutlined,
+  SolutionOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/images/oi_logo.png";
 import { useSelector } from "react-redux";
@@ -28,6 +29,12 @@ const menuList = [
     path: "/dashboard/reports",
     label: "Документы",
     icon: <ReconciliationOutlined />,
+    role: ["ADMIN", "USER", "MODERATOR"],
+  },
+  {
+    path: "/dashboard/contracts",
+    label: "Договор",
+    icon: <SolutionOutlined />,
     role: ["ADMIN", "USER", "MODERATOR"],
   },
   {

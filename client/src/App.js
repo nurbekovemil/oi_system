@@ -41,6 +41,9 @@ import ChangeAccess from "./components/profile/ChangeUserPass";
 import Regulations from "./pages/private/Regulations";
 import ChangeDefaultPass from "./pages/private/ChangeDefaultPass";
 import Saerch from "./pages/private/Search";
+import Contracts from "./pages/private/contracts";
+import ContractForm from "./pages/private/contracts/Form";
+import ContractTypes from "./pages/private/contracts/Types";
 
 function App() {
   moment.locale("ru");
@@ -91,6 +94,10 @@ function App() {
               element={<CompanyView />}
             />
             <Route path="/dashboard/reports" element={<Reports />} />
+            <Route path="/dashboard/contracts" element={<Contracts />} />
+            <Route path="/dashboard/contracts/types" element={<ContractTypes />} />
+            <Route path="/dashboard/contracts/:formType/:contractType" element={<ContractForm />} />
+            
             <Route path="/dashboard/reports/types" element={<ReportTypes />} />
             <Route
               path="/dashboard/reports/:formType/:reportType/:tempId/:reportId"
