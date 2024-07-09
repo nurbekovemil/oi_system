@@ -4,6 +4,8 @@ import {
     DataType,
     Model,
     ForeignKey,
+    HasMany,
+    BelongsTo,
   } from 'sequelize-typescript';
 import { ContractTemplates } from './contract-templates.entity';
 
@@ -28,6 +30,9 @@ import { ContractTemplates } from './contract-templates.entity';
     @ForeignKey(() => ContractTemplates)
     @Column({ type: DataType.INTEGER })
     tempId: number;
+
+    @BelongsTo(() => ContractTemplates)
+    templates: ContractTemplates
 
 }
   

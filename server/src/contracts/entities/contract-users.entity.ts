@@ -30,10 +30,6 @@ import { ContractStatus } from './contract-status.entity';
     @ForeignKey(() => Contracts)
     @Column({ type: DataType.INTEGER })
     contractId: number;
-    
-    @ForeignKey(() => Company)
-    @Column({ type: DataType.INTEGER })
-    companyId: number;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER })

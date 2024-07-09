@@ -10,6 +10,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Company } from 'src/companies/entities/company.entity';
+import { Contracts } from 'src/contracts/entities/contract.entity';
 import { Report } from 'src/reports/entities/report.entity';
 import { RoleUsers } from 'src/roles/entities/role-users.entity';
 import { Roles } from 'src/roles/entities/role.entity';
@@ -60,4 +61,7 @@ export class User extends Model<User, UserCreateAttrs> {
 
   @BelongsToMany(() => Roles, () => RoleUsers)
   roles: Roles[];
+
+  @HasMany(() => Contracts)
+  contracts: Contracts[];
 }

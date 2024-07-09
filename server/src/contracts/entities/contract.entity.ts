@@ -1,5 +1,6 @@
 export class Role {}
 import {
+  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
@@ -26,10 +27,6 @@ export class Contracts extends Model<Contracts, ContractsCreationAttrs> {
   })
   id: number;
 
-  @ForeignKey(() => Company)
-  @Column({ type: DataType.INTEGER })
-  companyId: number;
-
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER})
   userId: number;
@@ -40,4 +37,13 @@ export class Contracts extends Model<Contracts, ContractsCreationAttrs> {
 
   @Column({ type: DataType.JSON })
   content: object;
+
+  @BelongsTo(() => ContractTypes)
+  contractType: ContractTypes
+
+  @BelongsTo(() => User)
+  user: User
+
+  
 }
+

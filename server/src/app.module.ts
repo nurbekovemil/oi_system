@@ -33,6 +33,11 @@ import { RoleAllowedReports } from './roles/entities/role-allowed-reports.entity
 import { BotModule } from './bot/bot.module';
 import { SearchModule } from './search/search.module';
 import { ContractsModule } from './contracts/contracts.module';
+import { Contracts } from './contracts/entities/contract.entity';
+import { ContractTypes } from './contracts/entities/contract-types.entity';
+import { ContractTemplates } from './contracts/entities/contract-templates.entity';
+import { ContractStatus } from './contracts/entities/contract-status.entity';
+import { ContractUsers } from './contracts/entities/contract-users.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -62,6 +67,11 @@ import { ContractsModule } from './contracts/contracts.module';
         EdsTypes,
         Receipt,
         OiKse,
+        Contracts,
+        ContractTypes,
+        ContractUsers,
+        ContractStatus,
+        ContractTemplates
       ],
       autoLoadModels: true,
       timezone: '+06:00',

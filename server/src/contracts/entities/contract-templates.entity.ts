@@ -5,12 +5,14 @@ import {
     ForeignKey,
     Model,
     HasMany,
+    BelongsTo,
   } from 'sequelize-typescript';
+import { ContractTypes } from './contract-types.entity';
 
   interface ContractTemplatesCreateAttrs {
     template: object[];
   }
-  @Table({ tableName: 'report_templates', timestamps: false })
+  @Table({ tableName: 'contract_templates', timestamps: false })
   export class ContractTemplates extends Model<
     ContractTemplates,
     ContractTemplatesCreateAttrs
@@ -25,4 +27,7 @@ import {
   
     @Column({ type: DataType.JSON })
     template: object[];
+
+    @HasMany(() => ContractTypes)
+    contractType: ContractTypes
   }

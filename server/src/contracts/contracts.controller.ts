@@ -6,29 +6,13 @@ import { UpdateContractDto } from './dto/update-contract.dto';
 @Controller('contracts')
 export class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
-
-  @Post()
-  create(@Body() createContractDto: CreateContractDto) {
-    return this.contractsService.create(createContractDto);
+  @Get('/types')
+  getContractTypes() {
+    return this.contractsService.getContractTypes();
   }
 
-  @Get()
-  findAll() {
-    return this.contractsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.contractsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateContractDto: UpdateContractDto) {
-    return this.contractsService.update(+id, updateContractDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contractsService.remove(+id);
+  @Get('/types/:id')
+  getContractTypeById(@Param('id') id: number) {
+    return this.contractsService.getContractTypeById(id);
   }
 }
