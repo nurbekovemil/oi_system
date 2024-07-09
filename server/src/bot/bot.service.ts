@@ -15,12 +15,23 @@ export class BotService {
     });
   }
 
+  // async sendNoticeForAdmin(reportData) {
+  //   const tg_bot_admin_id = process.env.TG_BOT_ADMIN_ID;
+  //   const { company, type } = reportData;
+  //   const message = `<b>Новый документ</b>\n\n${company?.name}\n${type.title}`;
+  //   this.botAdmin.sendMessage(tg_bot_admin_id, message, {
+  //     parse_mode: 'HTML',
+  //   });
+  // }
+  
   async sendNoticeForAdmin(reportData) {
-    const tg_bot_admin_id = process.env.TG_BOT_ADMIN_ID;
     const { company, type } = reportData;
     const message = `<b>Новый документ</b>\n\n${company?.name}\n${type.title}`;
-    this.botAdmin.sendMessage(tg_bot_admin_id, message, {
-      parse_mode: 'HTML',
+    const tg_bot_admin_ids = process.env.TG_BOT_ADMIN_IDS.split(',').map(Number);
+    tg_bot_admin_ids.forEach(admin_id => {
+      this.botAdmin.sendMessage(admin_id, message, {
+        parse_mode: 'HTML',
+      });
     });
   }
 
