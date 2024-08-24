@@ -35,4 +35,19 @@ export class EdsController {
   signRutoken(@Body() body, @Request() req) {
     return this.edsService.signRutoken(req.user, body);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('contract/rutoken/sign')
+  signContractRutoken(@Body() body, @Request() req) {
+    return this.edsService.signContractRutoken(req.user, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('contract/pin/confirm')
+  confirmContractPinCode(
+    @Body() body: { pin: number; contractId: number },
+    @Request() req,
+  ) {
+    // return this.edsService.confirmPinCode(req.user, body);
+  }
 }

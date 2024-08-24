@@ -3103,6 +3103,9 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
   font-weight: 600 !important;
   color: #8c8c8c !important;
 }
+.contract-select > .ant-select-selector span{
+  height: 30px !important;
+}
 .ant-collapse {
   border: none !important;
   border-radius: 12px !important;

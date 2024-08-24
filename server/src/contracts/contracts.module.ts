@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Contracts } from './entities/contract.entity';
 import { ContractTypes } from './entities/contract-types.entity';
 import { ContractTemplates } from './entities/contract-templates.entity';
-import { ContractUsers } from './entities/contract-users.entity';
+import { ContractCompanies } from './entities/contract-companies.entity';
 import { ContractStatus } from './entities/contract-status.entity';
 
 @Module({
@@ -14,11 +14,12 @@ import { ContractStatus } from './entities/contract-status.entity';
       Contracts,
       ContractTypes,
       ContractTemplates,
-      ContractUsers,
+      ContractCompanies,
       ContractStatus,
     ]),
   ],
   controllers: [ContractsController],
-  providers: [ContractsService]
+  providers: [ContractsService],
+  exports: [ContractsService],
 })
 export class ContractsModule {}

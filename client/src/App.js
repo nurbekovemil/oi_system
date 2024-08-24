@@ -44,6 +44,7 @@ import Saerch from "./pages/private/Search";
 import Contracts from "./pages/private/contracts";
 import ContractForm from "./pages/private/contracts/Form";
 import ContractTypes from "./pages/private/contracts/Types";
+import ContractEds from "./pages/private/contracts/Eds";
 
 function App() {
   moment.locale("ru");
@@ -96,7 +97,9 @@ function App() {
             <Route path="/dashboard/reports" element={<Reports />} />
             <Route path="/dashboard/contracts" element={<Contracts />} />
             <Route path="/dashboard/contracts/types" element={<ContractTypes />} />
+            <Route path="/dashboard/contracts/eds/:contractId" element={<ContractEds />} />
             <Route path="/dashboard/contracts/:formType/:contractType" element={<ContractForm />} />
+            <Route path="/dashboard/contracts/:formType/:contractType/:contractId" element={<ContractForm />} />
             
             <Route path="/dashboard/reports/types" element={<ReportTypes />} />
             <Route

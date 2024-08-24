@@ -5,16 +5,18 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Company } from 'src/companies/entities/company.entity';
-import { User } from 'src/users/entities/user.entity';
 import { ContractTypes } from './contract-types.entity';
+import { ContractCompanies } from './contract-companies.entity';
 
 interface ContractsCreationAttrs {
-  value: string;
-  description: string;
+  companyId: number;
+  typeId: number;
+  content: string;
 }
 
 @Table({ tableName: 'contracts' })
@@ -27,9 +29,9 @@ export class Contracts extends Model<Contracts, ContractsCreationAttrs> {
   })
   id: number;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Company)
   @Column({ type: DataType.INTEGER})
-  userId: number;
+  companyId: number;
 
   @ForeignKey(() => ContractTypes)
   @Column({ type: DataType.INTEGER })
@@ -41,9 +43,11 @@ export class Contracts extends Model<Contracts, ContractsCreationAttrs> {
   @BelongsTo(() => ContractTypes)
   contractType: ContractTypes
 
-  @BelongsTo(() => User)
-  user: User
+  @BelongsTo(() => Company)
+  company: Company
 
-  
+  @HasMany(() => ContractCompanies)
+  contractCompanies: ContractCompanies[]
+
 }
 

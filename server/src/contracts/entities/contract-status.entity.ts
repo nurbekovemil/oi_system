@@ -3,7 +3,9 @@ import {
     Column,
     DataType,
     Model,
+    HasMany,
   } from 'sequelize-typescript';
+import { ContractCompanies } from './contract-companies.entity';
 
   interface ContractStatusCreateAttrs {
     title: string;
@@ -21,5 +23,8 @@ import {
 
     @Column({ type: DataType.TEXT })
     title: string;
+
+    @HasMany(() => ContractCompanies)
+    contractCompanies: ContractCompanies[]
 }
   

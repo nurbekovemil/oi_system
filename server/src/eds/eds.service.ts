@@ -1,3 +1,4 @@
+import { ContractsService } from './../contracts/contracts.service';
 import { ReceiptsService } from './../receipts/receipts.service';
 import { ReportsService } from './../reports/reports.service';
 import { CompaniesService } from './../companies/companies.service';
@@ -15,6 +16,7 @@ export class EdsService {
     private CompaniesService: CompaniesService,
     private ReportsService: ReportsService,
     private ReceiptsService: ReceiptsService,
+    private ContractsService: ContractsService,
   ) {}
 
   async sendPinCodeEmail({ userId, companyId }) {
@@ -192,5 +194,9 @@ export class EdsService {
     } catch (error) {
       throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async signContractRutoken(user, body) {
+    return this.ContractsService.signContractRutoken(user, body);
   }
 }

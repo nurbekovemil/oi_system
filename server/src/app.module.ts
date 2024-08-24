@@ -37,7 +37,7 @@ import { Contracts } from './contracts/entities/contract.entity';
 import { ContractTypes } from './contracts/entities/contract-types.entity';
 import { ContractTemplates } from './contracts/entities/contract-templates.entity';
 import { ContractStatus } from './contracts/entities/contract-status.entity';
-import { ContractUsers } from './contracts/entities/contract-users.entity';
+import { ContractCompanies } from './contracts/entities/contract-companies.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -69,7 +69,7 @@ import { ContractUsers } from './contracts/entities/contract-users.entity';
         OiKse,
         Contracts,
         ContractTypes,
-        ContractUsers,
+        ContractCompanies,
         ContractStatus,
         ContractTemplates
       ],

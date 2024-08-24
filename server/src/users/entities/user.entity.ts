@@ -61,7 +61,4 @@ export class User extends Model<User, UserCreateAttrs> {
 
   @BelongsToMany(() => Roles, () => RoleUsers)
   roles: Roles[];
-
-  @HasMany(() => Contracts)
-  contracts: Contracts[];
 }

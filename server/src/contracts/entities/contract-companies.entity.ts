@@ -4,21 +4,21 @@ import {
     DataType,
     Model,
     ForeignKey,
+    BelongsTo,
+    HasOne,
   } from 'sequelize-typescript';
 import { Contracts } from './contract.entity';
 import { Company } from 'src/companies/entities/company.entity';
-import { User } from 'src/users/entities/user.entity';
 import { ContractStatus } from './contract-status.entity';
 
-  interface ContractUsersCreateAttrs {
+  interface ContractCompaniesCreateAttrs {
     contractId: number;
     companyId: number;
-    userId: number;
     statusId: number;
   }
 
-  @Table({ tableName: 'contract_users'})
-  export class ContractUsers extends Model<ContractUsers, ContractUsersCreateAttrs> {
+  @Table({ tableName: 'contract_companies'})
+  export class ContractCompanies extends Model<ContractCompanies, ContractCompaniesCreateAttrs> {
     @Column({
       type: DataType.INTEGER,
       unique: true,
@@ -31,9 +31,9 @@ import { ContractStatus } from './contract-status.entity';
     @Column({ type: DataType.INTEGER })
     contractId: number;
 
-    @ForeignKey(() => User)
+    @ForeignKey(() => Company)
     @Column({ type: DataType.INTEGER })
-    userId: number;
+    companyId: number;
 
     @ForeignKey(() => ContractStatus)
     @Column({ type: DataType.INTEGER })
@@ -44,5 +44,14 @@ import { ContractStatus } from './contract-status.entity';
   
     @Column({ type: DataType.JSON })
     hash: object;
+
+    @BelongsTo(() => Contracts)
+    contract: Contracts;
+
+    @BelongsTo(() => Company)
+    company: Company;
+
+    @BelongsTo(() => ContractStatus)
+    status: ContractStatus;
 }
   

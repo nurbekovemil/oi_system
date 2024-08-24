@@ -12,6 +12,7 @@ import { Company } from 'src/companies/entities/company.entity';
 import { Report } from 'src/reports/entities/report.entity';
 import { Eds } from './entities/ed.entity';
 import { ReceiptsModule } from 'src/receipts/receipts.module';
+import { ContractsModule } from 'src/contracts/contracts.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ReceiptsModule } from 'src/receipts/receipts.module';
     CompaniesModule,
     ReportsModule,
     ReceiptsModule,
+    ContractsModule
   ],
   controllers: [EdsController],
   providers: [EdsService],
