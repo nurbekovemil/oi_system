@@ -353,7 +353,7 @@ const ReportPublicView = () => {
                               </Row>
                             </>
                           )}
-                          {element === "textarea" && (
+                          {element === "textarea" && field != "audit_report" && (
                             <Form.Item
                               label={<Title level={5}>{label}</Title>}
                               name={field}
@@ -365,6 +365,20 @@ const ReportPublicView = () => {
                               <Divider orientation="left" plain />
                             </Form.Item>
                           )}
+                          {element === "textarea" &&
+                            form.getFieldValue("period") == 5 &&
+                            field == "audit_report" && (
+                              <Form.Item
+                                label={<Title level={5}>{label}</Title>}
+                                name={field}
+                              >
+                                {
+                                  <Text style={{ whiteSpace: "pre-wrap" }}>
+                                    {form.getFieldValue(field)}
+                                  </Text>
+                                }
+                              </Form.Item>
+                            )}
                           {element === "list_group" && (
                             <Row gutter={[16, 16]}>
                               {lists.map((list) => (
