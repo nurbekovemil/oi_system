@@ -46,9 +46,9 @@ export class OiKseService {
         const companyId = report.companyId;
         if ((!lastReports[companyId] || report.confirm_date > lastReports[companyId].confirmDate) && report.prospect) {
             lastReports[companyId] = {
-                kseCompanyId: companies.find(company => company.oi_company_id === companyId).kse_company_id,
+                kseCompanyId: companies.find(company => company.oi_company_id === companyId)?.kse_company_id,
                 confirmDate: report.confirm_date,
-                url: report.prospect[0].url
+                url: report.prospect[0].url,
             };
         }
     });
