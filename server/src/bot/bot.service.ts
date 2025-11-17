@@ -13,6 +13,18 @@ export class BotService {
     this.botChannel = new TelegramBot(process.env.TG_BOT_CHANNEL_KEY, {
       polling: false,
     });
+    this.botAdmin.onText(/\/start/, (msg) => {
+      const userId = msg.from.id;
+      const firstName = msg.from.first_name || '';
+      let message = `${userId}`
+      const tg_bot_admin_ids = process.env.TG_BOT_ADMIN_IDS.split(',').map(Number);
+      tg_bot_admin_ids.forEach(admin_id => {
+        this.botAdmin.sendMessage(admin_id, message, {
+          parse_mode: 'HTML',
+        });
+      });
+      // Тут можно сохранить userId в БД, если нужно
+    });
   }
 
   // async sendNoticeForAdmin(reportData) {
