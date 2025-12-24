@@ -30,31 +30,69 @@ export class OiKseService {
     return data;
   }
 
+  // async getListingPropectReports() {
+  //   const report_list = await this.reportsService.getOiKseListingProspectReports();
+  //   const company_list = await this.oikseRepository.findAll({
+  //     where: {
+  //       type: 'listing'
+  //     }
+  //   })
+  //   const lastReports = {};
+
+  //   let reports = JSON.parse(JSON.stringify(report_list))
+  //   let companies = JSON.parse(JSON.stringify(company_list))
+
+  //   await reports.forEach(report => {
+  //       const companyId = report.companyId;
+  //       if ((!lastReports[companyId] || report.confirm_date > lastReports[companyId].confirmDate) && report.prospect) {
+  //           lastReports[companyId] = {
+  //               kseCompanyId: companies.find(company => company.oi_company_id === companyId)?.kse_company_id,
+  //               confirmDate: report.confirm_date,
+  //               url: report.prospect[0].url,
+  //           };
+  //       }
+  //   });
+  //   const result = await Object.values(lastReports);
+  //   return result;
+  // }
+
   async getListingPropectReports() {
-    const report_list = await this.reportsService.getOiKseListingProspectReports();
-    const company_list = await this.oikseRepository.findAll({
-      where: {
-        type: 'listing'
-      }
-    })
-    const lastReports = {};
+  const reports = await this.reportsService.getOiKseListingProspectReports();
 
-    let reports = JSON.parse(JSON.stringify(report_list))
-    let companies = JSON.parse(JSON.stringify(company_list))
+  const companies = await this.oikseRepository.findAll({
+    where: { type: 'listing' },
+    raw: true,
+  });
 
-    await reports.forEach(report => {
-        const companyId = report.companyId;
-        if ((!lastReports[companyId] || report.confirm_date > lastReports[companyId].confirmDate) && report.prospect) {
-            lastReports[companyId] = {
-                kseCompanyId: companies.find(company => company.oi_company_id === companyId)?.kse_company_id,
-                confirmDate: report.confirm_date,
-                url: report.prospect[0].url,
-            };
-        }
-    });
-    const result = await Object.values(lastReports);
-    return result;
+  const lastReports: Record<number, any> = {};
+
+  for (const report of reports as any[]) {
+    if (!report.prospect?.length) continue;
+
+    const companyId = report.companyId;
+    const confirmDate = new Date(report.confirm_date);
+
+    if (
+      !lastReports[companyId] ||
+      confirmDate > lastReports[companyId].confirmDate
+    ) {
+      lastReports[companyId] = {
+        kseCompanyId: companies.find(
+          c => c.oi_company_id === companyId
+        )?.kse_company_id,
+        confirmDate,
+        url: report.prospect[0].url,
+      };
+    }
   }
+
+  // форматируем дату ТОЛЬКО на выходе
+  return Object.values(lastReports).map(r => ({
+    ...r,
+    confirmDate: r.confirmDate.toLocaleDateString('ru-RU'),
+  }));
+}
+
 
   async getLastNews() {
     const client_host = process.env.CLIENT_HOST;

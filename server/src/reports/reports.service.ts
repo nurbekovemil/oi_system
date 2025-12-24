@@ -515,12 +515,14 @@ export class ReportsService {
     attributes: [
       'companyId',
       'id',
-      [
-        sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
-        'confirm_date',
-      ],
+      // [
+      //   sequelize.fn('TO_CHAR', sequelize.col('confirm_date'), 'DD.MM.YYYY'),
+      //   'confirm_date',
+      // ],
+      'confirm_date', // ← оставляем Date
       [sequelize.literal(`content->'prospect'`), 'prospect'],
     ],
+    raw: true,
   });
   return reports;
   }
