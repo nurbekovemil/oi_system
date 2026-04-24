@@ -8,7 +8,6 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { useLazyLogoutQuery } from "../../store/services/auth-service";
-import Search from "../search";
 
 const toggler = [
   <svg
@@ -40,20 +39,16 @@ function Header({ onPress }) {
   return (
     <>
       <Row gutter={[24, 0]}>
-        <Col span={24} md={7} xs={7} sm={7}>
+        <Col span={24} md={12} xs={12} sm={12}>
           <Button
             icon={<ArrowLeftOutlined />}
             type="text"
             onClick={handleButtonClick}
-            // disabled={isWeakPass}
           >
             Назад
           </Button>
         </Col>
-        <Col span={24} md={10} xs={10} sm={10}>
-          <Search />
-        </Col>
-        <Col span={24} md={7} xs={7} sm={7} className="header-control">
+        <Col span={24} md={12} xs={12} sm={12} className="header-control">
           <Button
             type="link"
             className="sidebar-toggler"

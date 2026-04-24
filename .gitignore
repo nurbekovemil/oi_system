@@ -8,3 +8,5 @@ server/node_modules
 server/.production.env
 server/.development.env
 server/.env
+docs/*
+scripts/*

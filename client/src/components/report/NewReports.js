@@ -7,10 +7,11 @@ import {
   Space,
   Tooltip,
   Popover,
-  Descriptions,
-  Popconfirm,
-  message,
   Modal,
+  Select,
+  DatePicker,
+  Row,
+  Col,
 } from "antd";
 import {
   FormOutlined,
@@ -27,10 +28,13 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import {
   useGetReportsQuery,
+  useGetReportStatusesQuery,
+  useGetReportTypesQuery,
   useRejectReportMutation,
   useRemoveReportMutation,
   useSendReportMutation,
 } from "../../store/services/report-service";
+import { useGetCompaniesForOptionQuery } from "../../store/services/company-service";
 import { StatusTag } from "./StatusTag";
 import moment from "moment";
 import { Fragment, useState } from "react";
@@ -171,17 +175,44 @@ const items = [
   // },
 ];
 function NewReports() {
+  const { RangePicker } = DatePicker;
   const pageSizeOptions = [5, 10, 15, 20, 30];
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({
+    companyId: undefined,
+    typeId: undefined,
+    statusId: undefined,
+    period: null,
+  });
   const { user } = useSelector((state) => state.auth);
+  const isAdmin = ["ADMIN", "MODERATOR"].includes(user.roles[0].title);
   const navigate = useNavigate();
+  const { data: companies = [] } = useGetCompaniesForOptionQuery();
+  const { data: reportTypes = [] } = useGetReportTypesQuery();
+  const { data: statuses = [] } = useGetReportStatusesQuery();
+
+  const dateFrom = filters.period?.[0]
+    ? filters.period[0].format("YYYY-MM-DD")
+    : undefined;
+  const dateTo = filters.period?.[1]
+    ? filters.period[1].format("YYYY-MM-DD")
+    : undefined;
+
   const {
     data: dataReports,
     isSuccess: isSuccessReports,
     isLoading: isLoadingReports,
     isFetching,
-  } = useGetReportsQuery({ page: currentPage, limit: pageSize });
+  } = useGetReportsQuery({
+    page: currentPage,
+    limit: pageSize,
+    companyId: filters.companyId,
+    typeId: filters.typeId,
+    statusId: filters.statusId,
+    dateFrom,
+    dateTo,
+  });
 
   const [sendReport, {}] = useSendReportMutation();
   const [removeReport, {}] = useRemoveReportMutation();
@@ -190,6 +221,13 @@ function NewReports() {
   const getReportsHandler = (page, limit) => {
     setCurrentPage(page);
     setPageSize(limit);
+  };
+  const onFilterChange = (key, value) => {
+    setCurrentPage(1);
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   const signReport = (id) => {
@@ -370,6 +408,77 @@ function NewReports() {
     }));
   return (
     <>
+      <Row gutter={[16, 16]} className="reports-filters">
+        {isAdmin && (
+          <Col xs={24} sm={12} lg={6}>
+            <Text className="reports-filter-label">Компания</Text>
+            <Select
+              style={{ width: "100%" }}
+              showSearch
+              placeholder="Компания"
+              value={filters.companyId ?? null}
+              optionFilterProp="label"
+              options={[
+                { value: null, label: "Все" },
+                ...companies.map((company) => ({
+                  value: company.value ?? company.id,
+                  label: company.label ?? company.name,
+                })),
+              ]}
+              onChange={(value) =>
+                onFilterChange("companyId", value || undefined)
+              }
+            />
+          </Col>
+        )}
+        <Col xs={24} sm={12} lg={isAdmin ? 6 : 8}>
+          <Text className="reports-filter-label">Тип документа</Text>
+          <Select
+            style={{ width: "100%" }}
+            showSearch
+            placeholder="Тип отчета"
+            value={filters.typeId ?? null}
+            optionFilterProp="label"
+            options={[
+              { value: null, label: "Все" },
+              ...reportTypes.flatMap((group) =>
+                (group.types || []).map((type) => ({
+                  value: type.id,
+                  label: type.title,
+                }))
+              ),
+            ]}
+            onChange={(value) => onFilterChange("typeId", value || undefined)}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={isAdmin ? 6 : 8}>
+          <Text className="reports-filter-label">Период</Text>
+          <RangePicker
+            style={{ width: "100%" }}
+            value={filters.period}
+            format="DD-MM-YYYY"
+            onChange={(value) => onFilterChange("period", value)}
+          />
+        </Col>
+        <Col xs={24} sm={12} lg={isAdmin ? 6 : 8}>
+          <Text className="reports-filter-label">Статус</Text>
+          <Select
+            style={{ width: "100%" }}
+            showSearch
+            placeholder="Статус"
+            value={filters.statusId ?? null}
+            optionFilterProp="label"
+            options={[
+              { value: null, label: "Все" },
+              ...statuses.map((status) => ({
+                value: status.id,
+                label: status.title,
+              })),
+            ]}
+            onChange={(value) => onFilterChange("statusId", value || undefined)}
+          />
+        </Col>
+      </Row>
       {isLoadingReports || isFetching ? (
         <div
           style={{ padding: "16px 25px" }}

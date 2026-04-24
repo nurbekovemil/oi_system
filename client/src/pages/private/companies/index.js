@@ -6,7 +6,6 @@ import {
   Avatar,
   Button,
   Typography,
-  Dropdown,
   Modal,
   Form,
   Space,
@@ -15,13 +14,13 @@ import {
   Spin,
 } from "antd";
 import {
-  BarsOutlined,
   PlusOutlined,
   FormOutlined,
   DeleteOutlined,
-  EyeOutlined,
   BankOutlined,
   ExclamationCircleOutlined,
+  SearchOutlined,
+  CheckCircleFilled,
 } from "@ant-design/icons";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -29,7 +28,7 @@ import {
   useGetCompaniesQuery,
   useRemoveCompanyMutation,
 } from "../../../store/services/company-service";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 
 // через класс или id не работает стили так как шаблон стили загружает динамически
 const btnStyle = {
@@ -45,7 +44,28 @@ const columns = [
     title: "Название компании",
     dataIndex: "name",
     key: "name",
-    width: "85%",
+    width: "55%",
+  },
+  {
+    title: "Отчеты",
+    dataIndex: "reportsCount",
+    key: "reportsCount",
+    width: "10%",
+    align: "center",
+  },
+  {
+    title: "OI",
+    dataIndex: "oi",
+    key: "oi",
+    width: "10%",
+    align: "center",
+  },
+  {
+    title: "Листинг",
+    dataIndex: "listing",
+    key: "listing",
+    width: "10%",
+    align: "center",
   },
   {
     title: "Действие",
@@ -80,6 +100,17 @@ const Companies = () => {
   const pageSizeOptions = [5, 10, 20];
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const getUsersHandler = (page, limit) => {
     setCurrentPage(page);
     setPageSize(limit);
@@ -88,6 +119,7 @@ const Companies = () => {
   const { data, isSuccess, isLoading, isFetching } = useGetCompaniesQuery({
     page: currentPage,
     limit: pageSize,
+    search: search || undefined,
   });
 
   const [removeCompany, {}] = useRemoveCompanyMutation();
@@ -129,7 +161,16 @@ const Companies = () => {
               </Title>
             </Tooltip>
             <Tooltip title={company.activity} placement="right">
-              <Text type="secondary">
+              <Text
+                type="secondary"
+                style={{
+                  display: "block",
+                  maxWidth: "520px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {company.activity.length > 100
                   ? company.activity.slice(0, 100) + "..."
                   : company.activity}
@@ -137,6 +178,17 @@ const Companies = () => {
             </Tooltip>
           </div>
         </Avatar.Group>
+      ),
+      reportsCount: Number(company.reportsCount || 0),
+      oi: company.hasOi ? (
+        <CheckCircleFilled style={{ color: "#52c41a", fontSize: 18 }} />
+      ) : (
+        "-"
+      ),
+      listing: company.hasListing ? (
+        <CheckCircleFilled style={{ color: "#52c41a", fontSize: 18 }} />
+      ) : (
+        "-"
       ),
       action: (
         <Space>
@@ -208,17 +260,25 @@ const Companies = () => {
               className="criclebox tablespace mb-24"
               title="Список компаний"
               extra={
-                <Link to="/dashboard/companies/add">
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    style={{
-                      ...btnStyle,
-                    }}
-                  >
-                    Добавить компанию
-                  </Button>
-                </Link>
+                <Space size={12}>
+                  <Input
+                    placeholder="Поиск по названию"
+                    prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    allowClear
+                    style={{ width: 280 }}
+                  />
+                  <Link to="/dashboard/companies/add">
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      style={{ ...btnStyle }}
+                    >
+                      Добавить компанию
+                    </Button>
+                  </Link>
+                </Space>
               }
             >
               <div className="table-responsive">

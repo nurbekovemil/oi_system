@@ -5,8 +5,9 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Company } from './entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Sequelize } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { Report } from 'src/reports/entities/report.entity';
+import { OiKse } from 'src/oi_kse/entities/oi_kse.entity';
 import * as bcrypt from 'bcryptjs';
 import { CompanyTemplates } from './entities/company-templates.entity';
 import { BeforeSync } from 'sequelize-typescript';
@@ -16,6 +17,7 @@ export class CompaniesService {
     @InjectModel(Company) private companyRepository: typeof Company,
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Report) private reportRepository: typeof Report,
+    @InjectModel(OiKse) private oiKseRepository: typeof OiKse,
     @InjectModel(CompanyTemplates)
     private companyTemplatesRepository: typeof CompanyTemplates,
 
@@ -34,11 +36,36 @@ export class CompaniesService {
     }
   }
 
-  async getCompanies({ page, limit }) {
+  async getCompanies({ page, limit, search }) {
     const offset = (page - 1) * limit;
-    console.log(page, limit);
+    const where: any = search
+      ? { name: { [Op.iLike]: `%${search}%` } }
+      : {};
     const companies = await this.companyRepository.findAndCountAll({
-      attributes: ['id', 'name', 'activity'],
+      where,
+      attributes: [
+        'id',
+        'name',
+        'activity',
+        [
+          Sequelize.literal(
+            '(SELECT COUNT(*) FROM reports WHERE reports."companyId" = "Company"."id")',
+          ),
+          'reportsCount',
+        ],
+        [
+          Sequelize.literal(
+            `EXISTS(SELECT 1 FROM oi_kse WHERE oi_kse."oi_company_id" = "Company"."id" AND oi_kse."type" = 'oi')`,
+          ),
+          'hasOi',
+        ],
+        [
+          Sequelize.literal(
+            `EXISTS(SELECT 1 FROM oi_kse WHERE oi_kse."oi_company_id" = "Company"."id" AND oi_kse."type" = 'listing')`,
+          ),
+          'hasListing',
+        ],
+      ],
       order: [['name', 'asc']],
       limit,
       offset,
@@ -66,6 +93,83 @@ export class CompaniesService {
       },
     });
     return company;
+  }
+
+  async getOiKseLinksByCompanyId(id: number) {
+    return this.oiKseRepository.findAll({
+      where: { oi_company_id: id },
+      attributes: ['id', 'oi_company_id', 'kse_company_id', 'type'],
+      order: [['type', 'asc']],
+    });
+  }
+
+  async createOiKseLinkByCompanyId(
+    companyId: number,
+    data: { kse_company_id: number; type: string },
+  ) {
+    const { kse_company_id, type } = data;
+    const typeValue = String(type || '').toLowerCase();
+    if (!['oi', 'listing'].includes(typeValue)) {
+      throw new HttpException('Некорректный тип связки', HttpStatus.BAD_REQUEST);
+    }
+    const exists = await this.oiKseRepository.findOne({
+      where: { oi_company_id: companyId, type: typeValue },
+    });
+    if (exists) {
+      throw new HttpException(
+        'Связка с таким типом уже существует',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return this.oiKseRepository.create({
+      oi_company_id: Number(companyId),
+      kse_company_id: Number(kse_company_id),
+      type: typeValue,
+    } as any);
+  }
+
+  async updateOiKseLinkByCompanyId(
+    companyId: number,
+    linkId: number,
+    data: { kse_company_id: number; type: string },
+  ) {
+    const link = await this.oiKseRepository.findOne({
+      where: { id: linkId, oi_company_id: companyId },
+    });
+    if (!link) {
+      throw new HttpException('Связка не найдена', HttpStatus.NOT_FOUND);
+    }
+    const typeValue = String(data.type || '').toLowerCase();
+    if (!['oi', 'listing'].includes(typeValue)) {
+      throw new HttpException('Некорректный тип связки', HttpStatus.BAD_REQUEST);
+    }
+    const duplicate = await this.oiKseRepository.findOne({
+      where: {
+        oi_company_id: companyId,
+        type: typeValue,
+        id: { [Op.ne]: linkId },
+      },
+    });
+    if (duplicate) {
+      throw new HttpException(
+        'Связка с таким типом уже существует',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    link.kse_company_id = Number(data.kse_company_id);
+    link.type = typeValue;
+    await link.save();
+    return link;
+  }
+
+  async removeOiKseLinkByCompanyId(companyId: number, linkId: number) {
+    const deleted = await this.oiKseRepository.destroy({
+      where: { id: linkId, oi_company_id: companyId },
+    });
+    if (!deleted) {
+      throw new HttpException('Связка не найдена', HttpStatus.NOT_FOUND);
+    }
+    return { success: true };
   }
 
   async getTemplate(form_type: string) {

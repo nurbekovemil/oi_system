@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { Company } from 'src/companies/entities/company.entity';
-import { Sequelize } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { UserTemp } from './entities/user-temp.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/roles/entities/role.entity';
@@ -115,9 +115,22 @@ export class UsersService {
     throw new HttpException('Неверный пароль', HttpStatus.BAD_REQUEST);
   }
 
-  async findAll({ page, limit }) {
+  async findAll({ page, limit, search, companyId }) {
     const offset = (page - 1) * limit;
+    const parsedCompanyId = Number(companyId);
+    const where: any = search
+      ? {
+          [Op.or]: [
+            { login: { [Op.iLike]: `%${search}%` } },
+            { '$company.name$': { [Op.iLike]: `%${search}%` } },
+          ],
+        }
+      : {};
+    if (Number.isInteger(parsedCompanyId) && parsedCompanyId > 0) {
+      where.companyId = parsedCompanyId;
+    }
     return await this.userRepository.findAndCountAll({
+      where,
       include: [
         {
           model: this.companyRepository,
@@ -128,6 +141,7 @@ export class UsersService {
       order: [['login', 'ASC']],
       limit,
       offset,
+      subQuery: false,
     });
   }
   async deleteUser({ id }: { id: number }) {

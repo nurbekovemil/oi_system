@@ -2316,6 +2316,8 @@ section.ant-layout.layout-content .ant-layout-content.content-ant {
 }
 .ant-card-head-wrapper {
   min-height: 72px;
+  padding: 0 8px;
+  gap: 12px;
 }
 .card-credit .ant-card-body {
   padding-top: 15px;
@@ -3172,9 +3174,62 @@ section.ant-layout.ant-layout-has-sider.layout-dashboard.layout-profile
   border-radius: 0 6px 6px 0;
   background: #57b6c0;
   border-color: #57b6c0;
+  height: 40px;
+}
+
+.ant-input-search .ant-input {
+  height: 40px;
+}
+
+.ant-input-affix-wrapper {
+  height: 40px !important;
+  border-radius: 6px !important;
+  display: flex;
+  align-items: center;
+  padding: 0 16px 0 11px;
+}
+
+.ant-input-affix-wrapper .ant-input {
+  height: auto !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0;
 }
 
 .ant-input-group > .ant-input:first-child, .ant-input-group-addon:first-child {
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
+}
+
+.reports-filters .ant-select,
+.reports-filters .ant-picker {
+  width: 100%;
+}
+
+.reports-filters {
+  margin-top: 16px;
+  margin-bottom: 0;
+  padding: 0 25px 20px 25px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.reports-filters .ant-picker {
+  height: 40px !important;
+  border-radius: 6px !important;
+  width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.reports-filters .ant-picker input {
+  font-weight: 600;
+  color: #8c8c8c;
+}
+
+.reports-filter-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8c8c8c;
 }

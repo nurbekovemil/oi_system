@@ -8,10 +8,11 @@ import { Report } from 'src/reports/entities/report.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
 import { CompanyTemplates } from './entities/company-templates.entity';
+import { OiKse } from 'src/oi_kse/entities/oi_kse.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Company, CompanyTemplates, User, Report]),
+    SequelizeModule.forFeature([Company, CompanyTemplates, User, Report, OiKse]),
     JwtModule,
     UsersModule,
   ],

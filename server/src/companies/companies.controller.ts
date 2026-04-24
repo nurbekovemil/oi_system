@@ -48,6 +48,43 @@ export class CompaniesController {
     return this.companiesService.findOne(id);
   }
 
+  @Get(':id/oi-kse')
+  getOiKseLinksByCompanyId(@Param('id') id: number) {
+    return this.companiesService.getOiKseLinksByCompanyId(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/oi-kse')
+  createOiKseLinkByCompanyId(@Param('id') id: number, @Body() body) {
+    return this.companiesService.createOiKseLinkByCompanyId(Number(id), body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/oi-kse/:linkId')
+  updateOiKseLinkByCompanyId(
+    @Param('id') id: number,
+    @Param('linkId') linkId: number,
+    @Body() body,
+  ) {
+    return this.companiesService.updateOiKseLinkByCompanyId(
+      Number(id),
+      Number(linkId),
+      body,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id/oi-kse/:linkId')
+  removeOiKseLinkByCompanyId(
+    @Param('id') id: number,
+    @Param('linkId') linkId: number,
+  ) {
+    return this.companiesService.removeOiKseLinkByCompanyId(
+      Number(id),
+      Number(linkId),
+    );
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('/delete')
   deleteCompany(@Request() req, @Body() removeCompanyDto: RemoveCompanyDto) {

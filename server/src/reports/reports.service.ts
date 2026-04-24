@@ -222,7 +222,10 @@ export class ReportsService {
     return report;
   }
 
-  async getReports({ roles, userId, companyId }, { limit, page }) {
+  async getReports(
+    { roles, userId, companyId },
+    { limit, page, companyId: filterCompanyId, typeId, statusId, dateFrom, dateTo },
+  ) {
     const { id } = roles[0];
     const isAdmin = roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),
@@ -232,7 +235,46 @@ export class ReportsService {
       await this.roleAllowedReportsRepository.findOne({
         where: { roleId: id },
       });
-    const offset = (page - 1) * limit;
+    const parsedLimit = Number(limit) || 10;
+    const parsedPage = Number(page) || 1;
+    const parsedCompanyId = Number(filterCompanyId);
+    const parsedTypeId = Number(typeId);
+    const parsedStatusId = Number(statusId);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const reportWhere: any = {};
+    if (isAdmin) {
+      reportWhere.statusId = report_status;
+      reportWhere.typeId = report_types;
+      if (Number.isInteger(parsedCompanyId) && parsedCompanyId > 0) {
+        reportWhere.companyId = parsedCompanyId;
+      }
+      if (Number.isInteger(parsedTypeId) && parsedTypeId > 0) {
+        reportWhere.typeId = parsedTypeId;
+      }
+      if (Number.isInteger(parsedStatusId) && parsedStatusId > 0) {
+        reportWhere.statusId = parsedStatusId;
+      }
+    } else {
+      reportWhere.companyId = companyId;
+      if (Number.isInteger(parsedTypeId) && parsedTypeId > 0) {
+        reportWhere.typeId = parsedTypeId;
+      }
+      if (Number.isInteger(parsedStatusId) && parsedStatusId > 0) {
+        reportWhere.statusId = parsedStatusId;
+      }
+    }
+    if (dateFrom || dateTo) {
+      reportWhere.updatedAt = {};
+      if (dateFrom) {
+        reportWhere.updatedAt[Op.gte] = new Date(dateFrom);
+      }
+      if (dateTo) {
+        const to = new Date(dateTo);
+        to.setHours(23, 59, 59, 999);
+        reportWhere.updatedAt[Op.lte] = to;
+      }
+    }
     const reports = await this.reportRepository.findAndCountAll({
       include: [
         {
@@ -275,14 +317,19 @@ export class ReportsService {
           ],
         ],
       },
-      where: isAdmin
-        ? { statusId: report_status, typeId: report_types }
-        : { companyId },
-      limit,
+      where: reportWhere,
+      limit: parsedLimit,
       offset,
       order: [['updatedAt', 'DESC']],
     });
     return reports;
+  }
+
+  async getReportStatuses() {
+    return this.reportStatusRepository.findAll({
+      attributes: ['id', 'title', 'type'],
+      order: [['id', 'ASC']],
+    });
   }
 
   async getReportTypes() {

@@ -80,14 +80,20 @@ export class ReportsController {
   @Roles('ADMIN', 'USER', 'MODERATOR')
   @UseGuards(RolesGuard)
   @Get('/sort/:page/:limit')
-  getReports(@Param() param: any, @Request() req) {
-    return this.reportsService.getReports(req.user, param);
+  getReports(@Param() param: any, @Query() query: any, @Request() req) {
+    return this.reportsService.getReports(req.user, { ...param, ...query });
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/types')
   getReportTypes() {
     return this.reportsService.getReportTypes();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/statuses')
+  getReportStatuses() {
+    return this.reportsService.getReportStatuses();
   }
 
   // @UseGuards(JwtAuthGuard)

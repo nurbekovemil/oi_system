@@ -6,22 +6,20 @@ import {
   Avatar,
   Button,
   Typography,
-  Dropdown,
   Space,
   Tooltip,
   Spin,
+  Input,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import {
   PlusOutlined,
   UserOutlined,
   FormOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  BarsOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { useGetUsersQuery } from "../../../store/services/user-service";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 
 const { Title, Text } = Typography;
 // через класс или id не работает стили так как шаблон стили загружает динамически
@@ -71,6 +69,17 @@ function Users() {
   const pageSizeOptions = [5, 10, 20];
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const getUsersHandler = (page, limit) => {
     setCurrentPage(page);
     setPageSize(limit);
@@ -79,6 +88,7 @@ function Users() {
   const { data, isSuccess, isLoading, isFetching } = useGetUsersQuery({
     page: currentPage,
     limit: pageSize,
+    search: search || undefined,
   });
 
   const navigate = useNavigate();
@@ -153,17 +163,25 @@ function Users() {
               className="criclebox tablespace mb-24"
               title="Список пользователей"
               extra={
-                <Link to="/dashboard/users/add">
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    style={{
-                      ...btnStyle,
-                    }}
-                  >
-                    Добавить пользователя
-                  </Button>
-                </Link>
+                <Space size={12}>
+                  <Input
+                    placeholder="Поиск по логину или компании"
+                    prefix={<SearchOutlined style={{ color: "#bfbfbf" }} />}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    allowClear
+                    style={{ width: 300 }}
+                  />
+                  <Link to="/dashboard/users/add">
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      style={{ ...btnStyle }}
+                    >
+                      Добавить пользователя
+                    </Button>
+                  </Link>
+                </Space>
               }
             >
               <div className="table-responsive">

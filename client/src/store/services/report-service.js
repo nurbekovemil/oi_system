@@ -69,8 +69,20 @@ const companyApi = api.injectEndpoints({
       invalidatesTags: ["Reports"],
     }),
     getReports: builder.query({
-      query: ({ page, limit }) => `reports/sort/${page}/${limit}`,
+      query: ({ page, limit, companyId, typeId, statusId, dateFrom, dateTo }) => {
+        const params = new URLSearchParams();
+        if (companyId) params.set("companyId", companyId);
+        if (typeId) params.set("typeId", typeId);
+        if (statusId) params.set("statusId", statusId);
+        if (dateFrom) params.set("dateFrom", dateFrom);
+        if (dateTo) params.set("dateTo", dateTo);
+        const query = params.toString();
+        return `reports/sort/${page}/${limit}${query ? `?${query}` : ""}`;
+      },
       providesTags: ["Reports"],
+    }),
+    getReportStatuses: builder.query({
+      query: () => "reports/statuses",
     }),
     getReportByGroupType: builder.query({
       query: ({ reportId, type }) =>
@@ -105,6 +117,7 @@ export const {
   useGetReportByIdQuery,
   useGetOldReportsQuery,
   useGetReportsQuery,
+  useGetReportStatusesQuery,
 
   useLazyGetReportTemplateQuery,
   useLazyGetReportByIdQuery,

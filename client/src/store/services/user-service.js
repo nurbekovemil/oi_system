@@ -27,7 +27,12 @@ const userApi = api.injectEndpoints({
       invalidatesTags: ["getMe"],
     }),
     getUsers: builder.query({
-      query: ({ page, limit }) => `users?page=${page}&limit=${limit}`,
+      query: ({ page, limit, search, companyId }) => {
+        const params = new URLSearchParams({ page, limit });
+        if (search) params.set("search", search);
+        if (companyId) params.set("companyId", companyId);
+        return `users?${params.toString()}`;
+      },
       providesTags: ["UserUpdate"],
     }),
     resetUserPass: builder.query({
