@@ -82,7 +82,20 @@ const companyApi = api.injectEndpoints({
       providesTags: ["Reports"],
     }),
     getReportStatuses: builder.query({
-      query: () => "reports/statuses",
+      async queryFn(_arg, _api, _extraOptions, baseQuery) {
+        const primary = await baseQuery("reports/statuses");
+        if (!primary.error) {
+          return { data: primary.data };
+        }
+        if (primary.error?.status === 404) {
+          const fallback = await baseQuery("reports/status");
+          if (!fallback.error) {
+            return { data: fallback.data };
+          }
+          return { error: fallback.error };
+        }
+        return { error: primary.error };
+      },
     }),
     getReportByGroupType: builder.query({
       query: ({ reportId, type }) =>

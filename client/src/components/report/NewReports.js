@@ -37,7 +37,7 @@ import {
 import { useGetCompaniesForOptionQuery } from "../../store/services/company-service";
 import { StatusTag } from "./StatusTag";
 import moment from "moment";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import EdsCert from "../eds/EdsCert";
 import { useSelector } from "react-redux";
 // import { isRejected } from "@reduxjs/toolkit";
@@ -190,7 +190,7 @@ function NewReports() {
   const navigate = useNavigate();
   const { data: companies = [] } = useGetCompaniesForOptionQuery();
   const { data: reportTypes = [] } = useGetReportTypesQuery();
-  const { data: statuses = [] } = useGetReportStatusesQuery();
+  const { data: reportStatuses = [] } = useGetReportStatusesQuery();
 
   const dateFrom = filters.period?.[0]
     ? filters.period[0].format("YYYY-MM-DD")
@@ -213,6 +213,13 @@ function NewReports() {
     dateFrom,
     dateTo,
   });
+  const statuses = useMemo(
+    () =>
+      Array.isArray(reportStatuses)
+        ? reportStatuses
+        : reportStatuses?.rows || [],
+    [reportStatuses]
+  );
 
   const [sendReport, {}] = useSendReportMutation();
   const [removeReport, {}] = useRemoveReportMutation();

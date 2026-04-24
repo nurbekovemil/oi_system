@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 // import { logout } from "./slices/auth-slice";
-const SERVER_HOST = process.env.REACT_APP_SERVER_HOST;
+const SERVER_HOST = process.env.REACT_APP_SERVER_HOST || "/api";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: SERVER_HOST,
