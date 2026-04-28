@@ -85,7 +85,7 @@ function Sidenav({ color }) {
     <>
       <div className="brand">
         <img src={logo} alt="" />
-        <span>OI SYSTEM</span>
+        <div className="brand-title">Центр раскрытия информации</div>
       </div>
       <hr />
 

@@ -46,7 +46,9 @@ body {
   padding: 33px 20px;
 }
 .layout-dashboard .ant-layout-sider.sider-primary .brand img {
-  height: 30px;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 .layout-dashboard .ant-layout-sider.sider-primary hr {
   margin: 18px 0;
@@ -57,10 +59,19 @@ body {
 .layout-dashboard .ant-layout-sider.sider-primary .brand {
   font-weight: 600;
   padding-left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
 }
 .layout-dashboard .ant-layout-sider.sider-primary .brand span {
   vertical-align: middle;
-  margin-left: 10px;
+  margin-left: 0;
+}
+.layout-dashboard .ant-layout-sider.sider-primary .brand .brand-title {
+  font-size: 15px;
+  line-height: 1.25;
+  color: #2f3a4a;
+  max-width: 160px;
 }
 
 .layout-dashboard .ant-layout-sider.sider-primary .ant-layout-sider-children {

@@ -47,7 +47,7 @@ export class EdsService {
       );
       return response.data;
     } catch (error) {
-      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+      this.throwCdsError(error);
     }
   }
 
@@ -64,9 +64,13 @@ export class EdsService {
         pin,
       );
       const cert = await this.getEdsCertificate(token);
-      const hashDocument = Buffer.from(JSON.stringify(content)).toString(
-        'base64',
+      const normalized = JSON.stringify(content ?? {});
+      const sanitized = normalized.replace(
+        /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,
+        '',
       );
+      // const hashDocument = Buffer.from(JSON.stringify(content)).toString('base64');
+      const hashDocument = Buffer.from(sanitized, 'utf8').toString('base64');
       const signedDocument = await this.signEdsDocument(hashDocument, token);
 
       if (await this.isAdmin(roles)) {
@@ -87,8 +91,7 @@ export class EdsService {
         );
       }
     } catch (error) {
-      console.log(error);
-      throw new HttpException(error.response, HttpStatus.BAD_REQUEST);
+      this.throwCdsError(error);
     }
   }
 
@@ -149,7 +152,7 @@ export class EdsService {
       );
       return response.data;
     } catch (error) {
-      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+      this.throwCdsError(error);
     }
   }
   private async getEdsCertificate(userToken) {
@@ -169,7 +172,7 @@ export class EdsService {
       );
       return response.data;
     } catch (error) {
-      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+      this.throwCdsError(error);
     }
   }
   private async signEdsDocument(hash, userToken) {
@@ -188,9 +191,50 @@ export class EdsService {
           },
         },
       );
-      return response.data;
+      return response?.data;
     } catch (error) {
-      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+      this.throwCdsError(error);
     }
+  }
+
+  private throwCdsError(error: any): never {
+    if (!axios.isAxiosError(error)) {
+      throw new HttpException(
+        'Неизвестная ошибка при обращении к EDS сервису',
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
+
+    const status = error.response?.status;
+    const data = error.response?.data;
+
+    if (typeof data === 'string') {
+      const isHtml = data.trim().startsWith('<');
+      if (isHtml) {
+        throw new HttpException(
+          {
+            message: 'Внешний EDS сервис вернул HTML вместо JSON',
+            upstreamStatus: status ?? 500,
+          },
+          HttpStatus.BAD_GATEWAY,
+        );
+      }
+      throw new HttpException(
+        { message: data, upstreamStatus: status ?? 500 },
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
+
+    if (!error.response) {
+      throw new HttpException(
+        'Нет ответа от внешнего EDS сервиса',
+        HttpStatus.GATEWAY_TIMEOUT,
+      );
+    }
+
+    throw new HttpException(
+      { message: data ?? 'Ошибка внешнего EDS сервиса', upstreamStatus: status },
+      HttpStatus.BAD_GATEWAY,
+    );
   }
 }
