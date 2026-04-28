@@ -199,8 +199,14 @@ export class EdsService {
 
   private throwCdsError(error: any): never {
     if (!axios.isAxiosError(error)) {
+      const fallbackMessage =
+        error?.message ??
+        (typeof error === 'string' ? error : 'Неизвестная ошибка EDS сервиса');
       throw new HttpException(
-        'Неизвестная ошибка при обращении к EDS сервису',
+        {
+          message: fallbackMessage,
+          rawError: error,
+        },
         HttpStatus.BAD_GATEWAY,
       );
     }
@@ -227,7 +233,11 @@ export class EdsService {
 
     if (!error.response) {
       throw new HttpException(
-        'Нет ответа от внешнего EDS сервиса',
+        {
+          message: error.message ?? 'Нет ответа от внешнего EDS сервиса',
+          code: error.code,
+          rawError: error.toJSON?.() ?? error,
+        },
         HttpStatus.GATEWAY_TIMEOUT,
       );
     }
