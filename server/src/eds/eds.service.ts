@@ -72,8 +72,9 @@ export class EdsService {
         /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,
         '',
       );
+      const noSpaces = sanitized.replace(/\s+/g, '');
       // const hashDocument = Buffer.from(JSON.stringify(content)).toString('base64');
-      const hashDocument = Buffer.from(sanitized, 'utf8').toString('base64');
+      const hashDocument = Buffer.from(noSpaces, 'utf8').toString('base64');
       console.log('hashDocument', hashDocument);
       const signedDocument = await this.signEdsDocument(hashDocument, token);
       console.log('signedDocument', signedDocument);
