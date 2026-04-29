@@ -19,6 +19,7 @@ services:
     volumes:
       - /app/node_modules
       - ./server:/app
+      - ./server/logs:/app/logs
     environment:
       - port=3132
       - PGUSER=postgres

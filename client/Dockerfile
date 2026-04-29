@@ -1,11 +1,11 @@
 FROM node:16.15.0-alpine as builder
 WORKDIR /app
-COPY ./package.json ./
-RUN npm i
+COPY package*.json ./
+RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM nginx
+FROM nginx:alpine
 EXPOSE 3000
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/build /usr/share/nginx/html

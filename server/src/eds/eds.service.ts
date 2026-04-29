@@ -63,16 +63,19 @@ export class EdsService {
         organizationInn,
         pin,
       );
+      console.log('token', token);
       const cert = await this.getEdsCertificate(token);
       const normalized = JSON.stringify(content ?? {});
+      console.log('normalized', normalized);
       const sanitized = normalized.replace(
         /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,
         '',
       );
       // const hashDocument = Buffer.from(JSON.stringify(content)).toString('base64');
       const hashDocument = Buffer.from(sanitized, 'utf8').toString('base64');
+      console.log('hashDocument', hashDocument);
       const signedDocument = await this.signEdsDocument(hashDocument, token);
-
+      console.log('signedDocument', signedDocument);
       if (await this.isAdmin(roles)) {
         return this.ReceiptsService.createReceipt({
           reportId,
