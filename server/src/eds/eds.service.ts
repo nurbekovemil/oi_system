@@ -3,6 +3,9 @@ import { ReportsService } from './../reports/reports.service';
 import { CompaniesService } from './../companies/companies.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
+import fontkit from '@pdf-lib/fontkit';
+import * as fs from 'fs';
+import * as path from 'path';
 import { PDFFont, PDFDocument, StandardFonts } from 'pdf-lib';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
@@ -199,8 +202,9 @@ export class EdsService {
 
   private async textToPdfBase64(text: string): Promise<string> {
     const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
     let page = pdfDoc.addPage();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const font = await this.getPdfFont(pdfDoc);
     const fontSize = 10;
     const lineHeight = 12;
     const maxWidth = page.getWidth() - 60;
@@ -218,6 +222,25 @@ export class EdsService {
 
     const pdfBytes = await pdfDoc.save();
     return Buffer.from(pdfBytes).toString('base64');
+  }
+
+  private async getPdfFont(pdfDoc: PDFDocument): Promise<PDFFont> {
+    const fontPaths = [
+      path.resolve(process.cwd(), 'assets/fonts/DejaVuSans.ttf'),
+      'C:/Windows/Fonts/arial.ttf',
+      '/usr/share/fonts/TTF/DejaVuSans.ttf',
+      '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+      '/usr/share/fonts/dejavu/DejaVuSans.ttf',
+    ];
+
+    for (const fontPath of fontPaths) {
+      if (fs.existsSync(fontPath)) {
+        const fontBytes = fs.readFileSync(fontPath);
+        return pdfDoc.embedFont(Uint8Array.from(fontBytes));
+      }
+    }
+
+    return pdfDoc.embedFont(StandardFonts.Helvetica);
   }
 
   private wrapText(
