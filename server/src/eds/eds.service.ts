@@ -3,10 +3,8 @@ import { ReportsService } from './../reports/reports.service';
 import { CompaniesService } from './../companies/companies.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import fontkit from '@pdf-lib/fontkit';
-import * as fs from 'fs';
+import * as PDFDocument from 'pdfkit';
 import * as path from 'path';
-import { PDFFont, PDFDocument, StandardFonts } from 'pdf-lib';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
@@ -200,80 +198,25 @@ export class EdsService {
     }
   }
 
-  private async textToPdfBase64(text: string): Promise<string> {
-    const pdfDoc = await PDFDocument.create();
-    pdfDoc.registerFontkit(fontkit);
-    let page = pdfDoc.addPage();
-    const font = await this.getPdfFont(pdfDoc);
-    const fontSize = 10;
-    const lineHeight = 12;
-    const maxWidth = page.getWidth() - 60;
-    const wrappedLines = this.wrapText(text, font, fontSize, maxWidth);
+  private textToPdfBase64(text: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const fontPath = path.join(
+        __dirname,
+        'fonts',
+        'Roboto-Regular.ttf',
+      );
+      const doc = new PDFDocument({ margin: 30, size: 'A4' });
+      const chunks: Uint8Array[] = [];
 
-    let y = page.getHeight() - 40;
-    for (const line of wrappedLines) {
-      if (y < 40) {
-        page = pdfDoc.addPage();
-        y = page.getHeight() - 40;
-      }
-      page.drawText(line, { x: 30, y, size: fontSize, font });
-      y -= lineHeight;
-    }
+      doc.on('data', (chunk: Uint8Array) => chunks.push(chunk));
+      doc.on('end', () =>
+        resolve(Buffer.concat(chunks).toString('base64')),
+      );
+      doc.on('error', reject);
 
-    const pdfBytes = await pdfDoc.save();
-    return Buffer.from(pdfBytes).toString('base64');
-  }
-
-  private async getPdfFont(pdfDoc: PDFDocument): Promise<PDFFont> {
-    const fontPaths = [
-      path.resolve(process.cwd(), 'assets/fonts/DejaVuSans.ttf'),
-      'C:/Windows/Fonts/arial.ttf',
-      '/usr/share/fonts/TTF/DejaVuSans.ttf',
-      '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-      '/usr/share/fonts/dejavu/DejaVuSans.ttf',
-    ];
-
-    for (const fontPath of fontPaths) {
-      if (fs.existsSync(fontPath)) {
-        const fontBytes = fs.readFileSync(fontPath);
-        return pdfDoc.embedFont(Uint8Array.from(fontBytes));
-      }
-    }
-
-    return pdfDoc.embedFont(StandardFonts.Helvetica);
-  }
-
-  private wrapText(
-    text: string,
-    font: PDFFont,
-    fontSize: number,
-    maxWidth: number,
-  ): string[] {
-    const lines: string[] = [];
-    const rawLines = text.split('\n');
-
-    for (const rawLine of rawLines) {
-      const words = rawLine.split(' ');
-      let currentLine = '';
-
-      for (const word of words) {
-        const testLine = currentLine ? `${currentLine} ${word}` : word;
-        const width = font.widthOfTextAtSize(testLine, fontSize);
-
-        if (width <= maxWidth) {
-          currentLine = testLine;
-        } else {
-          if (currentLine) {
-            lines.push(currentLine);
-          }
-          currentLine = word;
-        }
-      }
-
-      lines.push(currentLine || '');
-    }
-
-    return lines;
+      doc.font(fontPath).fontSize(10).text(text, { lineGap: 2 });
+      doc.end();
+    });
   }
 
   private throwCdsError(error: any): never {
