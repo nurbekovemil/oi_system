@@ -3,8 +3,6 @@ import { ReportsService } from './../reports/reports.service';
 import { CompaniesService } from './../companies/companies.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import * as PDFDocument from 'pdfkit';
-import * as path from 'path';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
@@ -70,7 +68,7 @@ export class EdsService {
       const cert = await this.getEdsCertificate(token);
       const normalized = JSON.stringify(content ?? {});
       console.log('normalized', normalized);
-      const hashDocument = await this.textToPdfBase64(normalized);
+      const hashDocument = Buffer.from(normalized, 'utf8').toString('base64');
       console.log('hashDocument', hashDocument);
       const signedDocument = await this.signEdsDocument(hashDocument, token);
       console.log('signedDocument', signedDocument);
@@ -196,27 +194,6 @@ export class EdsService {
     } catch (error) {
       this.throwCdsError(error);
     }
-  }
-
-  private textToPdfBase64(text: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const fontPath = path.join(
-        __dirname,
-        'fonts',
-        'Roboto-Regular.ttf',
-      );
-      const doc = new PDFDocument({ margin: 30, size: 'A4' });
-      const chunks: Uint8Array[] = [];
-
-      doc.on('data', (chunk: Uint8Array) => chunks.push(chunk));
-      doc.on('end', () =>
-        resolve(Buffer.concat(chunks).toString('base64')),
-      );
-      doc.on('error', reject);
-
-      doc.font(fontPath).fontSize(10).text(text, { lineGap: 2 });
-      doc.end();
-    });
   }
 
   private throwCdsError(error: any): never {
