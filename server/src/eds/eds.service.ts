@@ -3,6 +3,7 @@ import { ReportsService } from './../reports/reports.service';
 import { CompaniesService } from './../companies/companies.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { PDFFont, PDFDocument, StandardFonts } from 'pdf-lib';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
@@ -68,13 +69,7 @@ export class EdsService {
       const cert = await this.getEdsCertificate(token);
       const normalized = JSON.stringify(content ?? {});
       console.log('normalized', normalized);
-      const sanitized = normalized.replace(
-        /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,
-        '',
-      );
-      const noSpaces = sanitized.replace(/\s+/g, '');
-      // const hashDocument = Buffer.from(JSON.stringify(content)).toString('base64');
-      const hashDocument = Buffer.from(noSpaces, 'utf8').toString('base64');
+      const hashDocument = await this.textToPdfBase64(normalized);
       console.log('hashDocument', hashDocument);
       const signedDocument = await this.signEdsDocument(hashDocument, token);
       console.log('signedDocument', signedDocument);
@@ -200,6 +195,62 @@ export class EdsService {
     } catch (error) {
       this.throwCdsError(error);
     }
+  }
+
+  private async textToPdfBase64(text: string): Promise<string> {
+    const pdfDoc = await PDFDocument.create();
+    let page = pdfDoc.addPage();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontSize = 10;
+    const lineHeight = 12;
+    const maxWidth = page.getWidth() - 60;
+    const wrappedLines = this.wrapText(text, font, fontSize, maxWidth);
+
+    let y = page.getHeight() - 40;
+    for (const line of wrappedLines) {
+      if (y < 40) {
+        page = pdfDoc.addPage();
+        y = page.getHeight() - 40;
+      }
+      page.drawText(line, { x: 30, y, size: fontSize, font });
+      y -= lineHeight;
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    return Buffer.from(pdfBytes).toString('base64');
+  }
+
+  private wrapText(
+    text: string,
+    font: PDFFont,
+    fontSize: number,
+    maxWidth: number,
+  ): string[] {
+    const lines: string[] = [];
+    const rawLines = text.split('\n');
+
+    for (const rawLine of rawLines) {
+      const words = rawLine.split(' ');
+      let currentLine = '';
+
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const width = font.widthOfTextAtSize(testLine, fontSize);
+
+        if (width <= maxWidth) {
+          currentLine = testLine;
+        } else {
+          if (currentLine) {
+            lines.push(currentLine);
+          }
+          currentLine = word;
+        }
+      }
+
+      lines.push(currentLine || '');
+    }
+
+    return lines;
   }
 
   private throwCdsError(error: any): never {
