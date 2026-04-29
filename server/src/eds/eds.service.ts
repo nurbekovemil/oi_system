@@ -58,6 +58,7 @@ export class EdsService {
         userId,
         companyId,
       );
+      console.log('test11111111111111');
       const { token } = await this.getEdsAccessToken(
         personIdnp,
         organizationInn,
