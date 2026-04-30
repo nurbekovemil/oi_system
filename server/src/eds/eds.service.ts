@@ -6,6 +6,7 @@ import axios from 'axios';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
+import { createHash } from 'crypto';
 @Injectable()
 export class EdsService {
   private readonly edsAccessToken = process.env.EDS_ACCESS_TOKEN;
@@ -58,20 +59,18 @@ export class EdsService {
         userId,
         companyId,
       );
-      console.log('test11111111111111');
       const { token } = await this.getEdsAccessToken(
         personIdnp,
         organizationInn,
         pin,
       );
-      console.log('token', token);
       const cert = await this.getEdsCertificate(token);
       const normalized = JSON.stringify(content ?? {});
-      console.log('normalized', normalized);
-      const hashDocument = Buffer.from(normalized, 'utf8').toString('base64');
-      console.log('hashDocument', hashDocument);
+      const base64Document = Buffer.from(normalized, 'utf8').toString('base64');
+      const hashDocument = createHash('sha256')
+        .update(base64Document, 'utf8')
+        .digest('hex');
       const signedDocument = await this.signEdsDocument(hashDocument, token);
-      console.log('signedDocument', signedDocument);
       if (await this.isAdmin(roles)) {
         return this.ReceiptsService.createReceipt({
           reportId,
