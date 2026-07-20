@@ -1,7 +1,7 @@
 import { ReceiptsService } from './../receipts/receipts.service';
 import { ReportsService } from './../reports/reports.service';
 import { CompaniesService } from './../companies/companies.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
@@ -10,6 +10,7 @@ import { createHash } from 'crypto';
 
 @Injectable()
 export class EdsService {
+  private readonly logger = new Logger(EdsService.name);
   private readonly edsAccessToken = process.env.EDS_ACCESS_TOKEN;
   private readonly cdsApiUrl = 'https://cdsapi.srs.kg/api/oep';
 
@@ -27,18 +28,42 @@ export class EdsService {
         userId,
         companyId,
       );
+      this.logger.log(
+        `[pin/send] userId=${userId} companyId=${companyId} personIdnp=${personIdnp} organizationInn=${organizationInn}`,
+      );
       if (!personIdnp || !organizationInn) {
         throw new HttpException(
           'Заполните ИНН пользователя или организации',
           HttpStatus.BAD_REQUEST,
         );
       }
-      return await this.cdsPost('/pin-code', {
+      const path = '/pin-code';
+      const url = `${this.cdsApiUrl}${path}`;
+      const body = {
         personIdnp,
         organizationInn,
         method: 'email',
-      });
+      };
+      this.logger.log(`[pin/send] CDS request POST ${url}`);
+      this.logger.log(`[pin/send] CDS body ${JSON.stringify(body)}`);
+      this.logger.log(
+        `[pin/send] token present=${Boolean(this.edsAccessToken)} tokenLength=${this.edsAccessToken?.length ?? 0}`,
+      );
+      const result = await this.cdsPost(path, body);
+      this.logger.log(
+        `[pin/send] CDS success ${JSON.stringify(result)}`,
+      );
+      return result;
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        this.logger.error(
+          `[pin/send] CDS error status=${error.response?.status} data=${JSON.stringify(error.response?.data)} message=${error.message}`,
+        );
+      } else {
+        this.logger.error(
+          `[pin/send] error ${error?.message ?? error}`,
+        );
+      }
       this.throwCdsError(error);
     }
   }
@@ -138,13 +163,21 @@ export class EdsService {
   }
 
   private async cdsPost(path: string, body: Record<string, unknown>) {
-    const response = await axios.post(`${this.cdsApiUrl}${path}`, body, {
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        Authorization: `Bearer ${this.edsAccessToken}`,
-      },
-    });
-    return response.data;
+    try {
+      const response = await axios.post(`${this.cdsApiUrl}${path}`, body, {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          Authorization: `Bearer ${this.edsAccessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        (error as any).cdsPath = path;
+        (error as any).cdsBodyKeys = Object.keys(body || {});
+      }
+      throw error;
+    }
   }
 
   private throwCdsError(error: any): never {
@@ -171,9 +204,15 @@ export class EdsService {
     if (typeof data === 'string') {
       const isHtml = data.trim().startsWith('<');
       if (isHtml) {
+        const plain = data.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const message = /503/i.test(plain)
+          ? 'Внешний EDS сервис временно недоступен (503)'
+          : /502/i.test(plain)
+            ? 'Ошибка шлюза внешнего EDS сервиса (502)'
+            : plain || 'Внешний EDS сервис вернул HTML вместо JSON';
         throw new HttpException(
           {
-            message: 'Внешний EDS сервис вернул HTML вместо JSON',
+            message,
             upstreamStatus: status ?? 500,
           },
           HttpStatus.BAD_GATEWAY,
@@ -197,7 +236,12 @@ export class EdsService {
     }
 
     throw new HttpException(
-      { message, upstreamStatus: status, raw: data },
+      {
+        message,
+        upstreamStatus: status,
+        cdsPath: error.cdsPath,
+        raw: data,
+      },
       HttpStatus.BAD_GATEWAY,
     );
   }

@@ -13,15 +13,44 @@ notification.config({
 
 const initialState = {};
 
+const stripHtml = (value) =>
+  String(value)
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 const extractErrorMessage = (payload, fallback = "Произошла ошибка") => {
   const data = payload?.data;
-  if (!data) return fallback;
-  if (typeof data === "string") return data;
+  const status = payload?.status;
+
+  if (data == null) {
+    if (status === 503) return "Сервис временно недоступен (503)";
+    if (status === 502) return "Ошибка шлюза (502)";
+    if (status === 504) return "Превышено время ожидания (504)";
+    return fallback;
+  }
+
+  if (typeof data === "string") {
+    const text = data.trim();
+    if (text.startsWith("<") || /<\/?[a-z][\s\S]*>/i.test(text)) {
+      const plain = stripHtml(text);
+      if (/503/i.test(plain)) return "Сервис временно недоступен (503)";
+      if (/502/i.test(plain)) return "Ошибка шлюза (502)";
+      if (/504/i.test(plain)) return "Превышено время ожидания (504)";
+      return plain || fallback;
+    }
+    return text || fallback;
+  }
+
   if (typeof data.message?.errorMessage === "string") {
     return data.message.errorMessage;
   }
   if (typeof data.errorMessage === "string") return data.errorMessage;
-  if (typeof data.message === "string") return data.message;
+  if (typeof data.message === "string") {
+    const text = data.message.trim();
+    if (text.startsWith("<")) return stripHtml(text) || fallback;
+    return text;
+  }
   if (Array.isArray(data.message)) return data.message.join(", ");
   return fallback;
 };
