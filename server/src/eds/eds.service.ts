@@ -37,8 +37,8 @@ export class EdsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const path = '/pin-code';
-      const url = `${this.cdsApiUrl}${path}`;
+      const path = '/get-pin-code';
+      const url = `https://cdsapi.srs.kg/api${path}`;
       const body = {
         personIdnp,
         organizationInn,
@@ -49,7 +49,7 @@ export class EdsService {
       this.logger.log(
         `[pin/send] token present=${Boolean(this.edsAccessToken)} tokenLength=${this.edsAccessToken?.length ?? 0}`,
       );
-      const result = await this.cdsPost(path, body);
+      const result = await this.cdsPost(path, body, 'https://cdsapi.srs.kg/api');
       this.logger.log(
         `[pin/send] CDS success ${JSON.stringify(result)}`,
       );
@@ -162,9 +162,13 @@ export class EdsService {
     return { cert, signedDocument };
   }
 
-  private async cdsPost(path: string, body: Record<string, unknown>) {
+  private async cdsPost(
+    path: string,
+    body: Record<string, unknown>,
+    baseUrl = this.cdsApiUrl,
+  ) {
     try {
-      const response = await axios.post(`${this.cdsApiUrl}${path}`, body, {
+      const response = await axios.post(`${baseUrl}${path}`, body, {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
           Authorization: `Bearer ${this.edsAccessToken}`,
@@ -173,7 +177,7 @@ export class EdsService {
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        (error as any).cdsPath = path;
+        (error as any).cdsPath = `${baseUrl}${path}`;
         (error as any).cdsBodyKeys = Object.keys(body || {});
       }
       throw error;
