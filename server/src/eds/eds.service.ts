@@ -10,6 +10,7 @@ import { createHash } from 'crypto';
 @Injectable()
 export class EdsService {
   private readonly edsAccessToken = process.env.EDS_ACCESS_TOKEN;
+  private readonly cdsApiUrl = 'https://cdsapi.srs.kg/api/oep';
   constructor(
     @InjectModel(Eds) private edsRepository: typeof Eds,
     private UsersService: UsersService,
@@ -20,7 +21,6 @@ export class EdsService {
 
   async sendPinCodeEmail({ userId, companyId }) {
     try {
-      const url = 'https://cdsapi.srs.kg/api/get-pin-code';
       const { personIdnp, organizationInn } = await this.getInns(
         userId,
         companyId,
@@ -31,22 +31,11 @@ export class EdsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-
-      const response = await axios.post(
-        url,
-        {
-          personIdnp,
-          organizationInn,
-          method: 'email',
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            Authorization: `Bearer ${this.edsAccessToken}`,
-          },
-        },
-      );
-      return response.data;
+      return await this.cdsPost('/pin-code', {
+        personIdnp,
+        organizationInn,
+        method: 'email',
+      });
     } catch (error) {
       this.throwCdsError(error);
     }
@@ -59,18 +48,17 @@ export class EdsService {
         userId,
         companyId,
       );
-      const { token } = await this.getEdsAccessToken(
-        personIdnp,
-        organizationInn,
-        pin,
-      );
-      const cert = await this.getEdsCertificate(token);
       const normalized = JSON.stringify(content ?? {});
       const base64Document = Buffer.from(normalized, 'utf8').toString('base64');
       const hashDocument = createHash('sha256')
         .update(base64Document, 'utf8')
         .digest('hex');
-      const signedDocument = await this.signEdsDocument(hashDocument, token);
+      const { cert, signedDocument } = await this.authAndSignHash(
+        hashDocument,
+        personIdnp,
+        organizationInn,
+        pin,
+      );
       if (await this.isAdmin(roles)) {
         return this.ReceiptsService.createReceipt({
           reportId,
@@ -131,68 +119,28 @@ export class EdsService {
     );
     return { personIdnp, organizationInn };
   }
-  private async getEdsAccessToken(personIdnp, organizationInn, pin) {
-    try {
-      const url = 'https://cdsapi.srs.kg/api/account/auth';
-      const response = await axios.post(
-        url,
-        {
-          personIdnp,
-          organizationInn,
-          byPin: pin,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            Authorization: `Bearer ${this.edsAccessToken}`,
-          },
-        },
-      );
-      return response.data;
-    } catch (error) {
-      this.throwCdsError(error);
-    }
+  private async authAndSignHash(hash, personIdnp, organizationInn, pin) {
+    const { token } = await this.cdsPost('/account/auth', {
+      personIdnp,
+      organizationInn,
+      byPin: pin,
+    });
+    const cert = await this.cdsPost('/cert-info', { userToken: token });
+    const signedDocument = await this.cdsPost('/sign/hash', {
+      hash,
+      userToken: token,
+    });
+    return { token, cert, signedDocument };
   }
-  private async getEdsCertificate(userToken) {
-    try {
-      const url = 'https://cdsapi.srs.kg/api/get-cert-info';
-      const response = await axios.post(
-        url,
-        {
-          userToken,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            Authorization: `Bearer ${this.edsAccessToken}`,
-          },
-        },
-      );
-      return response.data;
-    } catch (error) {
-      this.throwCdsError(error);
-    }
-  }
-  private async signEdsDocument(hash, userToken) {
-    try {
-      const url = 'https://cdsapi.srs.kg/api/get-sign/for-hash';
-      const response = await axios.post(
-        url,
-        {
-          hash,
-          userToken,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            Authorization: `Bearer ${this.edsAccessToken}`,
-          },
-        },
-      );
-      return response?.data;
-    } catch (error) {
-      this.throwCdsError(error);
-    }
+
+  private async cdsPost(path: string, body: Record<string, unknown>) {
+    const response = await axios.post(`${this.cdsApiUrl}${path}`, body, {
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        Authorization: `Bearer ${this.edsAccessToken}`,
+      },
+    });
+    return response.data;
   }
 
   private throwCdsError(error: any): never {

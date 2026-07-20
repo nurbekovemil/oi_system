@@ -25,7 +25,7 @@ import {
   CheckOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   useGetReportsQuery,
   useGetReportStatusesQuery,
@@ -37,12 +37,60 @@ import {
 import { useGetCompaniesForOptionQuery } from "../../store/services/company-service";
 import { StatusTag } from "./StatusTag";
 import moment from "moment";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import EdsCert from "../eds/EdsCert";
 import { useSelector } from "react-redux";
 // import { isRejected } from "@reduxjs/toolkit";
 const { Title, Text } = Typography;
 const { confirm } = Modal;
+const { RangePicker } = DatePicker;
+
+const pageSizeOptions = [5, 10, 15, 20, 30];
+const FILTERS_STORAGE_KEY = "reportsListFilters";
+
+const parseId = (value) => {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const getFiltersFromSearchParams = (searchParams) => {
+  const dateFrom = searchParams.get("dateFrom");
+  const dateTo = searchParams.get("dateTo");
+  const period =
+    dateFrom && dateTo
+      ? [moment(dateFrom, "YYYY-MM-DD"), moment(dateTo, "YYYY-MM-DD")]
+      : null;
+
+  return {
+    companyId: parseId(searchParams.get("companyId")),
+    typeId: parseId(searchParams.get("typeId")),
+    statusId: parseId(searchParams.get("statusId")),
+    period,
+  };
+};
+
+const readStoredFilters = () => {
+  try {
+    const raw = sessionStorage.getItem(FILTERS_STORAGE_KEY);
+    return raw ? new URLSearchParams(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredFilters = (params) => {
+  try {
+    const value = params.toString();
+    if (value) {
+      sessionStorage.setItem(FILTERS_STORAGE_KEY, value);
+    } else {
+      sessionStorage.removeItem(FILTERS_STORAGE_KEY);
+    }
+  } catch {
+    // ignore storage errors
+  }
+};
 
 const columns = [
   {
@@ -175,22 +223,31 @@ const items = [
   // },
 ];
 function NewReports() {
-  const { RangePicker } = DatePicker;
-  const pageSizeOptions = [5, 10, 15, 20, 30];
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState({
-    companyId: undefined,
-    typeId: undefined,
-    statusId: undefined,
-    period: null,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageSize = parseId(searchParams.get("limit")) || 10;
+  const currentPage = parseId(searchParams.get("page")) || 1;
+  const filters = useMemo(
+    () => getFiltersFromSearchParams(searchParams),
+    [searchParams]
+  );
   const { user } = useSelector((state) => state.auth);
   const isAdmin = ["ADMIN", "MODERATOR"].includes(user.roles[0].title);
   const navigate = useNavigate();
   const { data: companies = [] } = useGetCompaniesForOptionQuery();
   const { data: reportTypes = [] } = useGetReportTypesQuery();
   const { data: reportStatuses = [] } = useGetReportStatusesQuery();
+
+  useEffect(() => {
+    if ([...searchParams.keys()].length > 0) {
+      writeStoredFilters(searchParams);
+      return;
+    }
+
+    const stored = readStoredFilters();
+    if (stored && [...stored.keys()].length > 0) {
+      setSearchParams(stored, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const dateFrom = filters.period?.[0]
     ? filters.period[0].format("YYYY-MM-DD")
@@ -225,16 +282,44 @@ function NewReports() {
   const [removeReport, {}] = useRemoveReportMutation();
   const [rejectReport, {}] = useRejectReportMutation();
 
-  const getReportsHandler = (page, limit) => {
-    setCurrentPage(page);
-    setPageSize(limit);
+  const updateSearchParams = (patch) => {
+    const next = new URLSearchParams(searchParams);
+
+    Object.entries(patch).forEach(([key, value]) => {
+      if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
+        next.delete(key);
+      } else {
+        next.set(key, String(value));
+      }
+    });
+
+    writeStoredFilters(next);
+    setSearchParams(next, { replace: true });
   };
+
+  const getReportsHandler = (page, limit) => {
+    updateSearchParams({ page, limit });
+  };
+
   const onFilterChange = (key, value) => {
-    setCurrentPage(1);
-    setFilters((prev) => ({
-      ...prev,
+    if (key === "period") {
+      updateSearchParams({
+        page: 1,
+        dateFrom: value?.[0] ? value[0].format("YYYY-MM-DD") : undefined,
+        dateTo: value?.[1] ? value[1].format("YYYY-MM-DD") : undefined,
+      });
+      return;
+    }
+
+    updateSearchParams({
+      page: 1,
       [key]: value,
-    }));
+    });
   };
 
   const signReport = (id) => {
@@ -477,10 +562,12 @@ function NewReports() {
             optionFilterProp="label"
             options={[
               { value: null, label: "Все" },
-              ...statuses.map((status) => ({
-                value: status.id,
-                label: status.title,
-              })),
+              ...statuses
+                .filter((status) => [2, 4].includes(status.id))
+                .map((status) => ({
+                  value: status.id,
+                  label: status.title,
+                })),
             ]}
             onChange={(value) => onFilterChange("statusId", value || undefined)}
           />

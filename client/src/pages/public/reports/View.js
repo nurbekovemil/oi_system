@@ -61,9 +61,6 @@ const ReportPublicView = () => {
   const { data: dataReportById, isSuccess: isSuccessGetReportById } =
     useGetReportByIdQuery(reportId);
 
-  const { cert: edsData, typeId: edsType } =
-    dataReportById?.eds.length > 0 && dataReportById?.eds[0];
-
   const { data: dataReportType, isSuccess: isSuccessGetReportType } =
     useGetReportTypeByIdQuery(reportType);
 

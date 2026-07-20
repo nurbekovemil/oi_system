@@ -7,10 +7,12 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
-import ReactApexChart from "react-apexcharts";
+import ApexChart from "react-apexcharts";
 import moment from "moment";
 import { useGetCompaniesQuery } from "../../store/services/company-service";
 import { useGetReportsQuery } from "../../store/services/report-service";
+
+const ReactApexChart = ApexChart.default || ApexChart;
 
 function Home() {
   const { Title, Text } = Typography;

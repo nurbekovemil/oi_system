@@ -22,7 +22,9 @@ const toggler = [
 ];
 
 function Header({ onPress }) {
-  useEffect(() => window.scrollTo(0, 0));
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { user } = useSelector((state) => state.auth);
   const [logout] = useLazyLogoutQuery();
   const navigate = useNavigate();

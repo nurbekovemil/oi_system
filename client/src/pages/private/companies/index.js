@@ -23,7 +23,7 @@ import {
   CheckCircleFilled,
 } from "@ant-design/icons";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   useGetCompaniesQuery,
   useRemoveCompanyMutation,
@@ -38,6 +38,36 @@ const btnStyle = {
 
 const { Paragraph, Title, Text } = Typography;
 const { confirm } = Modal;
+const FILTERS_STORAGE_KEY = "companiesListFilters";
+const pageSizeOptions = [5, 10, 20];
+
+const parseId = (value) => {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const readStoredFilters = () => {
+  try {
+    const raw = sessionStorage.getItem(FILTERS_STORAGE_KEY);
+    return raw ? new URLSearchParams(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredFilters = (params) => {
+  try {
+    const value = params.toString();
+    if (value) {
+      sessionStorage.setItem(FILTERS_STORAGE_KEY, value);
+    } else {
+      sessionStorage.removeItem(FILTERS_STORAGE_KEY);
+    }
+  } catch {
+    // ignore storage errors
+  }
+};
 
 const columns = [
   {
@@ -96,24 +126,56 @@ const items = [
 
 const Companies = () => {
   const [form] = Form.useForm();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageSize = parseId(searchParams.get("limit")) || 10;
+  const currentPage = parseId(searchParams.get("page")) || 1;
+  const search = searchParams.get("search") || "";
+  const [searchInput, setSearchInput] = useState(search);
 
-  const pageSizeOptions = [5, 10, 20];
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  useEffect(() => {
+    if ([...searchParams.keys()].length > 0) {
+      writeStoredFilters(searchParams);
+      return;
+    }
+
+    const stored = readStoredFilters();
+    if (stored && [...stored.keys()].length > 0) {
+      setSearchParams(stored, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
+  const updateSearchParams = (patch) => {
+    const next = new URLSearchParams(searchParams);
+
+    Object.entries(patch).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === "") {
+        next.delete(key);
+      } else {
+        next.set(key, String(value));
+      }
+    });
+
+    writeStoredFilters(next);
+    setSearchParams(next, { replace: true });
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSearch(searchInput);
-      setCurrentPage(1);
+      if (searchInput === search) return;
+      updateSearchParams({
+        search: searchInput || undefined,
+        page: 1,
+      });
     }, 400);
     return () => clearTimeout(timer);
   }, [searchInput]);
 
   const getUsersHandler = (page, limit) => {
-    setCurrentPage(page);
-    setPageSize(limit);
+    updateSearchParams({ page, limit });
   };
 
   const { data, isSuccess, isLoading, isFetching } = useGetCompaniesQuery({

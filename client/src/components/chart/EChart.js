@@ -1,7 +1,8 @@
-import ReactApexChart from "react-apexcharts";
+import ApexChart from "react-apexcharts";
 import { Typography } from "antd";
 import eChart from "./configs/eChart";
 
+const ReactApexChart = ApexChart.default || ApexChart;
 const { Title, Paragraph } = Typography;
 const { options, series } = eChart;
 
