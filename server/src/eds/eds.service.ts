@@ -6,13 +6,12 @@ import axios from 'axios';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
-import { createHash } from 'crypto';
 
 @Injectable()
 export class EdsService {
   private readonly logger = new Logger(EdsService.name);
   private readonly edsAccessToken = process.env.EDS_ACCESS_TOKEN;
-  private readonly cdsApiUrl = 'https://cdsapi.srs.kg/api/oep';
+  private readonly cdsApiUrl = 'https://cdsapi.srs.kg/api';
 
   constructor(
     @InjectModel(Eds) private edsRepository: typeof Eds,
@@ -75,12 +74,9 @@ export class EdsService {
         userId,
         companyId,
       );
-      // JSON → base64 → SHA256 → подпись хеша (по инструкции CDS)
+      // JSON → base64 (для /get-sign/for-hash)
       const normalized = JSON.stringify(content ?? {});
-      const base64Document = Buffer.from(normalized, 'utf8').toString('base64');
-      const hashDocument = createHash('sha256')
-        .update(base64Document, 'utf8')
-        .digest('hex');
+      const hashDocument = Buffer.from(normalized, 'utf8').toString('base64');
       const { cert, signedDocument } = await this.authAndSignHash(
         hashDocument,
         personIdnp,
@@ -154,8 +150,8 @@ export class EdsService {
       organizationInn,
       byPin: pin,
     });
-    const cert = await this.cdsPost('/cert-info', { userToken: token });
-    const signedDocument = await this.cdsPost('/sign/hash', {
+    const cert = await this.cdsPost('/get-cert-info', { userToken: token });
+    const signedDocument = await this.cdsPost('/get-sign/for-hash', {
       hash,
       userToken: token,
     });
