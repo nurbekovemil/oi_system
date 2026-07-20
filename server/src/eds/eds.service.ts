@@ -197,6 +197,7 @@ export class EdsService {
       );
     }
 
+    const cdsPath = (error as any).cdsPath as string | undefined;
     const status = error.response?.status;
     const data = error.response?.data;
     const message = this.extractCdsMessage(data);
@@ -205,21 +206,22 @@ export class EdsService {
       const isHtml = data.trim().startsWith('<');
       if (isHtml) {
         const plain = data.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        const message = /503/i.test(plain)
+        const htmlMessage = /503/i.test(plain)
           ? 'Внешний EDS сервис временно недоступен (503)'
           : /502/i.test(plain)
             ? 'Ошибка шлюза внешнего EDS сервиса (502)'
             : plain || 'Внешний EDS сервис вернул HTML вместо JSON';
         throw new HttpException(
           {
-            message,
+            message: htmlMessage,
             upstreamStatus: status ?? 500,
+            cdsPath,
           },
           HttpStatus.BAD_GATEWAY,
         );
       }
       throw new HttpException(
-        { message: data, upstreamStatus: status ?? 500 },
+        { message: data, upstreamStatus: status ?? 500, cdsPath },
         HttpStatus.BAD_GATEWAY,
       );
     }
@@ -229,6 +231,7 @@ export class EdsService {
         {
           message: error.message ?? 'Нет ответа от внешнего EDS сервиса',
           code: error.code,
+          cdsPath,
           rawError: error.toJSON?.() ?? error,
         },
         HttpStatus.GATEWAY_TIMEOUT,
@@ -239,7 +242,7 @@ export class EdsService {
       {
         message,
         upstreamStatus: status,
-        cdsPath: (error as any).cdsPath,
+        cdsPath,
         raw: data,
       },
       HttpStatus.BAD_GATEWAY,
