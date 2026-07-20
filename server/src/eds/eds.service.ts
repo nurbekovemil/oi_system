@@ -7,10 +7,12 @@ import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
 import { createHash } from 'crypto';
+
 @Injectable()
 export class EdsService {
   private readonly edsAccessToken = process.env.EDS_ACCESS_TOKEN;
   private readonly cdsApiUrl = 'https://cdsapi.srs.kg/api/oep';
+
   constructor(
     @InjectModel(Eds) private edsRepository: typeof Eds,
     private UsersService: UsersService,
@@ -48,6 +50,7 @@ export class EdsService {
         userId,
         companyId,
       );
+      // JSON → base64 → SHA256 → подпись хеша (по инструкции CDS)
       const normalized = JSON.stringify(content ?? {});
       const base64Document = Buffer.from(normalized, 'utf8').toString('base64');
       const hashDocument = createHash('sha256')
@@ -94,7 +97,7 @@ export class EdsService {
   }
 
   private async isAdmin(roles) {
-    return await roles.some((role) =>
+    return roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),
     );
   }
@@ -119,6 +122,7 @@ export class EdsService {
     );
     return { personIdnp, organizationInn };
   }
+
   private async authAndSignHash(hash, personIdnp, organizationInn, pin) {
     const { token } = await this.cdsPost('/account/auth', {
       personIdnp,
@@ -130,7 +134,7 @@ export class EdsService {
       hash,
       userToken: token,
     });
-    return { token, cert, signedDocument };
+    return { cert, signedDocument };
   }
 
   private async cdsPost(path: string, body: Record<string, unknown>) {
@@ -145,6 +149,9 @@ export class EdsService {
 
   private throwCdsError(error: any): never {
     if (!axios.isAxiosError(error)) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       const fallbackMessage =
         error?.message ??
         (typeof error === 'string' ? error : 'Неизвестная ошибка EDS сервиса');
@@ -159,6 +166,7 @@ export class EdsService {
 
     const status = error.response?.status;
     const data = error.response?.data;
+    const message = this.extractCdsMessage(data);
 
     if (typeof data === 'string') {
       const isHtml = data.trim().startsWith('<');
@@ -189,8 +197,23 @@ export class EdsService {
     }
 
     throw new HttpException(
-      { message: data ?? 'Ошибка внешнего EDS сервиса', upstreamStatus: status },
+      { message, upstreamStatus: status, raw: data },
       HttpStatus.BAD_GATEWAY,
     );
+  }
+
+  private extractCdsMessage(data: any): string {
+    if (!data) return 'Ошибка внешнего EDS сервиса';
+    if (typeof data === 'string') return data;
+    if (typeof data.errorMessage === 'string') return data.errorMessage;
+    if (typeof data.message?.errorMessage === 'string') {
+      return data.message.errorMessage;
+    }
+    if (typeof data.message === 'string') return data.message;
+    try {
+      return JSON.stringify(data);
+    } catch {
+      return 'Ошибка внешнего EDS сервиса';
+    }
   }
 }

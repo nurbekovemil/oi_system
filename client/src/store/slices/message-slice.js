@@ -13,9 +13,26 @@ notification.config({
 
 const initialState = {};
 
+const extractErrorMessage = (payload, fallback = "Произошла ошибка") => {
+  const data = payload?.data;
+  if (!data) return fallback;
+  if (typeof data === "string") return data;
+  if (typeof data.message?.errorMessage === "string") {
+    return data.message.errorMessage;
+  }
+  if (typeof data.errorMessage === "string") return data.errorMessage;
+  if (typeof data.message === "string") return data.message;
+  if (Array.isArray(data.message)) return data.message.join(", ");
+  return fallback;
+};
+
 const showMessage = (message, type) => {
+  const text =
+    typeof message === "string" && message.trim()
+      ? message
+      : "Произошла ошибка";
   notification[type]({
-    message,
+    message: text,
   });
 };
 
@@ -30,69 +47,73 @@ const messageSlice = createSlice({
     builder.addMatcher(reportApi.endpoints.removeReport.matchFulfilled, () =>
       showMessage("Документ успешно удален", "success")
     );
-    builder.addMatcher(reportApi.endpoints.sendReport.matchRejected, (state, {payload}) =>
-      showMessage(payload.data.message, "error")
+    builder.addMatcher(
+      reportApi.endpoints.sendReport.matchRejected,
+      (state, { payload }) =>
+        showMessage(extractErrorMessage(payload), "error")
     );
     // Auth messages
     builder.addMatcher(
       authApi.endpoints.login.matchRejected,
       (state, { payload }) => {
-        showMessage(payload.data.message, "error");
+        showMessage(extractErrorMessage(payload, "Ошибка авторизации"), "error");
       }
     );
     builder.addMatcher(
       authApi.endpoints.rutoken.matchRejected,
       (state, { payload }) => {
-        showMessage(payload.data.message, "error");
+        showMessage(extractErrorMessage(payload, "Ошибка входа через Рутокен"), "error");
       }
     );
     builder.addMatcher(
       authApi.endpoints.cloudEdsSendPinCode.matchFulfilled,
-      (state, { payload }) => {
-        showMessage('Пин код отправлен на почту', "success");
+      () => {
+        showMessage("Пин код отправлен на почту", "success");
       }
     );
     builder.addMatcher(
       authApi.endpoints.cloudEdsSendPinCode.matchRejected,
       (state, { payload }) => {
-        console.log(payload)
-        showMessage(payload.data.message, "error");
+        showMessage(extractErrorMessage(payload, "Ошибка отправки пин-кода"), "error");
       }
     );
     // User messages
     builder.addMatcher(
       userApi.endpoints.createUser.matchFulfilled,
-      (state, { payload }) => {
+      () => {
         showMessage("Пользователь успешно создан", "success");
       }
     );
     builder.addMatcher(
       userApi.endpoints.updateUser.matchFulfilled,
-      (state, { payload }) => {
+      () => {
         showMessage("Данные пользователя успешно обновлены", "success");
       }
     );
     builder.addMatcher(
       userApi.endpoints.createUser.matchRejected,
       (state, { payload }) => {
-        showMessage(payload?.data?.response?.message, "error");
+        showMessage(
+          extractErrorMessage(payload, "Ошибка создания пользователя"),
+          "error"
+        );
       }
     );
     builder.addMatcher(
       userApi.endpoints.updateUserPassword.matchFulfilled,
-      (state, { payload }) => {
+      () => {
         showMessage("Пароль успешно изменен", "success");
       }
     );
     builder.addMatcher(
       userApi.endpoints.updateUserPassword.matchRejected,
-      (state, { payload }) => {
+      () => {
         showMessage("Неверный пароль", "error");
       }
     );
     builder.addMatcher(
       userApi.endpoints.resetUserPass.matchFulfilled,
-      (state, {}) => {
+      () => {
         showMessage("Пароль сброшен", "success");
       }
     );
@@ -103,7 +124,28 @@ const messageSlice = createSlice({
     builder.addMatcher(
       edsApi.endpoints.sendPinCode.matchRejected,
       (state, { payload }) => {
-        showMessage(payload?.data?.errorMessage, "error");
+        showMessage(
+          extractErrorMessage(payload, "Ошибка отправки пин-кода"),
+          "error"
+        );
+      }
+    );
+    builder.addMatcher(
+      edsApi.endpoints.confirmPinCode.matchRejected,
+      (state, { payload }) => {
+        showMessage(
+          extractErrorMessage(payload, "Ошибка подписания ЭЦП"),
+          "error"
+        );
+      }
+    );
+    builder.addMatcher(
+      edsApi.endpoints.signRutoken.matchRejected,
+      (state, { payload }) => {
+        showMessage(
+          extractErrorMessage(payload, "Ошибка подписания Рутокен"),
+          "error"
+        );
       }
     );
   },
