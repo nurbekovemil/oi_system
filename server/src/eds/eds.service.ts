@@ -239,7 +239,7 @@ export class EdsService {
       {
         message,
         upstreamStatus: status,
-        cdsPath: error.cdsPath,
+        cdsPath: (error as any).cdsPath,
         raw: data,
       },
       HttpStatus.BAD_GATEWAY,
