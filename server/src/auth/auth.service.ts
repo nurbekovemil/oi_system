@@ -12,6 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import { RutokenDto } from './dto/rutoken.dto';
 import { EdsDto } from './dto/eds.dto';
 import axios from 'axios';
+import { cdsHttpsAgent } from '../eds/cds-https.agent';
 
 @Injectable()
 export class AuthService {
@@ -169,6 +170,7 @@ export class AuthService {
             'Content-Type': 'application/json;charset=UTF-8',
             Authorization: `Bearer ${edsAccessToken}`,
           },
+          httpsAgent: cdsHttpsAgent,
         },
       );
       return response.data;
@@ -197,6 +199,7 @@ export class AuthService {
             'Content-Type': 'application/json;charset=UTF-8',
             Authorization: `Bearer ${edsAccessToken}`,
           },
+          httpsAgent: cdsHttpsAgent,
         },
       );
       const tokens = await this.TokenService.generateToken({

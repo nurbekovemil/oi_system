@@ -6,6 +6,7 @@ import axios from 'axios';
 import { UsersService } from 'src/users/users.service';
 import { InjectModel } from '@nestjs/sequelize';
 import { Eds } from './entities/ed.entity';
+import { cdsHttpsAgent } from './cds-https.agent';
 
 @Injectable()
 export class EdsService {
@@ -169,6 +170,7 @@ export class EdsService {
           'Content-Type': 'application/json;charset=UTF-8',
           Authorization: `Bearer ${this.edsAccessToken}`,
         },
+        httpsAgent: cdsHttpsAgent,
       });
       return response.data;
     } catch (error) {
