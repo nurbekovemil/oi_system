@@ -118,6 +118,42 @@ export class EdsService {
     return await this.signReport(2, reportId, cert, hash, userId, companyId);
   }
 
+  async signToken(
+    { userId, companyId, roles },
+    { reportId, tokenKind, signature, payload, cert },
+  ) {
+    if (tokenKind !== 'jacarta' && tokenKind !== 'enotoken') {
+      throw new HttpException('Неизвестный тип токена', HttpStatus.BAD_REQUEST);
+    }
+    if (!String(signature || '').trim()) {
+      throw new HttpException('Подпись не получена', HttpStatus.BAD_REQUEST);
+    }
+    const report = await this.ReportsService.getReportById(reportId);
+    if (!report) {
+      throw new HttpException('Отчёт не найден', HttpStatus.NOT_FOUND);
+    }
+    if (payload != null) {
+      const expected = JSON.stringify(report.content ?? {});
+      if (payload !== expected) {
+        throw new HttpException(
+          'Данные подписи не совпадают с отчётом',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+    const hash = signature;
+    const certPayload = { ...(cert || {}), tokenKind };
+    if (await this.isAdmin(roles)) {
+      return this.ReceiptsService.createReceipt({
+        reportId,
+        cert: certPayload,
+        hash,
+        userId,
+      });
+    }
+    return this.signReport(2, reportId, certPayload, hash, userId, companyId);
+  }
+
   private async isAdmin(roles) {
     return roles.some((role) =>
       ['ADMIN', 'MODERATOR'].includes(role.title),

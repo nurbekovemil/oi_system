@@ -215,6 +215,16 @@ export class CompaniesService {
     return company
   }
 
+  async getCompanyByInnLoose(inn: string) {
+    const digits = String(inn || '').replace(/\D/g, '');
+    if (!digits) return null;
+    return this.companyRepository.findOne({
+      where: {
+        [Op.or]: [{ inn }, { inn: { [Op.iLike]: `%${digits}%` } }],
+      },
+    });
+  }
+
   async createMockData() {
     const data = [];
     try {

@@ -4,6 +4,7 @@ import { Response, Request } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { RutokenDto } from './dto/rutoken.dto';
 import { EdsDto } from './dto/eds.dto';
+import { LoginTokenDto } from './dto/login-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -51,6 +52,24 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const data = await this.AuthService.rutoken(dto);
+    res.cookie('refreshToken', data.tokens.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    return data;
+  }
+
+  @Post('/token/challenge')
+  createTokenChallenge() {
+    return this.AuthService.createTokenChallenge();
+  }
+
+  @Post('/token/login')
+  async loginToken(
+    @Body() dto: LoginTokenDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const data = await this.AuthService.loginToken(dto);
     res.cookie('refreshToken', data.tokens.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,

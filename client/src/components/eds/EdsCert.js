@@ -2,24 +2,30 @@ import { Descriptions } from "antd";
 import React from "react";
 
 const EdsCert = ({ data, type }) => {
+  const isCloud = type === 1;
   return (
     <Descriptions style={{ width: "400px" }}>
       <Descriptions.Item label="Название организации" span={3}>
-        {type == 1 ? data?.organizationName : data?.organizationName}
+        {data?.organizationName}
       </Descriptions.Item>
       <Descriptions.Item label="ИНН организации" span={3}>
-        {type == 1 ? data?.organizationInn : data?.INN}
+        {isCloud ? data?.organizationInn : data?.INN || data?.organizationInn}
       </Descriptions.Item>
       <Descriptions.Item label="ФИО" span={3}>
-        {type == 1 ? data?.commonName : data?.commonName}
+        {data?.commonName}
       </Descriptions.Item>
-      {type == 1 && (
+      {data?.tokenKind && (
+        <Descriptions.Item label="Токен" span={3}>
+          {data.tokenKind === "jacarta" ? "JaCarta" : "EnoToken"}
+        </Descriptions.Item>
+      )}
+      {isCloud && (
         <Descriptions.Item label="Cрок действия" span={3}>
           {data?.validNotAfter}
         </Descriptions.Item>
       )}
       <Descriptions.Item label="Сертификат" span={3}>
-        {type == 1 ? data?.keyIdentifier : data?.cert}
+        {isCloud ? data?.keyIdentifier : data?.cert}
       </Descriptions.Item>
     </Descriptions>
   );

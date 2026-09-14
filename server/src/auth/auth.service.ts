@@ -9,14 +9,22 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { randomBytes, randomUUID } from 'crypto';
+import { InjectModel } from '@nestjs/sequelize';
 import { RutokenDto } from './dto/rutoken.dto';
 import { EdsDto } from './dto/eds.dto';
+import { LoginTokenDto } from './dto/login-token.dto';
+import { TokenChallenge } from './entities/token-challenge.entity';
 import axios from 'axios';
 import { cdsHttpsAgent } from '../eds/cds-https.agent';
+
+const TOKEN_CHALLENGE_TTL_MS = 5 * 60 * 1000;
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectModel(TokenChallenge)
+    private tokenChallengeRepository: typeof TokenChallenge,
     private UsersService: UsersService,
     private CompaniesService: CompaniesService,
     private TokenService: TokenService,
@@ -227,5 +235,112 @@ export class AuthService {
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async createTokenChallenge() {
+    const id = randomUUID();
+    const nonce = randomBytes(32).toString('base64');
+    await this.tokenChallengeRepository.create({
+      id,
+      nonce,
+      expiresAt: new Date(Date.now() + TOKEN_CHALLENGE_TTL_MS),
+    });
+    return { challengeId: id, nonce };
+  }
+
+  async loginToken(dto: LoginTokenDto) {
+    try {
+      if (dto.tokenKind !== 'jacarta' && dto.tokenKind !== 'enotoken') {
+        throw new Error('Неизвестный тип токена');
+      }
+      await this.consumeTokenChallenge(dto.challengeId, dto.signature);
+      const user = await this.resolveTokenUser(dto);
+      return this.issueSession(user);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Ошибка входа по токену',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  private async consumeTokenChallenge(challengeId: string, signature: string) {
+    if (!challengeId || !String(signature || '').trim()) {
+      throw new Error('Подпись challenge не получена');
+    }
+    const challenge = await this.tokenChallengeRepository.findByPk(challengeId);
+    if (!challenge) {
+      throw new Error('Challenge не найден');
+    }
+    if (challenge.usedAt) {
+      throw new Error('Challenge уже использован');
+    }
+    if (challenge.expiresAt.getTime() < Date.now()) {
+      throw new Error('Challenge истёк, повторите вход');
+    }
+    challenge.usedAt = new Date();
+    await challenge.save();
+  }
+
+  private digits(value: unknown) {
+    return String(value ?? '').replace(/\D/g, '');
+  }
+
+  private isValidInn(value: unknown) {
+    const inn = this.digits(value);
+    if (!inn || /^0+$/.test(inn) || /^(\d)\1+$/.test(inn)) return false;
+    if (inn.length === 12) return false;
+    return inn.length === 14 || inn.length === 10;
+  }
+
+  private async resolveTokenUser(dto: LoginTokenDto) {
+    const userInn = this.digits(dto.user_inn);
+    const companyInn = this.digits(dto.company_inn);
+    if (!this.isValidInn(userInn)) {
+      throw new Error('ПИН/ИНН пользователя не найден в сертификате');
+    }
+
+    if (!this.isValidInn(companyInn)) {
+      throw new Error('ИНН компании не найден в сертификате');
+    }
+    const company =
+      (await this.CompaniesService.getCompanyByInn(companyInn)) ||
+      (await this.CompaniesService.getCompanyByInnLoose(companyInn));
+    if (!company) {
+      throw new Error('ИНН компании не найдено');
+    }
+    const user = await this.UsersService.getUserByCompanyId(
+      company.id,
+      userInn,
+    );
+    if (!user) {
+      throw new Error('ИНН пользователя не найдено');
+    }
+    return user;
+  }
+
+  private async issueSession(user) {
+    const tokens = await this.TokenService.generateToken({
+      userId: user.id,
+      companyId: user.companyId,
+      roles: user.roles,
+    });
+    await this.TokenService.saveToken(user.id, tokens.refreshToken);
+    return {
+      user: {
+        id: user.id,
+        login: user.login,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        roles: user.roles,
+        inn: user.inn,
+        companyId: user.companyId,
+        changePass: await bcrypt.compare(
+          process.env.DEFAULT_PASS,
+          user.password,
+        ),
+      },
+      tokens,
+    };
   }
 }

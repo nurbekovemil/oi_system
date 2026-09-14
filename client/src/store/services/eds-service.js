@@ -25,6 +25,14 @@ const edsApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Reports", "ReportById"],
     }),
+    signToken: builder.mutation({
+      query: (data) => ({
+        url: "eds/token/sign",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Reports", "ReportById"],
+    }),
   }),
 });
 
@@ -33,4 +41,5 @@ export const {
   useSendPinCodeMutation,
   useConfirmPinCodeMutation,
   useSignRutokenMutation,
+  useSignTokenMutation,
 } = edsApi;

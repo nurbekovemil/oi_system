@@ -95,6 +95,15 @@ const messageSlice = createSlice({
       }
     );
     builder.addMatcher(
+      authApi.endpoints.loginToken.matchRejected,
+      (state, { payload }) => {
+        showMessage(
+          extractErrorMessage(payload, "Ошибка входа через токен"),
+          "error"
+        );
+      }
+    );
+    builder.addMatcher(
       authApi.endpoints.cloudEdsSendPinCode.matchFulfilled,
       () => {
         showMessage("Пин код отправлен на почту", "success");
@@ -173,6 +182,24 @@ const messageSlice = createSlice({
       (state, { payload }) => {
         showMessage(
           extractErrorMessage(payload, "Ошибка подписания Рутокен"),
+          "error"
+        );
+      }
+    );
+    builder.addMatcher(
+      edsApi.endpoints.signToken.matchRejected,
+      (state, { payload }) => {
+        showMessage(
+          extractErrorMessage(payload, "Ошибка подписания токеном"),
+          "error"
+        );
+      }
+    );
+    builder.addMatcher(
+      reportApi.endpoints.getReportSignPayload.matchRejected,
+      (state, { payload }) => {
+        showMessage(
+          extractErrorMessage(payload, "Не удалось получить данные для подписи"),
           "error"
         );
       }

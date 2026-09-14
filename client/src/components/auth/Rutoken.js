@@ -131,15 +131,12 @@ const Rutoken = () => {
             <Form.Item>
               <Button
                 disabled={!plugin}
-                            type="primary"
-                            style={{
-                              width: "100%",
-                              background: "#57b6c0",
-                              borderColor: "#57b6c0",
-                            }}
-                            onClick={checkDevices}
-                            icon={<SyncOutlined />}
-                          >
+                type="default"
+                className="auth-refresh-btn"
+                style={{ width: "100%" }}
+                onClick={checkDevices}
+                icon={<SyncOutlined />}
+              >
                             Обновить список рутокенов
                 </Button>
             </Form.Item>
@@ -161,12 +158,9 @@ const Rutoken = () => {
             <Form.Item>
               <Button
                       icon={<SyncOutlined />}
-                      type="primary"
-                      style={{
-                        width: "100%",
-                        background: "#57b6c0",
-                        borderColor: "#57b6c0",
-                      }}
+                      type="default"
+                      className="auth-refresh-btn"
+                      style={{ width: "100%" }}
                       onClick={checkCerts}
                     >
                       Обновить список сертификатов
@@ -199,11 +193,7 @@ const Rutoken = () => {
           type="primary"
           htmlType="submit"
           icon={<UserOutlined />}
-          style={{
-            width: "100%",
-            background: "#57b6c0",
-            borderColor: "#57b6c0",
-          }}
+          style={{ width: "100%" }}
         >
           Войти
         </Button>

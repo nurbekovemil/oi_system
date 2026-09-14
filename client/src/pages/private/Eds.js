@@ -22,6 +22,7 @@ import {
 
 import rutokenplugin from "@aktivco/rutoken-plugin";
 import { useLazyGetReportByIdQuery } from "../../store/services/report-service";
+import TokenSignForm from "../../components/eds/TokenSignForm";
 
 const { Title, Text } = Typography;
 const Eds = () => {
@@ -191,6 +192,8 @@ const Eds = () => {
             <Space direction="vertical">
               <Radio value={1}>Облачное ЭЦП</Radio>
               <Radio value={2}>Рутокен ЭЦП</Radio>
+              <Radio value={3}>JaCarta ЭЦП</Radio>
+              <Radio value={4}>EnoToken ЭЦП</Radio>
             </Space>
           </Radio.Group>
         </Card>
@@ -320,6 +323,38 @@ const Eds = () => {
                 </Col>
               </Row>
             )}
+          </Card>
+        </Col>
+      )}
+      {eds === 3 && (
+        <Col span={24}>
+          <Card
+            bordered={false}
+            className="criclebox mb-24"
+            title={<Title level={4}>JaCarta</Title>}
+          >
+            <TokenSignForm
+              key="jacarta"
+              kind="jacarta"
+              reportId={reportId}
+              onSuccess={() => navigate("/dashboard/reports")}
+            />
+          </Card>
+        </Col>
+      )}
+      {eds === 4 && (
+        <Col span={24}>
+          <Card
+            bordered={false}
+            className="criclebox mb-24"
+            title={<Title level={4}>EnoToken</Title>}
+          >
+            <TokenSignForm
+              key="enotoken"
+              kind="enotoken"
+              reportId={reportId}
+              onSuccess={() => navigate("/dashboard/reports")}
+            />
           </Card>
         </Col>
       )}

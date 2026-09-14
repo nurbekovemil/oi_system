@@ -10,6 +10,7 @@ import { TokenModule } from './token/token.module';
 import { Report } from './reports/entities/report.entity';
 import { Company } from './companies/entities/company.entity';
 import { Token } from './token/entities/token.entity';
+import { TokenChallenge } from './auth/entities/token-challenge.entity';
 import { CompanyTemplates } from './companies/entities/company-templates.entity';
 import { ReportTypes } from './reports/entities/report-types.entity';
 import { ReportTemplates } from './reports/entities/report-templates.entity';
@@ -55,6 +56,7 @@ import { LoggingModule } from './logging/logging.module';
         Company,
         CompanyTemplates,
         Token,
+        TokenChallenge,
         Roles,
         RoleUsers,
         RoleAllowedReports,

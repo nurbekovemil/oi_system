@@ -35,4 +35,10 @@ export class EdsController {
   signRutoken(@Body() body, @Request() req) {
     return this.edsService.signRutoken(req.user, body);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/token/sign')
+  signToken(@Body() body, @Request() req) {
+    return this.edsService.signToken(req.user, body);
+  }
 }

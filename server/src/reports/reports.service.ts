@@ -222,6 +222,14 @@ export class ReportsService {
     return report;
   }
 
+  async getSignPayload(id: number) {
+    const report = await this.getReportById(id);
+    if (!report) {
+      throw new HttpException('Отчёт не найден', HttpStatus.NOT_FOUND);
+    }
+    return { payload: JSON.stringify(report.content ?? {}) };
+  }
+
   async getReports(
     { roles, userId, companyId },
     { limit, page, companyId: filterCompanyId, typeId, statusId, dateFrom, dateTo },

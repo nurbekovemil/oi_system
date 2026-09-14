@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { Company } from 'src/companies/entities/company.entity';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { UserTemp } from './entities/user-temp.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/roles/entities/role.entity';
@@ -186,5 +186,74 @@ export class UsersService {
       ]
     })
     return user
+  }
+
+  async getUserByFio(fullName: string) {
+    const parts = String(fullName || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .split(' ')
+      .filter(Boolean);
+    if (!parts.length) return null;
+    const include = [
+      {
+        model: this.roleRepository,
+        attributes: {
+          exclude: ['updatedAt', 'createdAt'],
+        },
+      },
+    ];
+    const find = (where) => this.userRepository.findAll({ where, include });
+    const lastName = parts[0];
+    const firstName = parts.slice(1).join(' ');
+    const attempts = [];
+    if (parts.length >= 2) {
+      attempts.push(
+        find({
+          lastName: { [Op.iLike]: lastName },
+          firstName: {
+            [Op.or]: [
+              { [Op.iLike]: firstName },
+              { [Op.iLike]: `${parts[1]}%` },
+            ],
+          },
+        }),
+        find({
+          lastName: { [Op.iLike]: parts[1] },
+          firstName: { [Op.iLike]: `${lastName}%` },
+        }),
+      );
+    }
+    attempts.push(
+      find({ lastName: { [Op.iLike]: lastName } }),
+      find({ firstName: { [Op.iLike]: `%${lastName}%` } }),
+    );
+    for (const request of attempts) {
+      const users = await request;
+      if (users.length === 1) return users[0];
+    }
+    return null;
+  }
+
+  async getUserByInnLoose(inn: string) {
+    const digits = String(inn || '').replace(/\D/g, '');
+    if (!digits) return null;
+    return this.userRepository.findOne({
+      where: {
+        [Op.or]: [
+          { inn },
+          { inn: { [Op.iLike]: `%${digits}%` } },
+          { inn: { [Op.iLike]: `${digits}%` } },
+        ],
+      },
+      include: [
+        {
+          model: this.roleRepository,
+          attributes: {
+            exclude: ['updatedAt', 'createdAt'],
+          },
+        },
+      ],
+    });
   }
 }

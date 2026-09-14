@@ -27,8 +27,6 @@ const SignIn = () => {
         icon={<UserOutlined />}
         style={{
           width: "100%",
-          background: "#57b6c0",
-          borderColor: "#57b6c0",
         }}
       >
         Войти

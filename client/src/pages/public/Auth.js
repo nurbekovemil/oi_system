@@ -1,8 +1,16 @@
-import { Typography, Card, Row, Col, Space } from "antd";
+import { Typography, Card, Row, Col, Space, Tabs } from "antd";
+import {
+  CloudOutlined,
+  KeyOutlined,
+  LockOutlined,
+  SafetyCertificateOutlined,
+  UsbOutlined,
+} from "@ant-design/icons";
 
 import logo from "../../assets/images/auth_logo.png";
 import SignIn from "../../components/auth/SignIn";
 import Rutoken from "../../components/auth/Rutoken";
+import TokenLoginForm from "../../components/auth/TokenLoginForm";
 import { useState } from "react";
 import Eds from "../../components/auth/Eds";
 
@@ -43,68 +51,76 @@ const CopyrightText = (
     Центр раскрытия информации <br/>ЗАО "Кыргызская фондовая биржа" © {currentYear}
   </Title>
 );
+const tabLabel = (icon, text) => (
+  <span className="auth-tab-label">
+    {icon}
+    {text}
+  </span>
+);
+
 const tabList = [
   {
-    key: 'login',
-    tab: 'Логин / Пароль',
+    key: "login",
+    tab: tabLabel(<LockOutlined />, "Логин / Пароль"),
   },
   {
-    key: 'rutoken',
-    tab: 'РуТокен',
+    key: "rutoken",
+    tab: tabLabel(<UsbOutlined />, "РуТокен"),
   },
   {
-    key: 'eds',
-    tab: 'Облачная ЭЦП',
+    key: "jacarta",
+    tab: tabLabel(<SafetyCertificateOutlined />, "JaCarta"),
+  },
+  {
+    key: "enotoken",
+    tab: tabLabel(<KeyOutlined />, "EnoToken"),
+  },
+  {
+    key: "eds",
+    tab: tabLabel(<CloudOutlined />, "Облачная ЭЦП"),
   },
 ];
 const contentList = {
-  login: <SignIn/>,
-  rutoken: <Rutoken/>,
-  eds: <Eds/>,
+  login: <SignIn />,
+  rutoken: <Rutoken />,
+  jacarta: <TokenLoginForm kind="jacarta" />,
+  enotoken: <TokenLoginForm kind="enotoken" />,
+  eds: <Eds />,
 };
 
 const Auth = () => {
-  const [activeTab, setActiveTab] = useState('login');
-  const onTabChange = (key) => {
-    setActiveTab(key);
-  };
+  const [activeTab, setActiveTab] = useState("login");
   return (
-    <Row
-      style={{ height: "100vh" }}
-      align="middle"
-      justify="center"
-      gutter={16}
-    >
-      <Col span={24}  xs={20} sm={20} md={24} lg={24}>
-        <Row justify="center">
-          <Col span={8} xs={24} sm={24} md={10} lg={5}>
-            <Space
-              direction="vertical"
-              style={{
-                width: "100%",
-              }}
-            >
+    <div className="auth-page">
+      <Row style={{ minHeight: "100vh" }} align="middle" justify="center">
+        <Col span={24} xs={22} sm={20} md={18} lg={16} xl={14}>
+          <div className="auth-shell">
+            <Space direction="vertical" style={{ width: "100%" }} size={12}>
               {Logo}
               <Card
                 title={LoginButtonText}
                 bordered={false}
-                className="criclebox"
-                tabList={tabList}
-                onTabChange={(key) => {
-                  onTabChange(key);
-                }}
-                tabProps={{
-                  size: 'small',
-                }}
+                className="criclebox auth-login-card"
               >
-                {contentList[activeTab]}
+                <Tabs
+                  tabPosition="left"
+                  activeKey={activeTab}
+                  onChange={setActiveTab}
+                  animated={false}
+                >
+                  {tabList.map((item) => (
+                    <Tabs.TabPane tab={item.tab} key={item.key}>
+                      {activeTab === item.key ? contentList[item.key] : null}
+                    </Tabs.TabPane>
+                  ))}
+                </Tabs>
               </Card>
               {CopyrightText}
             </Space>
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+          </div>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

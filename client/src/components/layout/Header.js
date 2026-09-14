@@ -8,6 +8,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { useLazyLogoutQuery } from "../../store/services/auth-service";
+import { resetTokenSession } from "../../features/auth/tokenHardware";
 
 const toggler = [
   <svg
@@ -32,6 +33,7 @@ function Header({ onPress }) {
   const logoutHandler = () => {
     logout();
     localStorage.removeItem("accessToken");
+    resetTokenSession();
   };
 
   const handleButtonClick = () => {

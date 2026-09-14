@@ -85,6 +85,12 @@ export class ReportsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/sign-payload/:id')
+  getSignPayload(@Param('id') id: number) {
+    return this.reportsService.getSignPayload(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/types')
   getReportTypes() {
     return this.reportsService.getReportTypes();

@@ -44,9 +44,30 @@ const authApi = api.injectEndpoints({
         body: data
       }),
     }),
+    getTokenChallenge: builder.mutation({
+      query: () => ({
+        url: "auth/token/challenge",
+        method: "POST",
+      }),
+    }),
+    loginToken: builder.mutation({
+      query: (data) => ({
+        url: "auth/token/login",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
 export default authApi;
-export const { useLoginMutation, useLazyCheckAuthQuery, useLazyLogoutQuery, useRutokenMutation, useCloudEdsSendPinCodeMutation, useCloudEdsConfirmPinCodeMutation } =
-  authApi;
+export const {
+  useLoginMutation,
+  useLazyCheckAuthQuery,
+  useLazyLogoutQuery,
+  useRutokenMutation,
+  useCloudEdsSendPinCodeMutation,
+  useCloudEdsConfirmPinCodeMutation,
+  useGetTokenChallengeMutation,
+  useLoginTokenMutation,
+} = authApi;

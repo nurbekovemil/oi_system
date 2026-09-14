@@ -119,6 +119,9 @@ const companyApi = api.injectEndpoints({
     getReportTemplate: builder.query({
       query: (tid) => `reports/template/${tid}`,
     }),
+    getReportSignPayload: builder.query({
+      query: (id) => `reports/sign-payload/${id}`,
+    }),
   }),
 });
 
@@ -136,6 +139,7 @@ export const {
   useLazyGetReportByIdQuery,
   useLazyGetReportsQuery,
   useLazyGetReportByGroupTypeQuery,
+  useLazyGetReportSignPayloadQuery,
 
   useUploadReportFileMutation,
   useRemoveReportFileMutation,
