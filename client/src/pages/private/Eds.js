@@ -20,7 +20,11 @@ import {
   useSignRutokenMutation,
 } from "../../store/services/eds-service";
 
-import rutokenplugin from "@aktivco/rutoken-plugin";
+import {
+  listRutokenDevices,
+  loadRutokenPlugin,
+  rutokenFailText,
+} from "../../features/auth/rutokenPlugin";
 import { useLazyGetReportByIdQuery } from "../../store/services/report-service";
 import TokenSignForm from "../../components/eds/TokenSignForm";
 
@@ -77,19 +81,31 @@ const Eds = () => {
     }
   };
 
-  const checkDevices = async () => {
-    const devices = await plugin.enumerateDevices();
-    if (devices && devices.length > 0) {
-      const list = devices.map((device) => ({
-        value: device,
-        label: `Рутокен ЭЦП #${device}`,
-      }));
-      setDeviceList(list);
-      setCurrentRutoken(list[0]);
-    } else {
+  const checkDevices = async (instance = plugin) => {
+    if (!instance) return;
+    try {
+      const devices = await listRutokenDevices(instance);
+      if (devices.length > 0) {
+        const list = devices.map((device) => ({
+          value: device,
+          label: `Рутокен ЭЦП #${device}`,
+        }));
+        setDeviceList(list);
+        setCurrentRutoken(list[0]);
+      } else {
+        setDeviceList([]);
+        setCurrentRutoken({});
+        const text = rutokenFailText(new Error("DEVICE_MISSING"));
+        notification.error({
+          message: text.message,
+          description: text.description,
+        });
+      }
+    } catch (error) {
+      const text = rutokenFailText(error);
       notification.error({
-        message: "Рутокен не обнаружен",
-        description: "Подключите рутокен компьютеру",
+        message: text.message,
+        description: text.description,
       });
     }
   };
@@ -141,37 +157,40 @@ const Eds = () => {
       sendPinCode();
     }
     if (eds && eds === 2 && !isSuccessSignRutoken) {
-      rutokenplugin.ready
-        .then(function () {
-          const isFirefox =
-            !!window.navigator.userAgent.match(/firefox/i) &&
-            !window.navigator.userAgent.match(/seamonkey/i);
-
-          if (window.chrome || isFirefox) {
-            return rutokenplugin.isExtensionInstalled();
+      let cancelled = false;
+      (async () => {
+        try {
+          const instance = await loadRutokenPlugin();
+          if (cancelled) return;
+          setPlugin(instance);
+          const devices = await listRutokenDevices(instance);
+          if (cancelled) return;
+          if (devices.length > 0) {
+            const list = devices.map((device) => ({
+              value: device,
+              label: `Рутокен ЭЦП #${device}`,
+            }));
+            setDeviceList(list);
+            setCurrentRutoken(list[0]);
           } else {
-            return Promise.resolve(true);
-          }
-        })
-        .then(function (result) {
-          if (result) {
-            return rutokenplugin.isPluginInstalled();
-          } else {
-            notification.info({
-              message: "Расширение для Рутокен не установлено",
+            const text = rutokenFailText(new Error("DEVICE_MISSING"));
+            notification.error({
+              message: text.message,
+              description: text.description,
             });
           }
-        })
-        .then(function (result) {
-          if (result) {
-            return rutokenplugin.loadPlugin();
-          } else {
-            notification.info({ message: "Адаптер Рутокен Плагин не найдено" });
-          }
-        })
-        .then(function (plugin) {
-          setPlugin(plugin);
-        });
+        } catch (error) {
+          if (cancelled) return;
+          const text = rutokenFailText(error);
+          notification.error({
+            message: text.message,
+            description: text.description,
+          });
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
     }
     if (
       (eds === 1 && isSuccessConfirmPin) ||
@@ -244,7 +263,7 @@ const Eds = () => {
               <Col span={8}>
                 <Select
                   placeholder="Выберете устройства"
-                  value={currentRutoken}
+                  value={currentRutoken.value ?? null}
                   style={{
                     width: "100%",
                   }}
@@ -271,7 +290,7 @@ const Eds = () => {
               <Row gutter={8} style={{ marginBottom: "16px" }}>
                 <Col span={8}>
                   <Select
-                    value={currentCert}
+                    value={currentCert.value ?? null}
                     style={{
                       width: "100%",
                     }}

@@ -1,9 +1,13 @@
 import { Button, Col, Form, Input, Row, Select, notification,} from "antd";
-import { useLoginMutation, useRutokenMutation } from "../../store/services/auth-service";
+import { useRutokenMutation } from "../../store/services/auth-service";
 import { SyncOutlined, UserOutlined } from "@ant-design/icons";
-import rutokenplugin from "@aktivco/rutoken-plugin";
 import { useEffect, useState } from "react";
 import Link from "antd/lib/typography/Link";
+import {
+  listRutokenDevices,
+  loadRutokenPlugin,
+  rutokenFailText,
+} from "../../features/auth/rutokenPlugin";
 
 const Rutoken = () => {
   const [pin, setPin] = useState("");
@@ -15,7 +19,26 @@ const Rutoken = () => {
   const [certList, setCertList] = useState([]);
 
   const [rutoken] = useRutokenMutation()
-    // RuToken error handlers
+  const [scanning, setScanning] = useState(false);
+
+  const showFail = (error) => {
+    const text = rutokenFailText(error);
+    notification.error({
+      message: text.message,
+      description: text.href ? (
+        <span>
+          {text.description}{" "}
+          <Link href={text.href} target="_blank">
+            {text.hrefText}
+          </Link>
+        </span>
+      ) : (
+        text.description
+      ),
+      duration: 10,
+    });
+  };
+
     const handleError = (reason) => {
       let errorCodes = plugin.errorCodes;
       if (isNaN(reason.message)) {
@@ -26,10 +49,13 @@ const Rutoken = () => {
       }
     };
 
-  const checkDevices = async () => {
+  const checkDevices = async (instance = plugin, isActive = () => true) => {
+    if (!instance) return;
+    setScanning(true);
     try {
-      const devices = await plugin.enumerateDevices();
-      if (devices && devices.length > 0) {
+      const devices = await listRutokenDevices(instance);
+      if (!isActive()) return;
+      if (devices.length > 0) {
         const list = devices.map((device) => ({
           value: device,
           label: `Рутокен ЭЦП #${device}`,
@@ -37,13 +63,14 @@ const Rutoken = () => {
         setDeviceList(list);
         setCurrentRutoken(list[0]);
       } else {
-        notification.error({
-          message: "Рутокен не обнаружен",
-          description: "Подключите рутокен компьютеру",
-        });
+        setDeviceList([]);
+        setCurrentRutoken({});
+        showFail(new Error("DEVICE_MISSING"));
       }
     } catch (error) {
-      notification.info({ message: error});
+      showFail(error);
+    } finally {
+      setScanning(false);
     }
   };
   const checkCerts = async () => {
@@ -87,41 +114,22 @@ const Rutoken = () => {
     }, handleError);
   };
 
-  useEffect( () => {
-    rutokenplugin.ready
-      .then(function () {
-        const isFirefox =
-          !!window.navigator.userAgent.match(/firefox/i) &&
-          !window.navigator.userAgent.match(/seamonkey/i);
-        if (window.chrome || isFirefox) {
-          return rutokenplugin.isExtensionInstalled();
-        } else {
-          return Promise.resolve(true);
-        }
-      })
-      .then(function (result) {
-        if (result) {
-          return rutokenplugin.isPluginInstalled();
-        } else {
-          notification.error({
-            message: "Адаптер Рутокен Плагин не установлен в браузере",
-            btn: <Link href="https://chromewebstore.google.com/detail/%D0%B0%D0%B4%D0%B0%D0%BF%D1%82%D0%B5%D1%80-%D1%80%D1%83%D1%82%D0%BE%D0%BA%D0%B5%D0%BD-%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD/ohedcglhbbfdgaogjhcclacoccbagkjg?hl=ru" target="_blank">
-            Установить плагин для браузера
-          </Link>,
-          duration: 8
-          });
-        }
-      })
-      .then(function (result) {
-        if (result) {
-          return rutokenplugin.loadPlugin();
-        } else {
-          notification.error({ message: "Рутокен Плагин не установлено в компьютере", btn: <Link href="https://download.rutoken.ru/Rutoken_Plugin/4.8.0.0/Windows/RutokenPlugin.msi">Скачать плагин для ОС</Link> });
-        }
-      })
-      .then(function (plugin) {
-        setPlugin(plugin);
-      })
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const instance = await loadRutokenPlugin();
+        if (cancelled) return;
+        setPlugin(instance);
+        await checkDevices(instance, () => !cancelled);
+      } catch (error) {
+        if (!cancelled) showFail(error);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); 
   return (
     <>
@@ -131,10 +139,11 @@ const Rutoken = () => {
             <Form.Item>
               <Button
                 disabled={!plugin}
+                loading={scanning}
                 type="default"
                 className="auth-refresh-btn"
                 style={{ width: "100%" }}
-                onClick={checkDevices}
+                onClick={() => checkDevices()}
                 icon={<SyncOutlined />}
               >
                             Обновить список рутокенов
@@ -143,8 +152,8 @@ const Rutoken = () => {
             <Form.Item label="Выберете устройства">
               <Select
                       placeholder="Выберете устройства"
-                      disabled={!Object.keys(currentRutoken).length != 0}
-                      value={currentRutoken}
+                      disabled={!deviceList.length}
+                      value={currentRutoken.value ?? null}
                       style={{
                         width: "100%",
                       }}
@@ -168,8 +177,8 @@ const Rutoken = () => {
             </Form.Item>
             <Form.Item label="Выберите сертификат">
               <Select
-                disabled={!Object.keys(currentCert).length != 0}
-                value={currentCert}
+                disabled={!certList.length}
+                value={currentCert.value ?? null}
                 style={{
                   width: "100%",
                 }}
