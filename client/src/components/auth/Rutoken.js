@@ -6,6 +6,9 @@ import Link from "antd/lib/typography/Link";
 import {
   listRutokenDevices,
   loadRutokenPlugin,
+  loginRutoken,
+  logoutRutoken,
+  rutokenErrorText,
   rutokenFailText,
 } from "../../features/auth/rutokenPlugin";
 
@@ -38,16 +41,6 @@ const Rutoken = () => {
       duration: 10,
     });
   };
-
-    const handleError = (reason) => {
-      let errorCodes = plugin.errorCodes;
-      if (isNaN(reason.message)) {
-        notification.error({ message: reason });
-      }
-      if (parseInt(reason.message) == errorCodes.PIN_INCORRECT) {
-        notification.error({ message: "Неверный пин код" });
-      }
-    };
 
   const checkDevices = async (instance = plugin, isActive = () => true) => {
     if (!instance) return;
@@ -103,15 +96,20 @@ const Rutoken = () => {
   };
 
   const confirmRotokenPinCide = async () => {
-    plugin.login(currentRutoken.value, pin).then(async () => {
-        const {INN: user_inn, serialNumber: company_inn} = currentCert.data
-        const props = {
-          user_inn,
-          company_inn
-        }
-        await rutoken(props)
-
-    }, handleError);
+    const device = currentRutoken.value;
+    try {
+      await loginRutoken(plugin, device, pin);
+    } catch (error) {
+      notification.error({ message: rutokenErrorText(plugin, error) });
+      return;
+    }
+    await logoutRutoken(plugin, device);
+    const {INN: user_inn, serialNumber: company_inn} = currentCert.data
+    const props = {
+      user_inn,
+      company_inn
+    }
+    await rutoken(props)
   };
 
   useEffect(() => {

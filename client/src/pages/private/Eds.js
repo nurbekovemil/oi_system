@@ -21,8 +21,12 @@ import {
 } from "../../store/services/eds-service";
 
 import {
+  listRutokenCerts,
   listRutokenDevices,
   loadRutokenPlugin,
+  loginRutoken,
+  logoutRutoken,
+  rutokenErrorText,
   rutokenFailText,
 } from "../../features/auth/rutokenPlugin";
 import { useLazyGetReportByIdQuery } from "../../store/services/report-service";
@@ -46,6 +50,7 @@ const Eds = () => {
   const [certList, setCertList] = useState([]);
   const [signRutoken, { isSuccess: isSuccessSignRutoken }] =
     useSignRutokenMutation();
+  const [isSigningRutoken, setIsSigningRutoken] = useState(false);
 
   // Eds handlers
   const [
@@ -70,17 +75,6 @@ const Eds = () => {
     setEds(e.target.value);
   };
 
-  // RuToken error handlers
-  const handleError = (reason) => {
-    let errorCodes = plugin.errorCodes;
-    if (isNaN(reason.message)) {
-      notification.error({ message: reason });
-    }
-    if (parseInt(reason.message) == errorCodes.PIN_INCORRECT) {
-      notification.error({ message: "Неверный пин код" });
-    }
-  };
-
   const checkDevices = async (instance = plugin) => {
     if (!instance) return;
     try {
@@ -92,6 +86,7 @@ const Eds = () => {
         }));
         setDeviceList(list);
         setCurrentRutoken(list[0]);
+        await checkCerts(instance, list[0].value);
       } else {
         setDeviceList([]);
         setCurrentRutoken({});
@@ -109,47 +104,49 @@ const Eds = () => {
       });
     }
   };
-  const checkCerts = async () => {
-    const certs = await plugin.enumerateCertificates(currentRutoken.value, 0);
-    if (certs.length > 0) {
-      let list = [];
-      for (let cert of certs) {
-        const { subject } = await plugin.parseCertificate(
-          currentRutoken.value,
-          cert
-        );
-        const parseCertList = subject.reduce((acc, item) => {
-          acc[item.rdn] = item.value;
-          return acc;
-        }, {});
-        list = [
-          ...list,
-          {
-            value: cert,
-            label: `${parseCertList.commonName} | ${parseCertList.organizationName}`,
-            data: { ...parseCertList, cert },
-          },
-        ];
-      }
+  const checkCerts = async (instance = plugin, device = currentRutoken.value) => {
+    if (!instance || device === undefined) return;
+    try {
+      const list = await listRutokenCerts(instance, device);
       setCertList(list);
-      setCurrentCert(list[0]);
-    } else {
-      notification.error({ message: "Сертификат на Рутокен не обнаружен" });
+      setCurrentCert(list[0] || {});
+      if (!list.length) {
+        notification.error({ message: "Сертификат на Рутокен не обнаружен" });
+      }
+    } catch (error) {
+      notification.error({ message: rutokenErrorText(instance, error) });
     }
   };
   const confirmRotokenPinCide = async (pin) => {
-    const { data } = await getReportById(reportId);
-    plugin.login(currentRutoken.value, pin).then(async () => {
-      var options = {};
+    if (!plugin || currentRutoken.value === undefined || !currentCert.value) {
+      notification.error({ message: "Выберите Рутокен и сертификат" });
+      return;
+    }
+    const device = currentRutoken.value;
+    setIsSigningRutoken(true);
+    try {
+      const { data } = await getReportById(reportId);
+      if (!data) throw new Error("Не удалось загрузить отчёт");
+      await loginRutoken(plugin, device, pin);
       const hash = await plugin.sign(
-        currentRutoken.value,
+        device,
         currentCert.value,
         JSON.stringify(data.content),
         plugin.DATA_FORMAT_PLAIN,
-        options
+        {}
       );
-      signRutoken({ reportId, hash, cert: currentCert.data });
-    }, handleError);
+      await signRutoken({ reportId, hash, cert: currentCert.data }).unwrap();
+    } catch (error) {
+      const serverMessage = error?.data?.message;
+      notification.error({
+        message: serverMessage
+          ? String(serverMessage)
+          : rutokenErrorText(plugin, error),
+      });
+    } finally {
+      await logoutRutoken(plugin, device);
+      setIsSigningRutoken(false);
+    }
   };
 
   useEffect(() => {
@@ -172,6 +169,7 @@ const Eds = () => {
             }));
             setDeviceList(list);
             setCurrentRutoken(list[0]);
+            await checkCerts(instance, list[0].value);
           } else {
             const text = rutokenFailText(new Error("DEVICE_MISSING"));
             notification.error({
@@ -268,7 +266,12 @@ const Eds = () => {
                     width: "100%",
                   }}
                   options={deviceList}
-                  onChange={(value, option) => setCurrentRutoken(option)}
+                  onChange={(value, option) => {
+                    setCurrentRutoken(option);
+                    setCertList([]);
+                    setCurrentCert({});
+                    checkCerts(plugin, value);
+                  }}
                 />
               </Col>
               <Col span={6}>
@@ -279,7 +282,7 @@ const Eds = () => {
                     background: "#57b6c0",
                     borderColor: "#57b6c0",
                   }}
-                  onClick={checkDevices}
+                  onClick={() => checkDevices()}
                   icon={<SyncOutlined />}
                 >
                   Обновить список рутокенов
@@ -307,7 +310,7 @@ const Eds = () => {
                       background: "#57b6c0",
                       borderColor: "#57b6c0",
                     }}
-                    onClick={checkCerts}
+                    onClick={() => checkCerts()}
                   >
                     Обновить список сертификатов
                   </Button>
@@ -318,17 +321,19 @@ const Eds = () => {
             {Object.keys(currentCert).length != 0 && (
               <Row gutter={8}>
                 <Col span={8}>
-                  <Input
+                  <Input.Password
                     style={{
                       width: "100%",
                     }}
                     placeholder="Введите пин код"
                     onChange={(e) => setPin(e.target.value)}
+                    onPressEnter={confirmPinCodeHandler}
                   />
                 </Col>
                 <Col span={6}>
                   <Button
                     type="primary"
+                    loading={isSigningRutoken}
                     onClick={confirmPinCodeHandler}
                     style={{
                       width: "100%",

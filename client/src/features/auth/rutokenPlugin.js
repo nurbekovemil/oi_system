@@ -52,7 +52,7 @@ export function rutokenFailText(error) {
   return {
     message: "Рутокен не обнаружен",
     description:
-      "Подключите токен и нажмите «Обновить». Если на других сайтах он есть, разрешите адаптеру доступ к этому сайту и обновите страницу.",
+      "Подключите Рутокен к компьютеру и нажмите «Обновить список рутокенов». Если устройство подключено, но не определяется, проверьте, что расширению «Адаптер Рутокен Плагин» предоставлен доступ к данному сайту, и перезагрузите страницу.",
   };
 }
 
@@ -94,4 +94,76 @@ export async function listRutokenDevices(plugin) {
     await delay(300);
   } while (Date.now() < deadline);
   return devices;
+}
+
+function errorCode(error) {
+  const code = parseInt(error?.message ?? error, 10);
+  return Number.isNaN(code) ? null : code;
+}
+
+export function rutokenErrorText(plugin, error) {
+  const codes = plugin?.errorCodes || {};
+  const code = errorCode(error);
+  if (code === null) return String(error?.message || error || "Неизвестная ошибка");
+  if (code === codes.PIN_INCORRECT) return "Неверный пин код";
+  if (code === codes.PIN_LOCKED) return "Пин код заблокирован";
+  if (code === codes.PIN_LENGTH_INVALID) return "Неверная длина пин кода";
+  if (code === codes.DEVICE_NOT_FOUND) return "Рутокен отключён. Подключите его и обновите список";
+  if (code === codes.CERTIFICATE_NOT_FOUND) return "Сертификат не найден на Рутокене";
+  const name = Object.keys(codes).find((key) => codes[key] === code);
+  return `Ошибка Рутокен: ${name || code}`;
+}
+
+// Токен может остаться залогиненным после входа на сайт через Рутокен —
+// повторный login тогда падает с ALREADY_LOGGED_IN, поэтому сначала выходим.
+export async function loginRutoken(plugin, device, pin) {
+  try {
+    await plugin.logout(device);
+  } catch (e) {
+    // не был залогинен
+  }
+  try {
+    await plugin.login(device, pin);
+  } catch (error) {
+    if (errorCode(error) !== plugin.errorCodes?.ALREADY_LOGGED_IN) throw error;
+  }
+}
+
+export async function logoutRutoken(plugin, device) {
+  try {
+    await plugin.logout(device);
+  } catch (e) {
+    // уже не залогинен
+  }
+}
+
+export async function listRutokenCerts(plugin, device) {
+  const categories = [
+    plugin.CERT_CATEGORY_USER ?? 1,
+    plugin.CERT_CATEGORY_UNSPEC ?? 0,
+  ];
+  const ids = [];
+  for (const category of categories) {
+    try {
+      for (const id of toArray(await plugin.enumerateCertificates(device, category))) {
+        if (!ids.includes(id)) ids.push(id);
+      }
+    } catch (e) {
+      // категория не поддерживается
+    }
+  }
+  const list = [];
+  for (const cert of ids) {
+    const { subject } = await plugin.parseCertificate(device, cert);
+    const fields = subject.reduce((acc, item) => {
+      acc[item.rdn] = item.value;
+      return acc;
+    }, {});
+    list.push({
+      value: cert,
+      label: `${fields.commonName} | ${fields.organizationName}`,
+      data: { ...fields, cert },
+    });
+  }
+  return list;
 }
